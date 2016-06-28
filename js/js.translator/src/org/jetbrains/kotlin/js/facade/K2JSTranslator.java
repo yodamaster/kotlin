@@ -78,7 +78,7 @@ public final class K2JSTranslator {
         ModuleDescriptor moduleDescriptor = analysisResult.getModuleDescriptor();
         Diagnostics diagnostics = bindingTrace.getBindingContext().getDiagnostics();
 
-        TranslationContext context = Translation.generateAst(bindingTrace, files, mainCallParameters, config);
+        TranslationContext context = Translation.generateAst(bindingTrace, files, mainCallParameters, moduleDescriptor, config);
         ProgressIndicatorAndCompilationCanceledStatus.checkCanceled();
         if (hasError(diagnostics)) return new TranslationResult.Fail(diagnostics);
 
@@ -95,6 +95,7 @@ public final class K2JSTranslator {
         ProgressIndicatorAndCompilationCanceledStatus.checkCanceled();
 
         List<String> importedModules = new ArrayList<String>(context.getImportedModules().keySet());
-        return new TranslationResult.Success(config, files, program, diagnostics, importedModules, moduleDescriptor);
+        return new TranslationResult.Success(config, files, program, diagnostics, importedModules, moduleDescriptor,
+                                             bindingTrace.getBindingContext());
     }
 }
