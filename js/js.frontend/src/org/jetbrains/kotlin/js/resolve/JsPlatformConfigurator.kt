@@ -22,6 +22,7 @@ import org.jetbrains.kotlin.container.useInstance
 import org.jetbrains.kotlin.js.resolve.diagnostics.JsCallChecker
 import org.jetbrains.kotlin.js.resolve.diagnostics.JsNameChecker
 import org.jetbrains.kotlin.js.resolve.diagnostics.JsNameClashChecker
+import org.jetbrains.kotlin.js.resolve.diagnostics.JsModuleChecker
 import org.jetbrains.kotlin.js.resolve.diagnostics.NativeInnerClassChecker
 import org.jetbrains.kotlin.platform.PlatformToKotlinClassMap
 import org.jetbrains.kotlin.resolve.IdentifierChecker
@@ -35,7 +36,7 @@ import org.jetbrains.kotlin.types.DynamicTypesAllowed
 object JsPlatformConfigurator : PlatformConfigurator(
         DynamicTypesAllowed(),
         additionalDeclarationCheckers = listOf(NativeInvokeChecker(), NativeGetterChecker(), NativeSetterChecker(),
-                                               NativeInnerClassChecker(), JsNameChecker),
+                                               NativeInnerClassChecker(), JsNameChecker, JsModuleChecker),
         additionalCallCheckers = listOf(),
         additionalTypeCheckers = listOf(),
         additionalClassifierUsageCheckers = listOf(),
