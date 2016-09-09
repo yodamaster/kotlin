@@ -1759,12 +1759,6 @@ public class BoxJsTestGenerated extends AbstractBoxJsTest {
                 doTest(fileName);
             }
 
-            @TestMetadata("noRuntimeTypeCheck.kt")
-            public void testNoRuntimeTypeCheck() throws Exception {
-                String fileName = KotlinTestUtils.navigationMetadata("js/js.translator/testData/box/expression/cast/noRuntimeTypeCheck.kt");
-                doTest(fileName);
-            }
-
             @TestMetadata("primitiveToClass.kt")
             public void testPrimitiveToClass() throws Exception {
                 String fileName = KotlinTestUtils.navigationMetadata("js/js.translator/testData/box/expression/cast/primitiveToClass.kt");
