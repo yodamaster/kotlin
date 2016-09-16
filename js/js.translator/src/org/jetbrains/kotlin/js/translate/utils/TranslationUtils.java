@@ -32,6 +32,7 @@ import org.jetbrains.kotlin.js.translate.general.Translation;
 import org.jetbrains.kotlin.psi.*;
 import org.jetbrains.kotlin.resolve.BindingContext;
 import org.jetbrains.kotlin.resolve.DescriptorUtils;
+import org.jetbrains.kotlin.resolve.descriptorUtil.DescriptorUtilsKt;
 import org.jetbrains.kotlin.types.KotlinType;
 
 import java.util.ArrayList;
@@ -298,5 +299,12 @@ public final class TranslationUtils {
         }
         DeclarationDescriptor descriptor = context.bindingContext().get(BindingContext.REFERENCE_TARGET, ((KtSimpleNameExpression) expression));
         return !(descriptor instanceof LocalVariableDescriptor) || !((LocalVariableDescriptor) descriptor).isDelegated();
+    }
+
+    public static boolean isOverridableFunctionWithDefaultParameters(@NotNull FunctionDescriptor descriptor) {
+        return DescriptorUtilsKt.hasParametersWithDefaultValue(descriptor) &&
+            !(descriptor instanceof ConstructorDescriptor) &&
+            descriptor.getContainingDeclaration() instanceof ClassDescriptor &&
+            (descriptor.getModality() == Modality.ABSTRACT || descriptor.getModality() == Modality.OPEN);
     }
 }

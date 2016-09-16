@@ -105,13 +105,9 @@ public class DeclarationBodyVisitor extends TranslatorVisitor<Void> {
     @Override
     public Void visitNamedFunction(@NotNull KtNamedFunction expression, TranslationContext context) {
         FunctionDescriptor descriptor = getFunctionDescriptor(context.bindingContext(), expression);
-        if (descriptor.getModality() == Modality.ABSTRACT) {
-            return null;
-        }
 
         context = context.newDeclaration(descriptor, context.getDefinitionPlace());
-        JsPropertyInitializer methodAsPropertyInitializer = Translation.functionTranslator(expression, context).translateAsMethod();
-        result.add(methodAsPropertyInitializer);
+        result.addAll(Translation.functionTranslator(expression, context).translateAsMethod());
         return null;
     }
 

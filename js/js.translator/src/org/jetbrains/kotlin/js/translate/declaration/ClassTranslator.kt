@@ -176,7 +176,9 @@ class ClassTranslator private constructor(
         }
 
         // Translate constructor body
-        val constructorInitializer = FunctionTranslator.newInstance(constructor, context).translateAsMethod()
+        val constructorInitializers = FunctionTranslator.newInstance(constructor, context).translateAsMethod()
+        assert(constructorInitializers.size == 1) { "One initializer expected when translating constructor $constructor" }
+        val constructorInitializer = constructorInitializers[0]
         val constructorFunction = constructorInitializer.valueExpr as JsFunction
 
         // Translate super/this call

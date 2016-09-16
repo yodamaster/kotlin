@@ -68,6 +68,10 @@ public class DefaultArgumentsTest extends SingleFileTranslationTest {
         checkFooBoxIsOk();
     }
 
+    public void testComplexExpressionAsOverriddenDefaultArgument() throws Exception {
+        checkFooBoxIsOk();
+    }
+
     public void testDefaultArgumentsInFunctionWithExpressionAsBody() throws Exception {
         checkFooBoxIsOk();
     }
@@ -81,6 +85,14 @@ public class DefaultArgumentsTest extends SingleFileTranslationTest {
     }
 
     public void testEnumSuperConstructor() throws Exception {
+        checkFooBoxIsOk();
+    }
+
+    public void testSuperCall() throws Exception {
+        checkFooBoxIsOk();
+    }
+
+    public void testComplexExpressionAsConstructorDefaultArgument() throws Exception {
         checkFooBoxIsOk();
     }
 }

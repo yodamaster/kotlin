@@ -26,6 +26,7 @@ import org.jetbrains.kotlin.js.translate.context.hasCapturedExceptContaining
 import org.jetbrains.kotlin.js.translate.context.isCaptured
 import org.jetbrains.kotlin.js.translate.general.AbstractTranslator
 import org.jetbrains.kotlin.js.translate.utils.BindingUtils.getFunctionDescriptor
+import org.jetbrains.kotlin.js.translate.utils.FunctionBodyTranslator.setDefaultValueForArguments
 import org.jetbrains.kotlin.js.translate.utils.FunctionBodyTranslator.translateFunctionBody
 import org.jetbrains.kotlin.js.translate.utils.JsAstUtils
 import org.jetbrains.kotlin.js.translate.utils.TranslationUtils.simpleReturnFunction
@@ -41,7 +42,9 @@ class LiteralFunctionTranslator(context: TranslationContext) : AbstractTranslato
         val functionContext = invokingContext.newFunctionBodyWithUsageTracker(lambda, descriptor)
 
         FunctionTranslator.addParameters(lambda.parameters, descriptor, functionContext)
-        val functionBody = translateFunctionBody(descriptor, declaration, functionContext)
+        val functionBody = JsBlock()
+        functionBody.statements += setDefaultValueForArguments(descriptor, functionContext)
+        translateFunctionBody(descriptor, declaration, functionContext, functionBody)
         lambda.body.statements.addAll(functionBody.statements)
         lambda.functionDescriptor = descriptor
 

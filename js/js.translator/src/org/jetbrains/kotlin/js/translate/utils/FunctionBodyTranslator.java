@@ -20,7 +20,6 @@ import com.google.dart.compiler.backend.js.ast.*;
 import com.google.dart.compiler.backend.js.ast.metadata.MetadataProperties;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns;
-import org.jetbrains.kotlin.descriptors.ConstructorDescriptor;
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor;
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor;
 import org.jetbrains.kotlin.js.translate.context.Namer;
@@ -30,7 +29,6 @@ import org.jetbrains.kotlin.js.translate.general.Translation;
 import org.jetbrains.kotlin.js.translate.utils.mutator.Mutator;
 import org.jetbrains.kotlin.psi.KtDeclarationWithBody;
 import org.jetbrains.kotlin.psi.KtExpression;
-import org.jetbrains.kotlin.resolve.descriptorUtil.DescriptorUtilsKt;
 import org.jetbrains.kotlin.types.KotlinType;
 
 import java.util.ArrayList;
@@ -42,11 +40,13 @@ import static org.jetbrains.kotlin.js.translate.utils.mutator.LastExpressionMuta
 
 public final class FunctionBodyTranslator extends AbstractTranslator {
 
-    @NotNull
-    public static JsBlock translateFunctionBody(@NotNull FunctionDescriptor descriptor,
-                                                @NotNull KtDeclarationWithBody declarationWithBody,
-                                                @NotNull TranslationContext functionBodyContext) {
-        return (new FunctionBodyTranslator(descriptor, declarationWithBody, functionBodyContext)).translate();
+    public static void translateFunctionBody(
+            @NotNull FunctionDescriptor descriptor,
+            @NotNull KtDeclarationWithBody declarationWithBody,
+            @NotNull TranslationContext functionBodyContext,
+            @NotNull JsBlock block
+    ) {
+        new FunctionBodyTranslator(descriptor, declarationWithBody, functionBodyContext).translate(block);
     }
 
     @NotNull
@@ -56,7 +56,7 @@ public final class FunctionBodyTranslator extends AbstractTranslator {
 
         List<JsStatement> result = new ArrayList<JsStatement>(valueParameters.size());
         for (ValueParameterDescriptor valueParameter : valueParameters) {
-            if (!DescriptorUtilsKt.hasDefaultValue(valueParameter)) continue;
+            if (!valueParameter.declaresDefaultValue()) continue;
 
             JsNameRef jsNameRef = functionBodyContext.getNameForDescriptor(valueParameter).makeRef();
             KtExpression defaultArgument = getDefaultArgument(valueParameter);
@@ -85,17 +85,12 @@ public final class FunctionBodyTranslator extends AbstractTranslator {
         this.declaration = declaration;
     }
 
-    @NotNull
-    private JsBlock translate() {
+    private void translate(@NotNull JsBlock jsBlock) {
         KtExpression jetBodyExpression = declaration.getBodyExpression();
         assert jetBodyExpression != null : "Cannot translate a body of an abstract function.";
-        JsBlock jsBlock = new JsBlock();
-        if (!(descriptor instanceof ConstructorDescriptor) || ((ConstructorDescriptor) descriptor).isPrimary()) {
-            jsBlock.getStatements().addAll(setDefaultValueForArguments(descriptor, context()));
-        }
 
-        jsBlock.getStatements().addAll(mayBeWrapWithReturn(Translation.translateExpression(jetBodyExpression, context(), jsBlock)).getStatements());
-        return jsBlock;
+        JsNode body = Translation.translateExpression(jetBodyExpression, context(), jsBlock);
+        jsBlock.getStatements().addAll(mayBeWrapWithReturn(body).getStatements());
     }
 
     @NotNull

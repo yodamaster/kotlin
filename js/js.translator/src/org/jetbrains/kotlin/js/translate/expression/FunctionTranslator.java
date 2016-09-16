@@ -18,23 +18,23 @@ package org.jetbrains.kotlin.js.translate.expression;
 
 import com.google.dart.compiler.backend.js.ast.*;
 import com.google.dart.compiler.backend.js.ast.metadata.MetadataProperties;
-import com.intellij.util.SmartList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.kotlin.builtins.KotlinBuiltIns;
 import org.jetbrains.kotlin.descriptors.*;
 import org.jetbrains.kotlin.js.translate.context.AliasingContext;
 import org.jetbrains.kotlin.js.translate.context.Namer;
 import org.jetbrains.kotlin.js.translate.context.TranslationContext;
 import org.jetbrains.kotlin.js.translate.general.AbstractTranslator;
+import org.jetbrains.kotlin.js.translate.utils.FunctionBodyTranslator;
 import org.jetbrains.kotlin.js.translate.utils.TranslationUtils;
 import org.jetbrains.kotlin.psi.KtDeclarationWithBody;
 import org.jetbrains.kotlin.psi.KtLambdaExpression;
 import org.jetbrains.kotlin.resolve.DescriptorUtils;
 import org.jetbrains.kotlin.resolve.descriptorUtil.DescriptorUtilsKt;
+import org.jetbrains.kotlin.types.KotlinType;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.jetbrains.kotlin.js.translate.reference.CallExpressionTranslator.shouldBeInlined;
 import static org.jetbrains.kotlin.js.translate.utils.BindingUtils.getFunctionDescriptor;
@@ -90,26 +90,79 @@ public final class FunctionTranslator extends AbstractTranslator {
 
     @NotNull
     public JsPropertyInitializer translateAsEcma5PropertyDescriptor() {
-        generateFunctionObject();
+        List<JsParameter> parameters = new ArrayList<JsParameter>();
+        functionBodyContext = translateParameters(functionBodyContext, parameters);
+        setParameters(functionObject, parameters);
+        translateBody();
         return TranslationUtils.translateFunctionAsEcma5PropertyDescriptor(functionObject, descriptor, context());
     }
 
     @NotNull
-    public JsPropertyInitializer translateAsMethod() {
+    public List<JsPropertyInitializer> translateAsMethod() {
         JsName functionName = context().getNameForDescriptor(descriptor);
-        generateFunctionObject();
 
         if (shouldBeInlined(descriptor) && DescriptorUtilsKt.isEffectivelyPublicApi(descriptor)) {
+            translateSimple();
             InlineMetadata metadata = InlineMetadata.compose(functionObject, descriptor);
-            return new JsPropertyInitializer(functionName.makeRef(), metadata.getFunctionWithMetadata());
+            return Collections.singletonList(new JsPropertyInitializer(functionName.makeRef(), metadata.getFunctionWithMetadata()));
         }
 
-        return new JsPropertyInitializer(functionName.makeRef(), functionObject);
+        List<JsPropertyInitializer> propertyInitializers = new ArrayList<JsPropertyInitializer>();
+        if (TranslationUtils.isOverridableFunctionWithDefaultParameters(descriptor)) {
+            JsName bodyName = context().scope().declareName(functionName.getIdent() + Namer.DEFAULT_PARAMETER_IMPLEMENTOR_SUFFIX);
+            if (DescriptorUtilsKt.hasOwnParametersWithDefaultValue(descriptor)) {
+                propertyInitializers.add(new JsPropertyInitializer(functionName.makeRef(), translateCaller(bodyName)));
+            }
+
+            if (descriptor.getModality() != Modality.ABSTRACT) {
+                functionBodyContext = translateParameters(functionBodyContext, functionObject.getParameters());
+                translateBody();
+                propertyInitializers.add(new JsPropertyInitializer(bodyName.makeRef(), functionObject));
+            }
+        }
+        else if (descriptor.getModality() != Modality.ABSTRACT) {
+            translateSimple();
+            propertyInitializers.add(new JsPropertyInitializer(functionName.makeRef(), functionObject));
+        }
+
+        return propertyInitializers;
     }
 
-    private void generateFunctionObject() {
-        setParameters(functionObject, translateParameters());
+    private void translateSimple() {
+        functionBodyContext = translateParameters(functionBodyContext, functionObject.getParameters());
+        if (!(descriptor instanceof ConstructorDescriptor) || (((ConstructorDescriptor) descriptor).isPrimary())) {
+            functionObject.getBody().getStatements().addAll(
+                    FunctionBodyTranslator.setDefaultValueForArguments(descriptor, functionBodyContext));
+        }
         translateBody();
+    }
+
+    private JsFunction translateCaller(JsName bodyName) {
+        JsFunction callerFunction = new JsFunction(context().scope(), new JsBlock(), "");
+        TranslationContext context = context().contextWithScope(callerFunction);
+        context = translateParameters(context, callerFunction.getParameters());
+
+        JsName callbackName = callerFunction.getScope().declareFreshName("callback" + Namer.DEFAULT_PARAMETER_IMPLEMENTOR_SUFFIX);
+        JsExpression callee = new JsNameRef(bodyName, JsLiteral.THIS);
+
+        JsInvocation defaultInvocation = new JsInvocation(callee, new ArrayList<JsExpression>());
+        JsInvocation callbackInvocation = new JsInvocation(callbackName.makeRef());
+        JsExpression chosenInvocation = new JsConditional(callbackName.makeRef(), callbackInvocation, defaultInvocation);
+
+        for (JsParameter parameter : callerFunction.getParameters()) {
+            defaultInvocation.getArguments().add(parameter.getName().makeRef());
+            callbackInvocation.getArguments().add(parameter.getName().makeRef());
+        }
+
+        callerFunction.getParameters().add(new JsParameter(callbackName));
+        callerFunction.getBody().getStatements().addAll(FunctionBodyTranslator.setDefaultValueForArguments(descriptor, context));
+
+        KotlinType returnType = descriptor.getReturnType();
+        assert returnType != null : "Function descriptor is meant to be initialized here: " + descriptor;
+        JsStatement statement = KotlinBuiltIns.isUnit(returnType) ? chosenInvocation.makeStmt() : new JsReturn(chosenInvocation);
+        callerFunction.getBody().getStatements().add(statement);
+
+        return callerFunction;
     }
 
     private void translateBody() {
@@ -117,13 +170,11 @@ public final class FunctionTranslator extends AbstractTranslator {
             assert descriptor instanceof ConstructorDescriptor || descriptor.getModality().equals(Modality.ABSTRACT);
             return;
         }
-        JsBlock body = translateFunctionBody(descriptor, functionDeclaration, functionBodyContext);
-        functionObject.getBody().getStatements().addAll(body.getStatements());
+        translateFunctionBody(descriptor, functionDeclaration, functionBodyContext, functionObject.getBody());
     }
 
     @NotNull
-    private List<JsParameter> translateParameters() {
-        List<JsParameter> jsParameters = new SmartList<JsParameter>();
+    private TranslationContext translateParameters(@NotNull TranslationContext context, @NotNull List<JsParameter> jsParameters) {
         Map<DeclarationDescriptor, JsExpression> aliases = new HashMap<DeclarationDescriptor, JsExpression>();
 
         for (TypeParameterDescriptor type : descriptor.getTypeParameters()) {
@@ -138,21 +189,20 @@ public final class FunctionTranslator extends AbstractTranslator {
             }
         }
 
-        functionBodyContext = functionBodyContext.innerContextWithDescriptorsAliased(aliases);
+        context = context.innerContextWithDescriptorsAliased(aliases);
 
-        if (extensionFunctionReceiverName == null && descriptor.getValueParameters().isEmpty()) {
-            return jsParameters;
+        if (extensionFunctionReceiverName != null || !descriptor.getValueParameters().isEmpty()) {
+            mayBeAddThisParameterForExtensionFunction(jsParameters);
+            addParameters(jsParameters, descriptor, context());
         }
 
-        mayBeAddThisParameterForExtensionFunction(jsParameters);
-        addParameters(jsParameters, descriptor, context());
-        return jsParameters;
+        return context;
     }
 
     public static void addParameters(List<JsParameter> list, FunctionDescriptor descriptor, TranslationContext context) {
         for (ValueParameterDescriptor valueParameter : descriptor.getValueParameters()) {
             JsParameter jsParameter = new JsParameter(context.getNameForDescriptor(valueParameter));
-            MetadataProperties.setHasDefaultValue(jsParameter, DescriptorUtilsKt.hasDefaultValue(valueParameter));
+            MetadataProperties.setHasDefaultValue(jsParameter, valueParameter.getOriginal().declaresDefaultValue());
             list.add(jsParameter);
         }
     }
