@@ -20,6 +20,7 @@ import org.jetbrains.kotlin.container.StorageComponentContainer
 import org.jetbrains.kotlin.container.useImpl
 import org.jetbrains.kotlin.container.useInstance
 import org.jetbrains.kotlin.js.resolve.diagnostics.JsCallChecker
+import org.jetbrains.kotlin.js.resolve.diagnostics.JsNativeRttiChecker
 import org.jetbrains.kotlin.js.resolve.diagnostics.JsNameChecker
 import org.jetbrains.kotlin.js.resolve.diagnostics.JsNameClashChecker
 import org.jetbrains.kotlin.js.resolve.diagnostics.NativeInnerClassChecker
@@ -48,6 +49,7 @@ object JsPlatformConfigurator : PlatformConfigurator(
         container.useInstance(SyntheticScopes.Empty)
         container.useInstance(SyntheticConstructorsProvider.Empty)
         container.useInstance(JsTypeSpecificityComparator)
+        container.useImpl<JsNativeRttiChecker>()
         container.useInstance(JsNameClashChecker())
     }
 }

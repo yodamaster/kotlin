@@ -42,6 +42,8 @@ public interface ErrorsJs {
     DiagnosticFactory1<KtElement, KtElement> REFERENCE_TO_BUILTIN_MEMBERS_NOT_SUPPORTED = DiagnosticFactory1.create(ERROR, DEFAULT);
     DiagnosticFactory0<KtExpression> JSCODE_NO_JAVASCRIPT_PRODUCED = DiagnosticFactory0.create(ERROR, DEFAULT);
     DiagnosticFactory0<KtExpression> NATIVE_INNER_CLASS_PROHIBITED = DiagnosticFactory0.create(ERROR);
+    DiagnosticFactory1<PsiElement, KotlinType> CANNOT_CHECK_FOR_NATIVE_INTERFACE = DiagnosticFactory1.create(ERROR);
+    DiagnosticFactory2<PsiElement, KotlinType, KotlinType> UNCHECKED_CAST_TO_NATIVE_INTERFACE = DiagnosticFactory2.create(WARNING);
     DiagnosticFactory2<KtElement, String, DeclarationDescriptor> JS_NAME_CLASH = DiagnosticFactory2.create(
             ERROR, DECLARATION_SIGNATURE_OR_DEFAULT);
     DiagnosticFactory3<KtElement, String, DeclarationDescriptor, DeclarationDescriptor> JS_FAKE_NAME_CLASH =
