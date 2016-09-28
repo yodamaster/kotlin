@@ -122,6 +122,10 @@ public final class AnnotationsUtils {
         return hasAnnotationOrInsideAnnotatedClass(descriptor, PredefinedAnnotation.NATIVE);
     }
 
+    public static boolean isNativeInterface(@NotNull DeclarationDescriptor descriptor) {
+        return isNativeObject(descriptor) && DescriptorUtils.isInterface(descriptor);
+    }
+
     public static boolean isLibraryObject(@NotNull DeclarationDescriptor descriptor) {
         return hasAnnotationOrInsideAnnotatedClass(descriptor, PredefinedAnnotation.LIBRARY);
     }

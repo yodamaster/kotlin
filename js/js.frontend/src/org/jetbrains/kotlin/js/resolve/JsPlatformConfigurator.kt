@@ -20,6 +20,7 @@ import org.jetbrains.kotlin.container.StorageComponentContainer
 import org.jetbrains.kotlin.container.useImpl
 import org.jetbrains.kotlin.container.useInstance
 import org.jetbrains.kotlin.js.resolve.diagnostics.JsCallChecker
+import org.jetbrains.kotlin.js.resolve.diagnostics.JsNativeRttiChecker
 import org.jetbrains.kotlin.js.resolve.diagnostics.NativeInnerClassChecker
 import org.jetbrains.kotlin.resolve.IdentifierChecker
 import org.jetbrains.kotlin.resolve.OverloadFilter
@@ -44,5 +45,6 @@ object JsPlatformConfigurator : PlatformConfigurator(
         container.useInstance(SyntheticScopes.Empty)
         container.useInstance(SyntheticConstructorsProvider.Empty)
         container.useInstance(JsTypeSpecificityComparator)
+        container.useImpl<JsNativeRttiChecker>()
     }
 }
