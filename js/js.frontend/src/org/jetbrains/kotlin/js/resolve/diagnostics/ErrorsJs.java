@@ -46,6 +46,7 @@ public interface ErrorsJs {
     DiagnosticFactory0<KtExpression> NATIVE_INNER_CLASS_PROHIBITED = DiagnosticFactory0.create(ERROR);
     DiagnosticFactory1<PsiElement, KotlinType> CANNOT_CHECK_FOR_NATIVE_INTERFACE = DiagnosticFactory1.create(ERROR);
     DiagnosticFactory2<PsiElement, KotlinType, KotlinType> UNCHECKED_CAST_TO_NATIVE_INTERFACE = DiagnosticFactory2.create(WARNING);
+    DiagnosticFactory1<PsiElement, KotlinType> NATIVE_INTERFACE_AS_REIFIED_TYPE_ARGUMENT = DiagnosticFactory1.create(ERROR);
 
     @SuppressWarnings("UnusedDeclaration")
     Object _initializer = new Object() {
