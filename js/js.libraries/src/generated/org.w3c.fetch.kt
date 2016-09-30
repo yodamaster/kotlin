@@ -58,14 +58,14 @@ import org.w3c.xhr.*
     fun text(): dynamic = noImpl
 }
 
-@native public interface RequestInit {
-    var method: String
-    var headers: dynamic
-    var body: dynamic
-    var mode: String
-    var credentials: String
-    var cache: String
-    var redirect: String
+@native public abstract class RequestInit {
+    abstract var method: String
+    abstract var headers: dynamic
+    abstract var body: dynamic
+    abstract var mode: String
+    abstract var credentials: String
+    abstract var cache: String
+    abstract var redirect: String
 }
 
 @Suppress("NOTHING_TO_INLINE")
@@ -111,10 +111,10 @@ public inline fun RequestInit(method: String, headers: dynamic, body: dynamic, m
     }
 }
 
-@native public interface ResponseInit {
-    var status: Short
-    var statusText: String
-    var headers: dynamic
+@native public abstract class ResponseInit {
+    open var status: Short = 200
+    open var statusText: String = "OK"
+    abstract var headers: dynamic
 }
 
 @Suppress("NOTHING_TO_INLINE")

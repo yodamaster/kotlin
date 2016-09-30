@@ -25,39 +25,39 @@ import org.w3c.xhr.*
         get() = noImpl
 }
 
-@native public interface SVGSVGElement : SVGElement, SVGTests, SVGLangSpace, SVGExternalResourcesRequired, SVGStylable, SVGLocatable, SVGFitToViewBox, SVGZoomAndPan {
-    val x: SVGAnimatedLength
+@native public abstract class SVGSVGElement : SVGElement, SVGTests, SVGLangSpace, SVGExternalResourcesRequired, SVGStylable, SVGLocatable, SVGFitToViewBox, SVGZoomAndPan {
+    open val x: SVGAnimatedLength
         get() = noImpl
-    val y: SVGAnimatedLength
+    open val y: SVGAnimatedLength
         get() = noImpl
-    val width: SVGAnimatedLength
+    open val width: SVGAnimatedLength
         get() = noImpl
-    val height: SVGAnimatedLength
+    open val height: SVGAnimatedLength
         get() = noImpl
-    var contentScriptType: dynamic
-        get() = noImpl
-        set(value) = noImpl
-    var contentStyleType: dynamic
+    open var contentScriptType: dynamic
         get() = noImpl
         set(value) = noImpl
-    val viewport: SVGRect
-        get() = noImpl
-    val pixelUnitToMillimeterX: Float
-        get() = noImpl
-    val pixelUnitToMillimeterY: Float
-        get() = noImpl
-    val screenPixelToMillimeterX: Float
-        get() = noImpl
-    val screenPixelToMillimeterY: Float
-        get() = noImpl
-    val useCurrentView: Boolean
-        get() = noImpl
-    val currentView: SVGViewSpec
-        get() = noImpl
-    var currentScale: Float
+    open var contentStyleType: dynamic
         get() = noImpl
         set(value) = noImpl
-    val currentTranslate: SVGPoint
+    open val viewport: SVGRect
+        get() = noImpl
+    open val pixelUnitToMillimeterX: Float
+        get() = noImpl
+    open val pixelUnitToMillimeterY: Float
+        get() = noImpl
+    open val screenPixelToMillimeterX: Float
+        get() = noImpl
+    open val screenPixelToMillimeterY: Float
+        get() = noImpl
+    open val useCurrentView: Boolean
+        get() = noImpl
+    open val currentView: SVGViewSpec
+        get() = noImpl
+    open var currentScale: Float
+        get() = noImpl
+        set(value) = noImpl
+    open val currentTranslate: SVGPoint
         get() = noImpl
     fun suspendRedraw(maxWaitMilliseconds: Int): Int = noImpl
     fun unsuspendRedraw(suspendHandleID: Int): Unit = noImpl
@@ -84,114 +84,114 @@ import org.w3c.xhr.*
     fun getElementById(elementId: String): Element = noImpl
 }
 
-@native public interface SVGGElement : SVGElement, SVGTests, SVGLangSpace, SVGExternalResourcesRequired, SVGStylable, SVGTransformable {
+@native public abstract class SVGGElement : SVGElement, SVGTests, SVGLangSpace, SVGExternalResourcesRequired, SVGStylable, SVGTransformable {
 }
 
-@native public interface SVGDefsElement : SVGElement, SVGTests, SVGLangSpace, SVGExternalResourcesRequired, SVGStylable, SVGTransformable {
+@native public abstract class SVGDefsElement : SVGElement, SVGTests, SVGLangSpace, SVGExternalResourcesRequired, SVGStylable, SVGTransformable {
 }
 
-@native public interface SVGDescElement : SVGElement, SVGLangSpace, SVGStylable {
+@native public abstract class SVGDescElement : SVGElement, SVGLangSpace, SVGStylable {
 }
 
-@native public interface SVGTitleElement : SVGElement, SVGLangSpace, SVGStylable {
+@native public abstract class SVGTitleElement : SVGElement, SVGLangSpace, SVGStylable {
 }
 
-@native public interface SVGSymbolElement : SVGElement, SVGLangSpace, SVGExternalResourcesRequired, SVGStylable, SVGFitToViewBox {
+@native public abstract class SVGSymbolElement : SVGElement, SVGLangSpace, SVGExternalResourcesRequired, SVGStylable, SVGFitToViewBox {
 }
 
-@native public interface SVGUseElement : SVGElement, SVGURIReference, SVGTests, SVGLangSpace, SVGExternalResourcesRequired, SVGStylable, SVGTransformable {
-    val x: SVGAnimatedLength
+@native public abstract class SVGUseElement : SVGElement, SVGURIReference, SVGTests, SVGLangSpace, SVGExternalResourcesRequired, SVGStylable, SVGTransformable {
+    open val x: SVGAnimatedLength
         get() = noImpl
-    val y: SVGAnimatedLength
+    open val y: SVGAnimatedLength
         get() = noImpl
-    val width: SVGAnimatedLength
+    open val width: SVGAnimatedLength
         get() = noImpl
-    val height: SVGAnimatedLength
+    open val height: SVGAnimatedLength
         get() = noImpl
-    val instanceRoot: SVGElementInstance
+    open val instanceRoot: SVGElementInstance
         get() = noImpl
-    val animatedInstanceRoot: SVGElementInstance
-        get() = noImpl
-}
-
-@native public interface SVGElementInstance : EventTarget {
-    val correspondingElement: SVGElement
-        get() = noImpl
-    val correspondingUseElement: SVGUseElement
-        get() = noImpl
-    val parentNode: SVGElementInstance
-        get() = noImpl
-    val childNodes: SVGElementInstanceList
-        get() = noImpl
-    val firstChild: SVGElementInstance
-        get() = noImpl
-    val lastChild: SVGElementInstance
-        get() = noImpl
-    val previousSibling: SVGElementInstance
-        get() = noImpl
-    val nextSibling: SVGElementInstance
+    open val animatedInstanceRoot: SVGElementInstance
         get() = noImpl
 }
 
-@native public interface SVGElementInstanceList {
-    val length: Int
+@native public abstract class SVGElementInstance : EventTarget() {
+    open val correspondingElement: SVGElement
+        get() = noImpl
+    open val correspondingUseElement: SVGUseElement
+        get() = noImpl
+    open val parentNode: SVGElementInstance
+        get() = noImpl
+    open val childNodes: SVGElementInstanceList
+        get() = noImpl
+    open val firstChild: SVGElementInstance
+        get() = noImpl
+    open val lastChild: SVGElementInstance
+        get() = noImpl
+    open val previousSibling: SVGElementInstance
+        get() = noImpl
+    open val nextSibling: SVGElementInstance
+        get() = noImpl
+}
+
+@native public abstract class SVGElementInstanceList {
+    open val length: Int
         get() = noImpl
     fun item(index: Int): SVGElementInstance = noImpl
 }
 
-@native public interface SVGImageElement : SVGElement, SVGURIReference, SVGTests, SVGLangSpace, SVGExternalResourcesRequired, SVGStylable, SVGTransformable {
-    val x: SVGAnimatedLength
+@native public abstract class SVGImageElement : SVGElement, SVGURIReference, SVGTests, SVGLangSpace, SVGExternalResourcesRequired, SVGStylable, SVGTransformable {
+    open val x: SVGAnimatedLength
         get() = noImpl
-    val y: SVGAnimatedLength
+    open val y: SVGAnimatedLength
         get() = noImpl
-    val width: SVGAnimatedLength
+    open val width: SVGAnimatedLength
         get() = noImpl
-    val height: SVGAnimatedLength
+    open val height: SVGAnimatedLength
         get() = noImpl
-    val preserveAspectRatio: SVGAnimatedPreserveAspectRatio
+    open val preserveAspectRatio: SVGAnimatedPreserveAspectRatio
         get() = noImpl
 }
 
-@native public interface SVGSwitchElement : SVGElement, SVGTests, SVGLangSpace, SVGExternalResourcesRequired, SVGStylable, SVGTransformable {
+@native public abstract class SVGSwitchElement : SVGElement, SVGTests, SVGLangSpace, SVGExternalResourcesRequired, SVGStylable, SVGTransformable {
 }
 
-@native public interface GetSVGDocument {
+@native public abstract class GetSVGDocument {
     fun getSVGDocument(): SVGDocument = noImpl
 }
 
-@native public interface SVGElement : Element {
-//    var id: dynamic
+@native public abstract class SVGElement : Element() {
+//    open var id: dynamic
 //        get() = noImpl
 //        set(value) = noImpl
-    var xmlbase: dynamic
+    open var xmlbase: dynamic
         get() = noImpl
         set(value) = noImpl
-    val ownerSVGElement: SVGSVGElement
+    open val ownerSVGElement: SVGSVGElement
         get() = noImpl
-    val viewportElement: SVGElement
+    open val viewportElement: SVGElement
         get() = noImpl
-    val style: CSSStyleDeclaration
+    open val style: CSSStyleDeclaration
         get() = noImpl
 }
 
-@native public interface SVGAnimatedBoolean {
-    var baseVal: dynamic
+@native public abstract class SVGAnimatedBoolean {
+    open var baseVal: dynamic
         get() = noImpl
         set(value) = noImpl
-    val animVal: Boolean
+    open val animVal: Boolean
         get() = noImpl
 }
 
-@native public interface SVGAnimatedString {
-    var baseVal: dynamic
+@native public abstract class SVGAnimatedString {
+    open var baseVal: dynamic
         get() = noImpl
         set(value) = noImpl
-    val animVal: String
+    open val animVal: String
         get() = noImpl
 }
 
-@native public interface SVGStringList {
-    val numberOfItems: Int
+@native public abstract class SVGStringList {
+    open val numberOfItems: Int
         get() = noImpl
     fun clear(): Unit = noImpl
     fun initialize(newItem: String): String = noImpl
@@ -202,38 +202,38 @@ import org.w3c.xhr.*
     fun appendItem(newItem: String): String = noImpl
 }
 
-@native public interface SVGAnimatedEnumeration {
-    var baseVal: dynamic
+@native public abstract class SVGAnimatedEnumeration {
+    open var baseVal: dynamic
         get() = noImpl
         set(value) = noImpl
-    val animVal: Short
+    open val animVal: Short
         get() = noImpl
 }
 
-@native public interface SVGAnimatedInteger {
-    var baseVal: dynamic
+@native public abstract class SVGAnimatedInteger {
+    open var baseVal: dynamic
         get() = noImpl
         set(value) = noImpl
-    val animVal: Int
+    open val animVal: Int
         get() = noImpl
 }
 
-@native public interface SVGNumber {
-    var value: dynamic
+@native public abstract class SVGNumber {
+    open var value: dynamic
         get() = noImpl
         set(value) = noImpl
 }
 
-@native public interface SVGAnimatedNumber {
-    var baseVal: dynamic
+@native public abstract class SVGAnimatedNumber {
+    open var baseVal: dynamic
         get() = noImpl
         set(value) = noImpl
-    val animVal: Float
+    open val animVal: Float
         get() = noImpl
 }
 
-@native public interface SVGNumberList {
-    val numberOfItems: Int
+@native public abstract class SVGNumberList {
+    open val numberOfItems: Int
         get() = noImpl
     fun clear(): Unit = noImpl
     fun initialize(newItem: SVGNumber): SVGNumber = noImpl
@@ -244,23 +244,23 @@ import org.w3c.xhr.*
     fun appendItem(newItem: SVGNumber): SVGNumber = noImpl
 }
 
-@native public interface SVGAnimatedNumberList {
-    val baseVal: SVGNumberList
+@native public abstract class SVGAnimatedNumberList {
+    open val baseVal: SVGNumberList
         get() = noImpl
-    val animVal: SVGNumberList
+    open val animVal: SVGNumberList
         get() = noImpl
 }
 
-@native public interface SVGLength {
-    val unitType: Short
+@native public abstract class SVGLength {
+    open val unitType: Short
         get() = noImpl
-    var value: dynamic
-        get() = noImpl
-        set(value) = noImpl
-    var valueInSpecifiedUnits: dynamic
+    open var value: dynamic
         get() = noImpl
         set(value) = noImpl
-    var valueAsString: dynamic
+    open var valueInSpecifiedUnits: dynamic
+        get() = noImpl
+        set(value) = noImpl
+    open var valueAsString: dynamic
         get() = noImpl
         set(value) = noImpl
     fun newValueSpecifiedUnits(unitType: Short, valueInSpecifiedUnits: Float): Unit = noImpl
@@ -281,15 +281,15 @@ import org.w3c.xhr.*
     }
 }
 
-@native public interface SVGAnimatedLength {
-    val baseVal: SVGLength
+@native public abstract class SVGAnimatedLength {
+    open val baseVal: SVGLength
         get() = noImpl
-    val animVal: SVGLength
+    open val animVal: SVGLength
         get() = noImpl
 }
 
-@native public interface SVGLengthList {
-    val numberOfItems: Int
+@native public abstract class SVGLengthList {
+    open val numberOfItems: Int
         get() = noImpl
     fun clear(): Unit = noImpl
     fun initialize(newItem: SVGLength): SVGLength = noImpl
@@ -300,23 +300,23 @@ import org.w3c.xhr.*
     fun appendItem(newItem: SVGLength): SVGLength = noImpl
 }
 
-@native public interface SVGAnimatedLengthList {
-    val baseVal: SVGLengthList
+@native public abstract class SVGAnimatedLengthList {
+    open val baseVal: SVGLengthList
         get() = noImpl
-    val animVal: SVGLengthList
+    open val animVal: SVGLengthList
         get() = noImpl
 }
 
-@native public interface SVGAngle {
-    val unitType: Short
+@native public abstract class SVGAngle {
+    open val unitType: Short
         get() = noImpl
-    var value: dynamic
-        get() = noImpl
-        set(value) = noImpl
-    var valueInSpecifiedUnits: dynamic
+    open var value: dynamic
         get() = noImpl
         set(value) = noImpl
-    var valueAsString: dynamic
+    open var valueInSpecifiedUnits: dynamic
+        get() = noImpl
+        set(value) = noImpl
+    open var valueAsString: dynamic
         get() = noImpl
         set(value) = noImpl
     fun newValueSpecifiedUnits(unitType: Short, valueInSpecifiedUnits: Float): Unit = noImpl
@@ -331,19 +331,19 @@ import org.w3c.xhr.*
     }
 }
 
-@native public interface SVGAnimatedAngle {
-    val baseVal: SVGAngle
+@native public abstract class SVGAnimatedAngle {
+    open val baseVal: SVGAngle
         get() = noImpl
-    val animVal: SVGAngle
+    open val animVal: SVGAngle
         get() = noImpl
 }
 
-@native public interface SVGColor {
-    val colorType: Short
+@native public abstract class SVGColor {
+    open val colorType: Short
         get() = noImpl
-    val rgbColor: dynamic
+    open val rgbColor: dynamic
         get() = noImpl
-    val iccColor: SVGICCColor
+    open val iccColor: SVGICCColor
         get() = noImpl
     fun setRGBColor(rgbColor: String): Unit = noImpl
     fun setRGBColorICCColor(rgbColor: String, iccColor: String): Unit = noImpl
@@ -357,37 +357,37 @@ import org.w3c.xhr.*
     }
 }
 
-@native public interface SVGICCColor {
-    var colorProfile: dynamic
+@native public abstract class SVGICCColor {
+    open var colorProfile: dynamic
         get() = noImpl
         set(value) = noImpl
-    val colors: SVGNumberList
+    open val colors: SVGNumberList
         get() = noImpl
 }
 
-@native public interface SVGRect {
-    var x: dynamic
+@native public abstract class SVGRect {
+    open var x: dynamic
         get() = noImpl
         set(value) = noImpl
-    var y: dynamic
+    open var y: dynamic
         get() = noImpl
         set(value) = noImpl
-    var width: dynamic
+    open var width: dynamic
         get() = noImpl
         set(value) = noImpl
-    var height: dynamic
+    open var height: dynamic
         get() = noImpl
         set(value) = noImpl
 }
 
-@native public interface SVGAnimatedRect {
-    val baseVal: SVGRect
+@native public abstract class SVGAnimatedRect {
+    open val baseVal: SVGRect
         get() = noImpl
-    val animVal: SVGRect
+    open val animVal: SVGRect
         get() = noImpl
 }
 
-@native public interface SVGUnitTypes {
+@native public abstract class SVGUnitTypes {
 
     companion object {
         val SVG_UNIT_TYPE_UNKNOWN: Short = 0
@@ -396,14 +396,14 @@ import org.w3c.xhr.*
     }
 }
 
-@native public interface SVGStylable {
+@native public abstract class SVGStylable {
     fun getPresentationAttribute(name: String): dynamic = noImpl
 }
 
-@native public interface SVGLocatable {
-    val nearestViewportElement: SVGElement
+@native public abstract class SVGLocatable {
+    open val nearestViewportElement: SVGElement
         get() = noImpl
-    val farthestViewportElement: SVGElement
+    open val farthestViewportElement: SVGElement
         get() = noImpl
     fun getBBox(): SVGRect = noImpl
     fun getCTM(): SVGMatrix = noImpl
@@ -411,44 +411,44 @@ import org.w3c.xhr.*
     fun getTransformToElement(element: SVGElement): SVGMatrix = noImpl
 }
 
-@native public interface SVGTransformable : SVGLocatable {
-    val transform: SVGAnimatedTransformList
+@native public abstract class SVGTransformable : SVGLocatable() {
+    open val transform: SVGAnimatedTransformList
         get() = noImpl
 }
 
-@native public interface SVGTests {
-    val requiredFeatures: SVGStringList
+@native public abstract class SVGTests {
+    open val requiredFeatures: SVGStringList
         get() = noImpl
-    val requiredExtensions: SVGStringList
+    open val requiredExtensions: SVGStringList
         get() = noImpl
-    val systemLanguage: SVGStringList
+    open val systemLanguage: SVGStringList
         get() = noImpl
     fun hasExtension(extension: String): Boolean = noImpl
 }
 
-@native public interface SVGLangSpace {
-    var xmllang: dynamic
+@native public abstract class SVGLangSpace {
+    open var xmllang: dynamic
         get() = noImpl
         set(value) = noImpl
-    var xmlspace: dynamic
+    open var xmlspace: dynamic
         get() = noImpl
         set(value) = noImpl
 }
 
-@native public interface SVGExternalResourcesRequired {
-    val externalResourcesRequired: SVGAnimatedBoolean
+@native public abstract class SVGExternalResourcesRequired {
+    open val externalResourcesRequired: SVGAnimatedBoolean
         get() = noImpl
 }
 
-@native public interface SVGFitToViewBox {
-    val viewBox: SVGAnimatedRect
+@native public abstract class SVGFitToViewBox {
+    open val viewBox: SVGAnimatedRect
         get() = noImpl
-    val preserveAspectRatio: SVGAnimatedPreserveAspectRatio
+    open val preserveAspectRatio: SVGAnimatedPreserveAspectRatio
         get() = noImpl
 }
 
-@native public interface SVGZoomAndPan {
-    var zoomAndPan: dynamic
+@native public abstract class SVGZoomAndPan {
+    open var zoomAndPan: dynamic
         get() = noImpl
         set(value) = noImpl
 
@@ -459,34 +459,34 @@ import org.w3c.xhr.*
     }
 }
 
-@native public interface SVGViewSpec : SVGZoomAndPan, SVGFitToViewBox {
-    val transform: SVGTransformList
+@native public abstract class SVGViewSpec : SVGZoomAndPan, SVGFitToViewBox {
+    open val transform: SVGTransformList
         get() = noImpl
-    val viewTarget: SVGElement
+    open val viewTarget: SVGElement
         get() = noImpl
-    val viewBoxString: String
+    open val viewBoxString: String
         get() = noImpl
-    val preserveAspectRatioString: String
+    open val preserveAspectRatioString: String
         get() = noImpl
-    val transformString: String
+    open val transformString: String
         get() = noImpl
-    val viewTargetString: String
-        get() = noImpl
-}
-
-@native public interface SVGURIReference {
-    val href: SVGAnimatedString
+    open val viewTargetString: String
         get() = noImpl
 }
 
-@native public interface SVGCSSRule : CSSRule {
+@native public abstract class SVGURIReference {
+    open val href: SVGAnimatedString
+        get() = noImpl
+}
+
+@native public abstract class SVGCSSRule : CSSRule() {
 
     companion object {
         val COLOR_PROFILE_RULE: Short = 7
     }
 }
 
-@native public interface SVGRenderingIntent {
+@native public abstract class SVGRenderingIntent {
 
     companion object {
         val RENDERING_INTENT_UNKNOWN: Short = 0
@@ -498,30 +498,30 @@ import org.w3c.xhr.*
     }
 }
 
-@native public interface SVGStyleElement : SVGElement, SVGLangSpace {
-    var type: dynamic
+@native public abstract class SVGStyleElement : SVGElement, SVGLangSpace {
+    open var type: dynamic
         get() = noImpl
         set(value) = noImpl
-    var media: dynamic
+    open var media: dynamic
         get() = noImpl
         set(value) = noImpl
-    var title: dynamic
+    open var title: dynamic
         get() = noImpl
         set(value) = noImpl
 }
 
-@native public interface SVGPoint {
-    var x: dynamic
+@native public abstract class SVGPoint {
+    open var x: dynamic
         get() = noImpl
         set(value) = noImpl
-    var y: dynamic
+    open var y: dynamic
         get() = noImpl
         set(value) = noImpl
     fun matrixTransform(matrix: SVGMatrix): SVGPoint = noImpl
 }
 
-@native public interface SVGPointList {
-    val numberOfItems: Int
+@native public abstract class SVGPointList {
+    open val numberOfItems: Int
         get() = noImpl
     fun clear(): Unit = noImpl
     fun initialize(newItem: SVGPoint): SVGPoint = noImpl
@@ -532,23 +532,23 @@ import org.w3c.xhr.*
     fun appendItem(newItem: SVGPoint): SVGPoint = noImpl
 }
 
-@native public interface SVGMatrix {
-    var a: dynamic
+@native public abstract class SVGMatrix {
+    open var a: dynamic
         get() = noImpl
         set(value) = noImpl
-    var b: dynamic
+    open var b: dynamic
         get() = noImpl
         set(value) = noImpl
-    var c: dynamic
+    open var c: dynamic
         get() = noImpl
         set(value) = noImpl
-    var d: dynamic
+    open var d: dynamic
         get() = noImpl
         set(value) = noImpl
-    var e: dynamic
+    open var e: dynamic
         get() = noImpl
         set(value) = noImpl
-    var f: dynamic
+    open var f: dynamic
         get() = noImpl
         set(value) = noImpl
     fun multiply(secondMatrix: SVGMatrix): SVGMatrix = noImpl
@@ -564,12 +564,12 @@ import org.w3c.xhr.*
     fun skewY(angle: Float): SVGMatrix = noImpl
 }
 
-@native public interface SVGTransform {
-    val type: Short
+@native public abstract class SVGTransform {
+    open val type: Short
         get() = noImpl
-    val matrix: SVGMatrix
+    open val matrix: SVGMatrix
         get() = noImpl
-    val angle: Float
+    open val angle: Float
         get() = noImpl
     fun setMatrix(matrix: SVGMatrix): Unit = noImpl
     fun setTranslate(tx: Float, ty: Float): Unit = noImpl
@@ -589,8 +589,8 @@ import org.w3c.xhr.*
     }
 }
 
-@native public interface SVGTransformList {
-    val numberOfItems: Int
+@native public abstract class SVGTransformList {
+    open val numberOfItems: Int
         get() = noImpl
     fun clear(): Unit = noImpl
     fun initialize(newItem: SVGTransform): SVGTransform = noImpl
@@ -603,18 +603,18 @@ import org.w3c.xhr.*
     fun consolidate(): SVGTransform = noImpl
 }
 
-@native public interface SVGAnimatedTransformList {
-    val baseVal: SVGTransformList
+@native public abstract class SVGAnimatedTransformList {
+    open val baseVal: SVGTransformList
         get() = noImpl
-    val animVal: SVGTransformList
+    open val animVal: SVGTransformList
         get() = noImpl
 }
 
-@native public interface SVGPreserveAspectRatio {
-    var align: dynamic
+@native public abstract class SVGPreserveAspectRatio {
+    open var align: dynamic
         get() = noImpl
         set(value) = noImpl
-    var meetOrSlice: dynamic
+    open var meetOrSlice: dynamic
         get() = noImpl
         set(value) = noImpl
 
@@ -636,17 +636,17 @@ import org.w3c.xhr.*
     }
 }
 
-@native public interface SVGAnimatedPreserveAspectRatio {
-    val baseVal: SVGPreserveAspectRatio
+@native public abstract class SVGAnimatedPreserveAspectRatio {
+    open val baseVal: SVGPreserveAspectRatio
         get() = noImpl
-    val animVal: SVGPreserveAspectRatio
+    open val animVal: SVGPreserveAspectRatio
         get() = noImpl
 }
 
-@native public interface SVGPathSeg {
-    val pathSegType: Short
+@native public abstract class SVGPathSeg {
+    open val pathSegType: Short
         get() = noImpl
-    val pathSegTypeAsLetter: String
+    open val pathSegTypeAsLetter: String
         get() = noImpl
 
     companion object {
@@ -673,239 +673,239 @@ import org.w3c.xhr.*
     }
 }
 
-@native public interface SVGPathSegClosePath : SVGPathSeg {
+@native public abstract class SVGPathSegClosePath : SVGPathSeg() {
 }
 
-@native public interface SVGPathSegMovetoAbs : SVGPathSeg {
-    var x: dynamic
+@native public abstract class SVGPathSegMovetoAbs : SVGPathSeg() {
+    open var x: dynamic
         get() = noImpl
         set(value) = noImpl
-    var y: dynamic
-        get() = noImpl
-        set(value) = noImpl
-}
-
-@native public interface SVGPathSegMovetoRel : SVGPathSeg {
-    var x: dynamic
-        get() = noImpl
-        set(value) = noImpl
-    var y: dynamic
+    open var y: dynamic
         get() = noImpl
         set(value) = noImpl
 }
 
-@native public interface SVGPathSegLinetoAbs : SVGPathSeg {
-    var x: dynamic
+@native public abstract class SVGPathSegMovetoRel : SVGPathSeg() {
+    open var x: dynamic
         get() = noImpl
         set(value) = noImpl
-    var y: dynamic
-        get() = noImpl
-        set(value) = noImpl
-}
-
-@native public interface SVGPathSegLinetoRel : SVGPathSeg {
-    var x: dynamic
-        get() = noImpl
-        set(value) = noImpl
-    var y: dynamic
+    open var y: dynamic
         get() = noImpl
         set(value) = noImpl
 }
 
-@native public interface SVGPathSegCurvetoCubicAbs : SVGPathSeg {
-    var x: dynamic
+@native public abstract class SVGPathSegLinetoAbs : SVGPathSeg() {
+    open var x: dynamic
         get() = noImpl
         set(value) = noImpl
-    var y: dynamic
-        get() = noImpl
-        set(value) = noImpl
-    var x1: dynamic
-        get() = noImpl
-        set(value) = noImpl
-    var y1: dynamic
-        get() = noImpl
-        set(value) = noImpl
-    var x2: dynamic
-        get() = noImpl
-        set(value) = noImpl
-    var y2: dynamic
+    open var y: dynamic
         get() = noImpl
         set(value) = noImpl
 }
 
-@native public interface SVGPathSegCurvetoCubicRel : SVGPathSeg {
-    var x: dynamic
+@native public abstract class SVGPathSegLinetoRel : SVGPathSeg() {
+    open var x: dynamic
         get() = noImpl
         set(value) = noImpl
-    var y: dynamic
-        get() = noImpl
-        set(value) = noImpl
-    var x1: dynamic
-        get() = noImpl
-        set(value) = noImpl
-    var y1: dynamic
-        get() = noImpl
-        set(value) = noImpl
-    var x2: dynamic
-        get() = noImpl
-        set(value) = noImpl
-    var y2: dynamic
+    open var y: dynamic
         get() = noImpl
         set(value) = noImpl
 }
 
-@native public interface SVGPathSegCurvetoQuadraticAbs : SVGPathSeg {
-    var x: dynamic
+@native public abstract class SVGPathSegCurvetoCubicAbs : SVGPathSeg() {
+    open var x: dynamic
         get() = noImpl
         set(value) = noImpl
-    var y: dynamic
+    open var y: dynamic
         get() = noImpl
         set(value) = noImpl
-    var x1: dynamic
+    open var x1: dynamic
         get() = noImpl
         set(value) = noImpl
-    var y1: dynamic
+    open var y1: dynamic
         get() = noImpl
         set(value) = noImpl
-}
-
-@native public interface SVGPathSegCurvetoQuadraticRel : SVGPathSeg {
-    var x: dynamic
+    open var x2: dynamic
         get() = noImpl
         set(value) = noImpl
-    var y: dynamic
-        get() = noImpl
-        set(value) = noImpl
-    var x1: dynamic
-        get() = noImpl
-        set(value) = noImpl
-    var y1: dynamic
+    open var y2: dynamic
         get() = noImpl
         set(value) = noImpl
 }
 
-@native public interface SVGPathSegArcAbs : SVGPathSeg {
-    var x: dynamic
+@native public abstract class SVGPathSegCurvetoCubicRel : SVGPathSeg() {
+    open var x: dynamic
         get() = noImpl
         set(value) = noImpl
-    var y: dynamic
+    open var y: dynamic
         get() = noImpl
         set(value) = noImpl
-    var r1: dynamic
+    open var x1: dynamic
         get() = noImpl
         set(value) = noImpl
-    var r2: dynamic
+    open var y1: dynamic
         get() = noImpl
         set(value) = noImpl
-    var angle: dynamic
+    open var x2: dynamic
         get() = noImpl
         set(value) = noImpl
-    var largeArcFlag: dynamic
-        get() = noImpl
-        set(value) = noImpl
-    var sweepFlag: dynamic
+    open var y2: dynamic
         get() = noImpl
         set(value) = noImpl
 }
 
-@native public interface SVGPathSegArcRel : SVGPathSeg {
-    var x: dynamic
+@native public abstract class SVGPathSegCurvetoQuadraticAbs : SVGPathSeg() {
+    open var x: dynamic
         get() = noImpl
         set(value) = noImpl
-    var y: dynamic
+    open var y: dynamic
         get() = noImpl
         set(value) = noImpl
-    var r1: dynamic
+    open var x1: dynamic
         get() = noImpl
         set(value) = noImpl
-    var r2: dynamic
-        get() = noImpl
-        set(value) = noImpl
-    var angle: dynamic
-        get() = noImpl
-        set(value) = noImpl
-    var largeArcFlag: dynamic
-        get() = noImpl
-        set(value) = noImpl
-    var sweepFlag: dynamic
+    open var y1: dynamic
         get() = noImpl
         set(value) = noImpl
 }
 
-@native public interface SVGPathSegLinetoHorizontalAbs : SVGPathSeg {
-    var x: dynamic
+@native public abstract class SVGPathSegCurvetoQuadraticRel : SVGPathSeg() {
+    open var x: dynamic
+        get() = noImpl
+        set(value) = noImpl
+    open var y: dynamic
+        get() = noImpl
+        set(value) = noImpl
+    open var x1: dynamic
+        get() = noImpl
+        set(value) = noImpl
+    open var y1: dynamic
         get() = noImpl
         set(value) = noImpl
 }
 
-@native public interface SVGPathSegLinetoHorizontalRel : SVGPathSeg {
-    var x: dynamic
+@native public abstract class SVGPathSegArcAbs : SVGPathSeg() {
+    open var x: dynamic
+        get() = noImpl
+        set(value) = noImpl
+    open var y: dynamic
+        get() = noImpl
+        set(value) = noImpl
+    open var r1: dynamic
+        get() = noImpl
+        set(value) = noImpl
+    open var r2: dynamic
+        get() = noImpl
+        set(value) = noImpl
+    open var angle: dynamic
+        get() = noImpl
+        set(value) = noImpl
+    open var largeArcFlag: dynamic
+        get() = noImpl
+        set(value) = noImpl
+    open var sweepFlag: dynamic
         get() = noImpl
         set(value) = noImpl
 }
 
-@native public interface SVGPathSegLinetoVerticalAbs : SVGPathSeg {
-    var y: dynamic
+@native public abstract class SVGPathSegArcRel : SVGPathSeg() {
+    open var x: dynamic
+        get() = noImpl
+        set(value) = noImpl
+    open var y: dynamic
+        get() = noImpl
+        set(value) = noImpl
+    open var r1: dynamic
+        get() = noImpl
+        set(value) = noImpl
+    open var r2: dynamic
+        get() = noImpl
+        set(value) = noImpl
+    open var angle: dynamic
+        get() = noImpl
+        set(value) = noImpl
+    open var largeArcFlag: dynamic
+        get() = noImpl
+        set(value) = noImpl
+    open var sweepFlag: dynamic
         get() = noImpl
         set(value) = noImpl
 }
 
-@native public interface SVGPathSegLinetoVerticalRel : SVGPathSeg {
-    var y: dynamic
+@native public abstract class SVGPathSegLinetoHorizontalAbs : SVGPathSeg() {
+    open var x: dynamic
         get() = noImpl
         set(value) = noImpl
 }
 
-@native public interface SVGPathSegCurvetoCubicSmoothAbs : SVGPathSeg {
-    var x: dynamic
-        get() = noImpl
-        set(value) = noImpl
-    var y: dynamic
-        get() = noImpl
-        set(value) = noImpl
-    var x2: dynamic
-        get() = noImpl
-        set(value) = noImpl
-    var y2: dynamic
+@native public abstract class SVGPathSegLinetoHorizontalRel : SVGPathSeg() {
+    open var x: dynamic
         get() = noImpl
         set(value) = noImpl
 }
 
-@native public interface SVGPathSegCurvetoCubicSmoothRel : SVGPathSeg {
-    var x: dynamic
-        get() = noImpl
-        set(value) = noImpl
-    var y: dynamic
-        get() = noImpl
-        set(value) = noImpl
-    var x2: dynamic
-        get() = noImpl
-        set(value) = noImpl
-    var y2: dynamic
+@native public abstract class SVGPathSegLinetoVerticalAbs : SVGPathSeg() {
+    open var y: dynamic
         get() = noImpl
         set(value) = noImpl
 }
 
-@native public interface SVGPathSegCurvetoQuadraticSmoothAbs : SVGPathSeg {
-    var x: dynamic
-        get() = noImpl
-        set(value) = noImpl
-    var y: dynamic
+@native public abstract class SVGPathSegLinetoVerticalRel : SVGPathSeg() {
+    open var y: dynamic
         get() = noImpl
         set(value) = noImpl
 }
 
-@native public interface SVGPathSegCurvetoQuadraticSmoothRel : SVGPathSeg {
-    var x: dynamic
+@native public abstract class SVGPathSegCurvetoCubicSmoothAbs : SVGPathSeg() {
+    open var x: dynamic
         get() = noImpl
         set(value) = noImpl
-    var y: dynamic
+    open var y: dynamic
+        get() = noImpl
+        set(value) = noImpl
+    open var x2: dynamic
+        get() = noImpl
+        set(value) = noImpl
+    open var y2: dynamic
         get() = noImpl
         set(value) = noImpl
 }
 
-@native public interface SVGPathSegList {
-    val numberOfItems: Int
+@native public abstract class SVGPathSegCurvetoCubicSmoothRel : SVGPathSeg() {
+    open var x: dynamic
+        get() = noImpl
+        set(value) = noImpl
+    open var y: dynamic
+        get() = noImpl
+        set(value) = noImpl
+    open var x2: dynamic
+        get() = noImpl
+        set(value) = noImpl
+    open var y2: dynamic
+        get() = noImpl
+        set(value) = noImpl
+}
+
+@native public abstract class SVGPathSegCurvetoQuadraticSmoothAbs : SVGPathSeg() {
+    open var x: dynamic
+        get() = noImpl
+        set(value) = noImpl
+    open var y: dynamic
+        get() = noImpl
+        set(value) = noImpl
+}
+
+@native public abstract class SVGPathSegCurvetoQuadraticSmoothRel : SVGPathSeg() {
+    open var x: dynamic
+        get() = noImpl
+        set(value) = noImpl
+    open var y: dynamic
+        get() = noImpl
+        set(value) = noImpl
+}
+
+@native public abstract class SVGPathSegList {
+    open val numberOfItems: Int
         get() = noImpl
     fun clear(): Unit = noImpl
     fun initialize(newItem: SVGPathSeg): SVGPathSeg = noImpl
@@ -916,19 +916,19 @@ import org.w3c.xhr.*
     fun appendItem(newItem: SVGPathSeg): SVGPathSeg = noImpl
 }
 
-@native public interface SVGAnimatedPathData {
-    val pathSegList: SVGPathSegList
+@native public abstract class SVGAnimatedPathData {
+    open val pathSegList: SVGPathSegList
         get() = noImpl
-    val normalizedPathSegList: SVGPathSegList
+    open val normalizedPathSegList: SVGPathSegList
         get() = noImpl
-    val animatedPathSegList: SVGPathSegList
+    open val animatedPathSegList: SVGPathSegList
         get() = noImpl
-    val animatedNormalizedPathSegList: SVGPathSegList
+    open val animatedNormalizedPathSegList: SVGPathSegList
         get() = noImpl
 }
 
-@native public interface SVGPathElement : SVGElement, SVGTests, SVGLangSpace, SVGExternalResourcesRequired, SVGStylable, SVGTransformable, SVGAnimatedPathData {
-    val pathLength: SVGAnimatedNumber
+@native public abstract class SVGPathElement : SVGElement, SVGTests, SVGLangSpace, SVGExternalResourcesRequired, SVGStylable, SVGTransformable, SVGAnimatedPathData {
+    open val pathLength: SVGAnimatedNumber
         get() = noImpl
     fun getTotalLength(): Float = noImpl
     fun getPointAtLength(distance: Float): SVGPoint = noImpl
@@ -954,69 +954,69 @@ import org.w3c.xhr.*
     fun createSVGPathSegCurvetoQuadraticSmoothRel(x: Float, y: Float): SVGPathSegCurvetoQuadraticSmoothRel = noImpl
 }
 
-@native public interface SVGRectElement : SVGElement, SVGTests, SVGLangSpace, SVGExternalResourcesRequired, SVGStylable, SVGTransformable {
-    val x: SVGAnimatedLength
+@native public abstract class SVGRectElement : SVGElement, SVGTests, SVGLangSpace, SVGExternalResourcesRequired, SVGStylable, SVGTransformable {
+    open val x: SVGAnimatedLength
         get() = noImpl
-    val y: SVGAnimatedLength
+    open val y: SVGAnimatedLength
         get() = noImpl
-    val width: SVGAnimatedLength
+    open val width: SVGAnimatedLength
         get() = noImpl
-    val height: SVGAnimatedLength
+    open val height: SVGAnimatedLength
         get() = noImpl
-    val rx: SVGAnimatedLength
+    open val rx: SVGAnimatedLength
         get() = noImpl
-    val ry: SVGAnimatedLength
-        get() = noImpl
-}
-
-@native public interface SVGCircleElement : SVGElement, SVGTests, SVGLangSpace, SVGExternalResourcesRequired, SVGStylable, SVGTransformable {
-    val cx: SVGAnimatedLength
-        get() = noImpl
-    val cy: SVGAnimatedLength
-        get() = noImpl
-    val r: SVGAnimatedLength
+    open val ry: SVGAnimatedLength
         get() = noImpl
 }
 
-@native public interface SVGEllipseElement : SVGElement, SVGTests, SVGLangSpace, SVGExternalResourcesRequired, SVGStylable, SVGTransformable {
-    val cx: SVGAnimatedLength
+@native public abstract class SVGCircleElement : SVGElement, SVGTests, SVGLangSpace, SVGExternalResourcesRequired, SVGStylable, SVGTransformable {
+    open val cx: SVGAnimatedLength
         get() = noImpl
-    val cy: SVGAnimatedLength
+    open val cy: SVGAnimatedLength
         get() = noImpl
-    val rx: SVGAnimatedLength
-        get() = noImpl
-    val ry: SVGAnimatedLength
+    open val r: SVGAnimatedLength
         get() = noImpl
 }
 
-@native public interface SVGLineElement : SVGElement, SVGTests, SVGLangSpace, SVGExternalResourcesRequired, SVGStylable, SVGTransformable {
-    val x1: SVGAnimatedLength
+@native public abstract class SVGEllipseElement : SVGElement, SVGTests, SVGLangSpace, SVGExternalResourcesRequired, SVGStylable, SVGTransformable {
+    open val cx: SVGAnimatedLength
         get() = noImpl
-    val y1: SVGAnimatedLength
+    open val cy: SVGAnimatedLength
         get() = noImpl
-    val x2: SVGAnimatedLength
+    open val rx: SVGAnimatedLength
         get() = noImpl
-    val y2: SVGAnimatedLength
-        get() = noImpl
-}
-
-@native public interface SVGAnimatedPoints {
-    val points: SVGPointList
-        get() = noImpl
-    val animatedPoints: SVGPointList
+    open val ry: SVGAnimatedLength
         get() = noImpl
 }
 
-@native public interface SVGPolylineElement : SVGElement, SVGTests, SVGLangSpace, SVGExternalResourcesRequired, SVGStylable, SVGTransformable, SVGAnimatedPoints {
-}
-
-@native public interface SVGPolygonElement : SVGElement, SVGTests, SVGLangSpace, SVGExternalResourcesRequired, SVGStylable, SVGTransformable, SVGAnimatedPoints {
-}
-
-@native public interface SVGTextContentElement : SVGElement, SVGTests, SVGLangSpace, SVGExternalResourcesRequired, SVGStylable {
-    val textLength: SVGAnimatedLength
+@native public abstract class SVGLineElement : SVGElement, SVGTests, SVGLangSpace, SVGExternalResourcesRequired, SVGStylable, SVGTransformable {
+    open val x1: SVGAnimatedLength
         get() = noImpl
-    val lengthAdjust: SVGAnimatedEnumeration
+    open val y1: SVGAnimatedLength
+        get() = noImpl
+    open val x2: SVGAnimatedLength
+        get() = noImpl
+    open val y2: SVGAnimatedLength
+        get() = noImpl
+}
+
+@native public abstract class SVGAnimatedPoints {
+    open val points: SVGPointList
+        get() = noImpl
+    open val animatedPoints: SVGPointList
+        get() = noImpl
+}
+
+@native public abstract class SVGPolylineElement : SVGElement, SVGTests, SVGLangSpace, SVGExternalResourcesRequired, SVGStylable, SVGTransformable, SVGAnimatedPoints {
+}
+
+@native public abstract class SVGPolygonElement : SVGElement, SVGTests, SVGLangSpace, SVGExternalResourcesRequired, SVGStylable, SVGTransformable, SVGAnimatedPoints {
+}
+
+@native public abstract class SVGTextContentElement : SVGElement, SVGTests, SVGLangSpace, SVGExternalResourcesRequired, SVGStylable {
+    open val textLength: SVGAnimatedLength
+        get() = noImpl
+    open val lengthAdjust: SVGAnimatedEnumeration
         get() = noImpl
     fun getNumberOfChars(): Int = noImpl
     fun getComputedTextLength(): Float = noImpl
@@ -1035,34 +1035,34 @@ import org.w3c.xhr.*
     }
 }
 
-@native public interface SVGTextPositioningElement : SVGTextContentElement {
-    val x: SVGAnimatedLengthList
+@native public abstract class SVGTextPositioningElement : SVGTextContentElement() {
+    open val x: SVGAnimatedLengthList
         get() = noImpl
-    val y: SVGAnimatedLengthList
+    open val y: SVGAnimatedLengthList
         get() = noImpl
-    val dx: SVGAnimatedLengthList
+    open val dx: SVGAnimatedLengthList
         get() = noImpl
-    val dy: SVGAnimatedLengthList
+    open val dy: SVGAnimatedLengthList
         get() = noImpl
-    val rotate: SVGAnimatedNumberList
+    open val rotate: SVGAnimatedNumberList
         get() = noImpl
 }
 
-@native public interface SVGTextElement : SVGTextPositioningElement, SVGTransformable {
+@native public abstract class SVGTextElement : SVGTextPositioningElement, SVGTransformable {
 }
 
-@native public interface SVGTSpanElement : SVGTextPositioningElement {
+@native public abstract class SVGTSpanElement : SVGTextPositioningElement() {
 }
 
-@native public interface SVGTRefElement : SVGTextPositioningElement, SVGURIReference {
+@native public abstract class SVGTRefElement : SVGTextPositioningElement, SVGURIReference {
 }
 
-@native public interface SVGTextPathElement : SVGTextContentElement, SVGURIReference {
-    val startOffset: SVGAnimatedLength
+@native public abstract class SVGTextPathElement : SVGTextContentElement, SVGURIReference {
+    open val startOffset: SVGAnimatedLength
         get() = noImpl
-    val method: SVGAnimatedEnumeration
+    open val method: SVGAnimatedEnumeration
         get() = noImpl
-    val spacing: SVGAnimatedEnumeration
+    open val spacing: SVGAnimatedEnumeration
         get() = noImpl
 
     companion object {
@@ -1075,46 +1075,46 @@ import org.w3c.xhr.*
     }
 }
 
-@native public interface SVGAltGlyphElement : SVGTextPositioningElement, SVGURIReference {
-    var glyphRef: dynamic
+@native public abstract class SVGAltGlyphElement : SVGTextPositioningElement, SVGURIReference {
+    open var glyphRef: dynamic
         get() = noImpl
         set(value) = noImpl
-    var format: dynamic
-        get() = noImpl
-        set(value) = noImpl
-}
-
-@native public interface SVGAltGlyphDefElement : SVGElement {
-}
-
-@native public interface SVGAltGlyphItemElement : SVGElement {
-}
-
-@native public interface SVGGlyphRefElement : SVGElement, SVGURIReference, SVGStylable {
-    var glyphRef: dynamic
-        get() = noImpl
-        set(value) = noImpl
-    var format: dynamic
-        get() = noImpl
-        set(value) = noImpl
-    var x: dynamic
-        get() = noImpl
-        set(value) = noImpl
-    var y: dynamic
-        get() = noImpl
-        set(value) = noImpl
-    var dx: dynamic
-        get() = noImpl
-        set(value) = noImpl
-    var dy: dynamic
+    open var format: dynamic
         get() = noImpl
         set(value) = noImpl
 }
 
-@native public interface SVGPaint : SVGColor {
-    val paintType: Short
+@native public abstract class SVGAltGlyphDefElement : SVGElement() {
+}
+
+@native public abstract class SVGAltGlyphItemElement : SVGElement() {
+}
+
+@native public abstract class SVGGlyphRefElement : SVGElement, SVGURIReference, SVGStylable {
+    open var glyphRef: dynamic
         get() = noImpl
-    val uri: String
+        set(value) = noImpl
+    open var format: dynamic
+        get() = noImpl
+        set(value) = noImpl
+    open var x: dynamic
+        get() = noImpl
+        set(value) = noImpl
+    open var y: dynamic
+        get() = noImpl
+        set(value) = noImpl
+    open var dx: dynamic
+        get() = noImpl
+        set(value) = noImpl
+    open var dy: dynamic
+        get() = noImpl
+        set(value) = noImpl
+}
+
+@native public abstract class SVGPaint : SVGColor() {
+    open val paintType: Short
+        get() = noImpl
+    open val uri: String
         get() = noImpl
     fun setUri(uri: String): Unit = noImpl
     fun setPaint(paintType: Short, uri: String, rgbColor: String, iccColor: String): Unit = noImpl
@@ -1133,20 +1133,20 @@ import org.w3c.xhr.*
     }
 }
 
-@native public interface SVGMarkerElement : SVGElement, SVGLangSpace, SVGExternalResourcesRequired, SVGStylable, SVGFitToViewBox {
-    val refX: SVGAnimatedLength
+@native public abstract class SVGMarkerElement : SVGElement, SVGLangSpace, SVGExternalResourcesRequired, SVGStylable, SVGFitToViewBox {
+    open val refX: SVGAnimatedLength
         get() = noImpl
-    val refY: SVGAnimatedLength
+    open val refY: SVGAnimatedLength
         get() = noImpl
-    val markerUnits: SVGAnimatedEnumeration
+    open val markerUnits: SVGAnimatedEnumeration
         get() = noImpl
-    val markerWidth: SVGAnimatedLength
+    open val markerWidth: SVGAnimatedLength
         get() = noImpl
-    val markerHeight: SVGAnimatedLength
+    open val markerHeight: SVGAnimatedLength
         get() = noImpl
-    val orientType: SVGAnimatedEnumeration
+    open val orientType: SVGAnimatedEnumeration
         get() = noImpl
-    val orientAngle: SVGAnimatedAngle
+    open val orientAngle: SVGAnimatedAngle
         get() = noImpl
     fun setOrientToAuto(): Unit = noImpl
     fun setOrientToAngle(angle: SVGAngle): Unit = noImpl
@@ -1161,36 +1161,36 @@ import org.w3c.xhr.*
     }
 }
 
-@native public interface SVGColorProfileElement : SVGElement, SVGURIReference, SVGRenderingIntent {
-    var local: String
+@native public abstract class SVGColorProfileElement : SVGElement, SVGURIReference, SVGRenderingIntent {
+    open var local: String
         get() = noImpl
         set(value) = noImpl
-    var name: String
+    open var name: String
         get() = noImpl
         set(value) = noImpl
-    var renderingIntent: Short
-        get() = noImpl
-        set(value) = noImpl
-}
-
-@native public interface SVGColorProfileRule : SVGCSSRule, SVGRenderingIntent {
-    var src: dynamic
-        get() = noImpl
-        set(value) = noImpl
-    var name: dynamic
-        get() = noImpl
-        set(value) = noImpl
-    var renderingIntent: dynamic
+    open var renderingIntent: Short
         get() = noImpl
         set(value) = noImpl
 }
 
-@native public interface SVGGradientElement : SVGElement, SVGURIReference, SVGExternalResourcesRequired, SVGStylable, SVGUnitTypes {
-    val gradientUnits: SVGAnimatedEnumeration
+@native public abstract class SVGColorProfileRule : SVGCSSRule, SVGRenderingIntent {
+    open var src: dynamic
         get() = noImpl
-    val gradientTransform: SVGAnimatedTransformList
+        set(value) = noImpl
+    open var name: dynamic
         get() = noImpl
-    val spreadMethod: SVGAnimatedEnumeration
+        set(value) = noImpl
+    open var renderingIntent: dynamic
+        get() = noImpl
+        set(value) = noImpl
+}
+
+@native public abstract class SVGGradientElement : SVGElement, SVGURIReference, SVGExternalResourcesRequired, SVGStylable, SVGUnitTypes {
+    open val gradientUnits: SVGAnimatedEnumeration
+        get() = noImpl
+    open val gradientTransform: SVGAnimatedTransformList
+        get() = noImpl
+    open val spreadMethod: SVGAnimatedEnumeration
         get() = noImpl
 
     companion object {
@@ -1201,111 +1201,111 @@ import org.w3c.xhr.*
     }
 }
 
-@native public interface SVGLinearGradientElement : SVGGradientElement {
-    val x1: SVGAnimatedLength
+@native public abstract class SVGLinearGradientElement : SVGGradientElement() {
+    open val x1: SVGAnimatedLength
         get() = noImpl
-    val y1: SVGAnimatedLength
+    open val y1: SVGAnimatedLength
         get() = noImpl
-    val x2: SVGAnimatedLength
+    open val x2: SVGAnimatedLength
         get() = noImpl
-    val y2: SVGAnimatedLength
-        get() = noImpl
-}
-
-@native public interface SVGRadialGradientElement : SVGGradientElement {
-    val cx: SVGAnimatedLength
-        get() = noImpl
-    val cy: SVGAnimatedLength
-        get() = noImpl
-    val r: SVGAnimatedLength
-        get() = noImpl
-    val fx: SVGAnimatedLength
-        get() = noImpl
-    val fy: SVGAnimatedLength
+    open val y2: SVGAnimatedLength
         get() = noImpl
 }
 
-@native public interface SVGStopElement : SVGElement, SVGStylable {
-    val offset: SVGAnimatedNumber
+@native public abstract class SVGRadialGradientElement : SVGGradientElement() {
+    open val cx: SVGAnimatedLength
+        get() = noImpl
+    open val cy: SVGAnimatedLength
+        get() = noImpl
+    open val r: SVGAnimatedLength
+        get() = noImpl
+    open val fx: SVGAnimatedLength
+        get() = noImpl
+    open val fy: SVGAnimatedLength
         get() = noImpl
 }
 
-@native public interface SVGPatternElement : SVGElement, SVGURIReference, SVGTests, SVGLangSpace, SVGExternalResourcesRequired, SVGStylable, SVGFitToViewBox, SVGUnitTypes {
-    val patternUnits: SVGAnimatedEnumeration
-        get() = noImpl
-    val patternContentUnits: SVGAnimatedEnumeration
-        get() = noImpl
-    val patternTransform: SVGAnimatedTransformList
-        get() = noImpl
-    val x: SVGAnimatedLength
-        get() = noImpl
-    val y: SVGAnimatedLength
-        get() = noImpl
-    val width: SVGAnimatedLength
-        get() = noImpl
-    val height: SVGAnimatedLength
+@native public abstract class SVGStopElement : SVGElement, SVGStylable {
+    open val offset: SVGAnimatedNumber
         get() = noImpl
 }
 
-@native public interface SVGClipPathElement : SVGElement, SVGTests, SVGLangSpace, SVGExternalResourcesRequired, SVGStylable, SVGTransformable, SVGUnitTypes {
-    val clipPathUnits: SVGAnimatedEnumeration
+@native public abstract class SVGPatternElement : SVGElement, SVGURIReference, SVGTests, SVGLangSpace, SVGExternalResourcesRequired, SVGStylable, SVGFitToViewBox, SVGUnitTypes {
+    open val patternUnits: SVGAnimatedEnumeration
+        get() = noImpl
+    open val patternContentUnits: SVGAnimatedEnumeration
+        get() = noImpl
+    open val patternTransform: SVGAnimatedTransformList
+        get() = noImpl
+    open val x: SVGAnimatedLength
+        get() = noImpl
+    open val y: SVGAnimatedLength
+        get() = noImpl
+    open val width: SVGAnimatedLength
+        get() = noImpl
+    open val height: SVGAnimatedLength
         get() = noImpl
 }
 
-@native public interface SVGMaskElement : SVGElement, SVGTests, SVGLangSpace, SVGExternalResourcesRequired, SVGStylable, SVGUnitTypes {
-    val maskUnits: SVGAnimatedEnumeration
-        get() = noImpl
-    val maskContentUnits: SVGAnimatedEnumeration
-        get() = noImpl
-    val x: SVGAnimatedLength
-        get() = noImpl
-    val y: SVGAnimatedLength
-        get() = noImpl
-    val width: SVGAnimatedLength
-        get() = noImpl
-    val height: SVGAnimatedLength
+@native public abstract class SVGClipPathElement : SVGElement, SVGTests, SVGLangSpace, SVGExternalResourcesRequired, SVGStylable, SVGTransformable, SVGUnitTypes {
+    open val clipPathUnits: SVGAnimatedEnumeration
         get() = noImpl
 }
 
-@native public interface SVGFilterElement : SVGElement, SVGURIReference, SVGLangSpace, SVGExternalResourcesRequired, SVGStylable, SVGUnitTypes {
-    val filterUnits: SVGAnimatedEnumeration
+@native public abstract class SVGMaskElement : SVGElement, SVGTests, SVGLangSpace, SVGExternalResourcesRequired, SVGStylable, SVGUnitTypes {
+    open val maskUnits: SVGAnimatedEnumeration
         get() = noImpl
-    val primitiveUnits: SVGAnimatedEnumeration
+    open val maskContentUnits: SVGAnimatedEnumeration
         get() = noImpl
-    val x: SVGAnimatedLength
+    open val x: SVGAnimatedLength
         get() = noImpl
-    val y: SVGAnimatedLength
+    open val y: SVGAnimatedLength
         get() = noImpl
-    val width: SVGAnimatedLength
+    open val width: SVGAnimatedLength
         get() = noImpl
-    val height: SVGAnimatedLength
+    open val height: SVGAnimatedLength
         get() = noImpl
-    val filterResX: SVGAnimatedInteger
+}
+
+@native public abstract class SVGFilterElement : SVGElement, SVGURIReference, SVGLangSpace, SVGExternalResourcesRequired, SVGStylable, SVGUnitTypes {
+    open val filterUnits: SVGAnimatedEnumeration
         get() = noImpl
-    val filterResY: SVGAnimatedInteger
+    open val primitiveUnits: SVGAnimatedEnumeration
+        get() = noImpl
+    open val x: SVGAnimatedLength
+        get() = noImpl
+    open val y: SVGAnimatedLength
+        get() = noImpl
+    open val width: SVGAnimatedLength
+        get() = noImpl
+    open val height: SVGAnimatedLength
+        get() = noImpl
+    open val filterResX: SVGAnimatedInteger
+        get() = noImpl
+    open val filterResY: SVGAnimatedInteger
         get() = noImpl
     fun setFilterRes(filterResX: Int, filterResY: Int): Unit = noImpl
 }
 
-@native public interface SVGFilterPrimitiveStandardAttributes : SVGStylable {
-    val x: SVGAnimatedLength
+@native public abstract class SVGFilterPrimitiveStandardAttributes : SVGStylable() {
+    open val x: SVGAnimatedLength
         get() = noImpl
-    val y: SVGAnimatedLength
+    open val y: SVGAnimatedLength
         get() = noImpl
-    val width: SVGAnimatedLength
+    open val width: SVGAnimatedLength
         get() = noImpl
-    val height: SVGAnimatedLength
+    open val height: SVGAnimatedLength
         get() = noImpl
-    val result: SVGAnimatedString
+    open val result: SVGAnimatedString
         get() = noImpl
 }
 
-@native public interface SVGFEBlendElement : SVGElement, SVGFilterPrimitiveStandardAttributes {
-    val in1: SVGAnimatedString
+@native public abstract class SVGFEBlendElement : SVGElement, SVGFilterPrimitiveStandardAttributes {
+    open val in1: SVGAnimatedString
         get() = noImpl
-    val in2: SVGAnimatedString
+    open val in2: SVGAnimatedString
         get() = noImpl
-    val mode: SVGAnimatedEnumeration
+    open val mode: SVGAnimatedEnumeration
         get() = noImpl
 
     companion object {
@@ -1318,12 +1318,12 @@ import org.w3c.xhr.*
     }
 }
 
-@native public interface SVGFEColorMatrixElement : SVGElement, SVGFilterPrimitiveStandardAttributes {
-    val in1: SVGAnimatedString
+@native public abstract class SVGFEColorMatrixElement : SVGElement, SVGFilterPrimitiveStandardAttributes {
+    open val in1: SVGAnimatedString
         get() = noImpl
-    val type: SVGAnimatedEnumeration
+    open val type: SVGAnimatedEnumeration
         get() = noImpl
-    val values: SVGAnimatedNumberList
+    open val values: SVGAnimatedNumberList
         get() = noImpl
 
     companion object {
@@ -1335,25 +1335,25 @@ import org.w3c.xhr.*
     }
 }
 
-@native public interface SVGFEComponentTransferElement : SVGElement, SVGFilterPrimitiveStandardAttributes {
-    val in1: SVGAnimatedString
+@native public abstract class SVGFEComponentTransferElement : SVGElement, SVGFilterPrimitiveStandardAttributes {
+    open val in1: SVGAnimatedString
         get() = noImpl
 }
 
-@native public interface SVGComponentTransferFunctionElement : SVGElement {
-    val type: SVGAnimatedEnumeration
+@native public abstract class SVGComponentTransferFunctionElement : SVGElement() {
+    open val type: SVGAnimatedEnumeration
         get() = noImpl
-    val tableValues: SVGAnimatedNumberList
+    open val tableValues: SVGAnimatedNumberList
         get() = noImpl
-    val slope: SVGAnimatedNumber
+    open val slope: SVGAnimatedNumber
         get() = noImpl
-    val intercept: SVGAnimatedNumber
+    open val intercept: SVGAnimatedNumber
         get() = noImpl
-    val amplitude: SVGAnimatedNumber
+    open val amplitude: SVGAnimatedNumber
         get() = noImpl
-    val exponent: SVGAnimatedNumber
+    open val exponent: SVGAnimatedNumber
         get() = noImpl
-    val offset: SVGAnimatedNumber
+    open val offset: SVGAnimatedNumber
         get() = noImpl
 
     companion object {
@@ -1366,32 +1366,32 @@ import org.w3c.xhr.*
     }
 }
 
-@native public interface SVGFEFuncRElement : SVGComponentTransferFunctionElement {
+@native public abstract class SVGFEFuncRElement : SVGComponentTransferFunctionElement() {
 }
 
-@native public interface SVGFEFuncGElement : SVGComponentTransferFunctionElement {
+@native public abstract class SVGFEFuncGElement : SVGComponentTransferFunctionElement() {
 }
 
-@native public interface SVGFEFuncBElement : SVGComponentTransferFunctionElement {
+@native public abstract class SVGFEFuncBElement : SVGComponentTransferFunctionElement() {
 }
 
-@native public interface SVGFEFuncAElement : SVGComponentTransferFunctionElement {
+@native public abstract class SVGFEFuncAElement : SVGComponentTransferFunctionElement() {
 }
 
-@native public interface SVGFECompositeElement : SVGElement, SVGFilterPrimitiveStandardAttributes {
-    val in1: SVGAnimatedString
+@native public abstract class SVGFECompositeElement : SVGElement, SVGFilterPrimitiveStandardAttributes {
+    open val in1: SVGAnimatedString
         get() = noImpl
-    val in2: SVGAnimatedString
+    open val in2: SVGAnimatedString
         get() = noImpl
-    val operator: SVGAnimatedEnumeration
+    open val operator: SVGAnimatedEnumeration
         get() = noImpl
-    val k1: SVGAnimatedNumber
+    open val k1: SVGAnimatedNumber
         get() = noImpl
-    val k2: SVGAnimatedNumber
+    open val k2: SVGAnimatedNumber
         get() = noImpl
-    val k3: SVGAnimatedNumber
+    open val k3: SVGAnimatedNumber
         get() = noImpl
-    val k4: SVGAnimatedNumber
+    open val k4: SVGAnimatedNumber
         get() = noImpl
 
     companion object {
@@ -1405,30 +1405,30 @@ import org.w3c.xhr.*
     }
 }
 
-@native public interface SVGFEConvolveMatrixElement : SVGElement, SVGFilterPrimitiveStandardAttributes {
-    val in1: SVGAnimatedString
+@native public abstract class SVGFEConvolveMatrixElement : SVGElement, SVGFilterPrimitiveStandardAttributes {
+    open val in1: SVGAnimatedString
         get() = noImpl
-    val orderX: SVGAnimatedInteger
+    open val orderX: SVGAnimatedInteger
         get() = noImpl
-    val orderY: SVGAnimatedInteger
+    open val orderY: SVGAnimatedInteger
         get() = noImpl
-    val kernelMatrix: SVGAnimatedNumberList
+    open val kernelMatrix: SVGAnimatedNumberList
         get() = noImpl
-    val divisor: SVGAnimatedNumber
+    open val divisor: SVGAnimatedNumber
         get() = noImpl
-    val bias: SVGAnimatedNumber
+    open val bias: SVGAnimatedNumber
         get() = noImpl
-    val targetX: SVGAnimatedInteger
+    open val targetX: SVGAnimatedInteger
         get() = noImpl
-    val targetY: SVGAnimatedInteger
+    open val targetY: SVGAnimatedInteger
         get() = noImpl
-    val edgeMode: SVGAnimatedEnumeration
+    open val edgeMode: SVGAnimatedEnumeration
         get() = noImpl
-    val kernelUnitLengthX: SVGAnimatedNumber
+    open val kernelUnitLengthX: SVGAnimatedNumber
         get() = noImpl
-    val kernelUnitLengthY: SVGAnimatedNumber
+    open val kernelUnitLengthY: SVGAnimatedNumber
         get() = noImpl
-    val preserveAlpha: SVGAnimatedBoolean
+    open val preserveAlpha: SVGAnimatedBoolean
         get() = noImpl
 
     companion object {
@@ -1439,64 +1439,64 @@ import org.w3c.xhr.*
     }
 }
 
-@native public interface SVGFEDiffuseLightingElement : SVGElement, SVGFilterPrimitiveStandardAttributes {
-    val in1: SVGAnimatedString
+@native public abstract class SVGFEDiffuseLightingElement : SVGElement, SVGFilterPrimitiveStandardAttributes {
+    open val in1: SVGAnimatedString
         get() = noImpl
-    val surfaceScale: SVGAnimatedNumber
+    open val surfaceScale: SVGAnimatedNumber
         get() = noImpl
-    val diffuseConstant: SVGAnimatedNumber
+    open val diffuseConstant: SVGAnimatedNumber
         get() = noImpl
-    val kernelUnitLengthX: SVGAnimatedNumber
+    open val kernelUnitLengthX: SVGAnimatedNumber
         get() = noImpl
-    val kernelUnitLengthY: SVGAnimatedNumber
-        get() = noImpl
-}
-
-@native public interface SVGFEDistantLightElement : SVGElement {
-    val azimuth: SVGAnimatedNumber
-        get() = noImpl
-    val elevation: SVGAnimatedNumber
+    open val kernelUnitLengthY: SVGAnimatedNumber
         get() = noImpl
 }
 
-@native public interface SVGFEPointLightElement : SVGElement {
-    val x: SVGAnimatedNumber
+@native public abstract class SVGFEDistantLightElement : SVGElement() {
+    open val azimuth: SVGAnimatedNumber
         get() = noImpl
-    val y: SVGAnimatedNumber
-        get() = noImpl
-    val z: SVGAnimatedNumber
+    open val elevation: SVGAnimatedNumber
         get() = noImpl
 }
 
-@native public interface SVGFESpotLightElement : SVGElement {
-    val x: SVGAnimatedNumber
+@native public abstract class SVGFEPointLightElement : SVGElement() {
+    open val x: SVGAnimatedNumber
         get() = noImpl
-    val y: SVGAnimatedNumber
+    open val y: SVGAnimatedNumber
         get() = noImpl
-    val z: SVGAnimatedNumber
-        get() = noImpl
-    val pointsAtX: SVGAnimatedNumber
-        get() = noImpl
-    val pointsAtY: SVGAnimatedNumber
-        get() = noImpl
-    val pointsAtZ: SVGAnimatedNumber
-        get() = noImpl
-    val specularExponent: SVGAnimatedNumber
-        get() = noImpl
-    val limitingConeAngle: SVGAnimatedNumber
+    open val z: SVGAnimatedNumber
         get() = noImpl
 }
 
-@native public interface SVGFEDisplacementMapElement : SVGElement, SVGFilterPrimitiveStandardAttributes {
-    val in1: SVGAnimatedString
+@native public abstract class SVGFESpotLightElement : SVGElement() {
+    open val x: SVGAnimatedNumber
         get() = noImpl
-    val in2: SVGAnimatedString
+    open val y: SVGAnimatedNumber
         get() = noImpl
-    val scale: SVGAnimatedNumber
+    open val z: SVGAnimatedNumber
         get() = noImpl
-    val xChannelSelector: SVGAnimatedEnumeration
+    open val pointsAtX: SVGAnimatedNumber
         get() = noImpl
-    val yChannelSelector: SVGAnimatedEnumeration
+    open val pointsAtY: SVGAnimatedNumber
+        get() = noImpl
+    open val pointsAtZ: SVGAnimatedNumber
+        get() = noImpl
+    open val specularExponent: SVGAnimatedNumber
+        get() = noImpl
+    open val limitingConeAngle: SVGAnimatedNumber
+        get() = noImpl
+}
+
+@native public abstract class SVGFEDisplacementMapElement : SVGElement, SVGFilterPrimitiveStandardAttributes {
+    open val in1: SVGAnimatedString
+        get() = noImpl
+    open val in2: SVGAnimatedString
+        get() = noImpl
+    open val scale: SVGAnimatedNumber
+        get() = noImpl
+    open val xChannelSelector: SVGAnimatedEnumeration
+        get() = noImpl
+    open val yChannelSelector: SVGAnimatedEnumeration
         get() = noImpl
 
     companion object {
@@ -1508,40 +1508,40 @@ import org.w3c.xhr.*
     }
 }
 
-@native public interface SVGFEFloodElement : SVGElement, SVGFilterPrimitiveStandardAttributes {
+@native public abstract class SVGFEFloodElement : SVGElement, SVGFilterPrimitiveStandardAttributes {
 }
 
-@native public interface SVGFEGaussianBlurElement : SVGElement, SVGFilterPrimitiveStandardAttributes {
-    val in1: SVGAnimatedString
+@native public abstract class SVGFEGaussianBlurElement : SVGElement, SVGFilterPrimitiveStandardAttributes {
+    open val in1: SVGAnimatedString
         get() = noImpl
-    val stdDeviationX: SVGAnimatedNumber
+    open val stdDeviationX: SVGAnimatedNumber
         get() = noImpl
-    val stdDeviationY: SVGAnimatedNumber
+    open val stdDeviationY: SVGAnimatedNumber
         get() = noImpl
     fun setStdDeviation(stdDeviationX: Float, stdDeviationY: Float): Unit = noImpl
 }
 
-@native public interface SVGFEImageElement : SVGElement, SVGURIReference, SVGLangSpace, SVGExternalResourcesRequired, SVGFilterPrimitiveStandardAttributes {
-    val preserveAspectRatio: SVGAnimatedPreserveAspectRatio
+@native public abstract class SVGFEImageElement : SVGElement, SVGURIReference, SVGLangSpace, SVGExternalResourcesRequired, SVGFilterPrimitiveStandardAttributes {
+    open val preserveAspectRatio: SVGAnimatedPreserveAspectRatio
         get() = noImpl
 }
 
-@native public interface SVGFEMergeElement : SVGElement, SVGFilterPrimitiveStandardAttributes {
+@native public abstract class SVGFEMergeElement : SVGElement, SVGFilterPrimitiveStandardAttributes {
 }
 
-@native public interface SVGFEMergeNodeElement : SVGElement {
-    val in1: SVGAnimatedString
+@native public abstract class SVGFEMergeNodeElement : SVGElement() {
+    open val in1: SVGAnimatedString
         get() = noImpl
 }
 
-@native public interface SVGFEMorphologyElement : SVGElement, SVGFilterPrimitiveStandardAttributes {
-    val in1: SVGAnimatedString
+@native public abstract class SVGFEMorphologyElement : SVGElement, SVGFilterPrimitiveStandardAttributes {
+    open val in1: SVGAnimatedString
         get() = noImpl
-    val operator: SVGAnimatedEnumeration
+    open val operator: SVGAnimatedEnumeration
         get() = noImpl
-    val radiusX: SVGAnimatedNumber
+    open val radiusX: SVGAnimatedNumber
         get() = noImpl
-    val radiusY: SVGAnimatedNumber
+    open val radiusY: SVGAnimatedNumber
         get() = noImpl
 
     companion object {
@@ -1551,47 +1551,47 @@ import org.w3c.xhr.*
     }
 }
 
-@native public interface SVGFEOffsetElement : SVGElement, SVGFilterPrimitiveStandardAttributes {
-    val in1: SVGAnimatedString
+@native public abstract class SVGFEOffsetElement : SVGElement, SVGFilterPrimitiveStandardAttributes {
+    open val in1: SVGAnimatedString
         get() = noImpl
-    val dx: SVGAnimatedNumber
+    open val dx: SVGAnimatedNumber
         get() = noImpl
-    val dy: SVGAnimatedNumber
-        get() = noImpl
-}
-
-@native public interface SVGFESpecularLightingElement : SVGElement, SVGFilterPrimitiveStandardAttributes {
-    val in1: SVGAnimatedString
-        get() = noImpl
-    val surfaceScale: SVGAnimatedNumber
-        get() = noImpl
-    val specularConstant: SVGAnimatedNumber
-        get() = noImpl
-    val specularExponent: SVGAnimatedNumber
-        get() = noImpl
-    val kernelUnitLengthX: SVGAnimatedNumber
-        get() = noImpl
-    val kernelUnitLengthY: SVGAnimatedNumber
+    open val dy: SVGAnimatedNumber
         get() = noImpl
 }
 
-@native public interface SVGFETileElement : SVGElement, SVGFilterPrimitiveStandardAttributes {
-    val in1: SVGAnimatedString
+@native public abstract class SVGFESpecularLightingElement : SVGElement, SVGFilterPrimitiveStandardAttributes {
+    open val in1: SVGAnimatedString
+        get() = noImpl
+    open val surfaceScale: SVGAnimatedNumber
+        get() = noImpl
+    open val specularConstant: SVGAnimatedNumber
+        get() = noImpl
+    open val specularExponent: SVGAnimatedNumber
+        get() = noImpl
+    open val kernelUnitLengthX: SVGAnimatedNumber
+        get() = noImpl
+    open val kernelUnitLengthY: SVGAnimatedNumber
         get() = noImpl
 }
 
-@native public interface SVGFETurbulenceElement : SVGElement, SVGFilterPrimitiveStandardAttributes {
-    val baseFrequencyX: SVGAnimatedNumber
+@native public abstract class SVGFETileElement : SVGElement, SVGFilterPrimitiveStandardAttributes {
+    open val in1: SVGAnimatedString
         get() = noImpl
-    val baseFrequencyY: SVGAnimatedNumber
+}
+
+@native public abstract class SVGFETurbulenceElement : SVGElement, SVGFilterPrimitiveStandardAttributes {
+    open val baseFrequencyX: SVGAnimatedNumber
         get() = noImpl
-    val numOctaves: SVGAnimatedInteger
+    open val baseFrequencyY: SVGAnimatedNumber
         get() = noImpl
-    val seed: SVGAnimatedNumber
+    open val numOctaves: SVGAnimatedInteger
         get() = noImpl
-    val stitchTiles: SVGAnimatedEnumeration
+    open val seed: SVGAnimatedNumber
         get() = noImpl
-    val type: SVGAnimatedEnumeration
+    open val stitchTiles: SVGAnimatedEnumeration
+        get() = noImpl
+    open val type: SVGAnimatedEnumeration
         get() = noImpl
 
     companion object {
@@ -1604,25 +1604,25 @@ import org.w3c.xhr.*
     }
 }
 
-@native public interface SVGCursorElement : SVGElement, SVGURIReference, SVGTests, SVGExternalResourcesRequired {
-    val x: SVGAnimatedLength
+@native public abstract class SVGCursorElement : SVGElement, SVGURIReference, SVGTests, SVGExternalResourcesRequired {
+    open val x: SVGAnimatedLength
         get() = noImpl
-    val y: SVGAnimatedLength
-        get() = noImpl
-}
-
-@native public interface SVGAElement : SVGElement, SVGURIReference, SVGTests, SVGLangSpace, SVGExternalResourcesRequired, SVGStylable, SVGTransformable {
-    val target: SVGAnimatedString
+    open val y: SVGAnimatedLength
         get() = noImpl
 }
 
-@native public interface SVGViewElement : SVGElement, SVGExternalResourcesRequired, SVGFitToViewBox, SVGZoomAndPan {
-    val viewTarget: SVGStringList
+@native public abstract class SVGAElement : SVGElement, SVGURIReference, SVGTests, SVGLangSpace, SVGExternalResourcesRequired, SVGStylable, SVGTransformable {
+    open val target: SVGAnimatedString
         get() = noImpl
 }
 
-@native public interface SVGScriptElement : SVGElement, SVGURIReference, SVGExternalResourcesRequired {
-    var type: dynamic
+@native public abstract class SVGViewElement : SVGElement, SVGExternalResourcesRequired, SVGFitToViewBox, SVGZoomAndPan {
+    open val viewTarget: SVGStringList
+        get() = noImpl
+}
+
+@native public abstract class SVGScriptElement : SVGElement, SVGURIReference, SVGExternalResourcesRequired {
+    open var type: dynamic
         get() = noImpl
         set(value) = noImpl
 }
@@ -1640,7 +1640,7 @@ import org.w3c.xhr.*
         get() = noImpl
 }
 
-@native public interface ElementTimeControl {
+@native public abstract class ElementTimeControl {
     fun beginElement(): Unit = noImpl
     fun beginElementAt(offset: Float): Unit = noImpl
     fun endElement(): Unit = noImpl
@@ -1655,73 +1655,73 @@ import org.w3c.xhr.*
     fun initTimeEvent(typeArg: String, viewArg: dynamic, detailArg: Int): Unit = noImpl
 }
 
-@native public interface SVGAnimationElement : SVGElement, SVGTests, SVGExternalResourcesRequired, ElementTimeControl {
-    val targetElement: SVGElement
+@native public abstract class SVGAnimationElement : SVGElement, SVGTests, SVGExternalResourcesRequired, ElementTimeControl {
+    open val targetElement: SVGElement
         get() = noImpl
     fun getStartTime(): Float = noImpl
     fun getCurrentTime(): Float = noImpl
     fun getSimpleDuration(): Float = noImpl
 }
 
-@native public interface SVGAnimateElement : SVGAnimationElement, SVGStylable {
+@native public abstract class SVGAnimateElement : SVGAnimationElement, SVGStylable {
 }
 
-@native public interface SVGSetElement : SVGAnimationElement {
+@native public abstract class SVGSetElement : SVGAnimationElement() {
 }
 
-@native public interface SVGAnimateMotionElement : SVGAnimationElement {
+@native public abstract class SVGAnimateMotionElement : SVGAnimationElement() {
 }
 
-@native public interface SVGMPathElement : SVGElement, SVGURIReference, SVGExternalResourcesRequired {
+@native public abstract class SVGMPathElement : SVGElement, SVGURIReference, SVGExternalResourcesRequired {
 }
 
-@native public interface SVGAnimateColorElement : SVGAnimationElement, SVGStylable {
+@native public abstract class SVGAnimateColorElement : SVGAnimationElement, SVGStylable {
 }
 
-@native public interface SVGAnimateTransformElement : SVGAnimationElement {
+@native public abstract class SVGAnimateTransformElement : SVGAnimationElement() {
 }
 
-@native public interface SVGFontElement : SVGElement, SVGExternalResourcesRequired, SVGStylable {
+@native public abstract class SVGFontElement : SVGElement, SVGExternalResourcesRequired, SVGStylable {
 }
 
-@native public interface SVGGlyphElement : SVGElement, SVGStylable {
+@native public abstract class SVGGlyphElement : SVGElement, SVGStylable {
 }
 
-@native public interface SVGMissingGlyphElement : SVGElement, SVGStylable {
+@native public abstract class SVGMissingGlyphElement : SVGElement, SVGStylable {
 }
 
-@native public interface SVGHKernElement : SVGElement {
+@native public abstract class SVGHKernElement : SVGElement() {
 }
 
-@native public interface SVGVKernElement : SVGElement {
+@native public abstract class SVGVKernElement : SVGElement() {
 }
 
-@native public interface SVGFontFaceElement : SVGElement {
+@native public abstract class SVGFontFaceElement : SVGElement() {
 }
 
-@native public interface SVGFontFaceSrcElement : SVGElement {
+@native public abstract class SVGFontFaceSrcElement : SVGElement() {
 }
 
-@native public interface SVGFontFaceUriElement : SVGElement {
+@native public abstract class SVGFontFaceUriElement : SVGElement() {
 }
 
-@native public interface SVGFontFaceFormatElement : SVGElement {
+@native public abstract class SVGFontFaceFormatElement : SVGElement() {
 }
 
-@native public interface SVGFontFaceNameElement : SVGElement {
+@native public abstract class SVGFontFaceNameElement : SVGElement() {
 }
 
-@native public interface SVGMetadataElement : SVGElement {
+@native public abstract class SVGMetadataElement : SVGElement() {
 }
 
-@native public interface SVGForeignObjectElement : SVGElement, SVGTests, SVGLangSpace, SVGExternalResourcesRequired, SVGStylable, SVGTransformable {
-    val x: SVGAnimatedLength
+@native public abstract class SVGForeignObjectElement : SVGElement, SVGTests, SVGLangSpace, SVGExternalResourcesRequired, SVGStylable, SVGTransformable {
+    open val x: SVGAnimatedLength
         get() = noImpl
-    val y: SVGAnimatedLength
+    open val y: SVGAnimatedLength
         get() = noImpl
-    val width: SVGAnimatedLength
+    open val width: SVGAnimatedLength
         get() = noImpl
-    val height: SVGAnimatedLength
+    open val height: SVGAnimatedLength
         get() = noImpl
 }
 

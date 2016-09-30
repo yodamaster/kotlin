@@ -20,34 +20,34 @@ import org.w3c.notifications.*
 import org.w3c.performance.*
 import org.w3c.workers.*
 
-@native public interface XMLHttpRequestEventTarget : EventTarget {
-    var onloadstart: ((Event) -> dynamic)?
+@native public abstract class XMLHttpRequestEventTarget : EventTarget() {
+    open var onloadstart: ((Event) -> dynamic)?
         get() = noImpl
         set(value) = noImpl
-    var onprogress: ((Event) -> dynamic)?
+    open var onprogress: ((Event) -> dynamic)?
         get() = noImpl
         set(value) = noImpl
-    var onabort: ((Event) -> dynamic)?
+    open var onabort: ((Event) -> dynamic)?
         get() = noImpl
         set(value) = noImpl
-    var onerror: ((Event) -> dynamic)?
+    open var onerror: ((Event) -> dynamic)?
         get() = noImpl
         set(value) = noImpl
-    var onload: ((Event) -> dynamic)?
+    open var onload: ((Event) -> dynamic)?
         get() = noImpl
         set(value) = noImpl
-    var ontimeout: ((Event) -> dynamic)?
+    open var ontimeout: ((Event) -> dynamic)?
         get() = noImpl
         set(value) = noImpl
-    var onloadend: ((Event) -> dynamic)?
+    open var onloadend: ((Event) -> dynamic)?
         get() = noImpl
         set(value) = noImpl
 }
 
-@native public interface XMLHttpRequestUpload : XMLHttpRequestEventTarget {
+@native public abstract class XMLHttpRequestUpload : XMLHttpRequestEventTarget() {
 }
 
-@native public open class XMLHttpRequest : XMLHttpRequestEventTarget {
+@native public open class XMLHttpRequest : XMLHttpRequestEventTarget() {
     var onreadystatechange: ((Event) -> dynamic)?
         get() = noImpl
         set(value) = noImpl
@@ -112,10 +112,10 @@ import org.w3c.workers.*
         get() = noImpl
 }
 
-@native public interface ProgressEventInit : EventInit {
-    var lengthComputable: Boolean
-    var loaded: Int
-    var total: Int
+@native public abstract class ProgressEventInit : EventInit() {
+    open var lengthComputable: Boolean = false
+    open var loaded: Int = 0
+    open var total: Int = 0
 }
 
 @Suppress("NOTHING_TO_INLINE")

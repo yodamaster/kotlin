@@ -20,7 +20,7 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-@native public open class Notification(title: String, options: NotificationOptions = noImpl) : EventTarget {
+@native public open class Notification(title: String, options: NotificationOptions = noImpl) : EventTarget() {
     var onclick: ((Event) -> dynamic)?
         get() = noImpl
         set(value) = noImpl
@@ -61,19 +61,19 @@ import org.w3c.xhr.*
     }
 }
 
-@native public interface NotificationOptions {
-    var dir: String
-    var lang: String
-    var body: String
-    var tag: String
-    var icon: String
-    var sound: String
-    var vibrate: dynamic
-    var renotify: Boolean
-    var silent: Boolean
-    var noscreen: Boolean
-    var sticky: Boolean
-    var data: Any?
+@native public abstract class NotificationOptions {
+    open var dir: String = "auto"
+    open var lang: String = ""
+    open var body: String = ""
+    open var tag: String = ""
+    abstract var icon: String
+    abstract var sound: String
+    abstract var vibrate: dynamic
+    open var renotify: Boolean = false
+    open var silent: Boolean = false
+    open var noscreen: Boolean = false
+    open var sticky: Boolean = false
+    open var data: Any? = null
 }
 
 @Suppress("NOTHING_TO_INLINE")
@@ -96,8 +96,8 @@ public inline fun NotificationOptions(dir: String = "auto", lang: String = "", b
     return o
 }
 
-@native public interface GetNotificationOptions {
-    var tag: String
+@native public abstract class GetNotificationOptions {
+    open var tag: String = ""
 }
 
 @Suppress("NOTHING_TO_INLINE")
@@ -114,8 +114,8 @@ public inline fun GetNotificationOptions(tag: String = ""): GetNotificationOptio
         get() = noImpl
 }
 
-@native public interface NotificationEventInit : ExtendableEventInit {
-    var notification: Notification
+@native public abstract class NotificationEventInit : ExtendableEventInit() {
+    abstract var notification: Notification
 }
 
 @Suppress("NOTHING_TO_INLINE")

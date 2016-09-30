@@ -32,8 +32,8 @@ import org.w3c.xhr.*
     fun close(): Unit = noImpl
 }
 
-@native public interface BlobPropertyBag {
-    var type: String
+@native public abstract class BlobPropertyBag {
+    open var type: String = ""
 }
 
 @Suppress("NOTHING_TO_INLINE")
@@ -52,9 +52,9 @@ public inline fun BlobPropertyBag(type: String = ""): BlobPropertyBag {
         get() = noImpl
 }
 
-@native public interface FilePropertyBag {
-    var type: String
-    var lastModified: Int
+@native public abstract class FilePropertyBag {
+    open var type: String = ""
+    abstract var lastModified: Int
 }
 
 @Suppress("NOTHING_TO_INLINE")
@@ -67,15 +67,15 @@ public inline fun FilePropertyBag(type: String = "", lastModified: Int): FilePro
     return o
 }
 
-@native public interface FileList {
-    val length: Int
+@native public abstract class FileList {
+    open val length: Int
         get() = noImpl
     fun item(index: Int): File? = noImpl
     @nativeGetter
     operator fun get(index: Int): File? = noImpl
 }
 
-@native public open class FileReader : EventTarget {
+@native public open class FileReader : EventTarget() {
     open val readyState: Short
         get() = noImpl
     open val result: dynamic
