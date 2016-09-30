@@ -20,63 +20,63 @@ import org.w3c.notifications.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-@native public interface Performance {
-    val timing: PerformanceTiming
+@native public abstract class Performance {
+    open val timing: PerformanceTiming
         get() = noImpl
-    val navigation: PerformanceNavigation
+    open val navigation: PerformanceNavigation
         get() = noImpl
     fun now(): Double = noImpl
 }
 
-@native public interface PerformanceTiming {
-    val navigationStart: Int
+@native public abstract class PerformanceTiming {
+    open val navigationStart: Int
         get() = noImpl
-    val unloadEventStart: Int
+    open val unloadEventStart: Int
         get() = noImpl
-    val unloadEventEnd: Int
+    open val unloadEventEnd: Int
         get() = noImpl
-    val redirectStart: Int
+    open val redirectStart: Int
         get() = noImpl
-    val redirectEnd: Int
+    open val redirectEnd: Int
         get() = noImpl
-    val fetchStart: Int
+    open val fetchStart: Int
         get() = noImpl
-    val domainLookupStart: Int
+    open val domainLookupStart: Int
         get() = noImpl
-    val domainLookupEnd: Int
+    open val domainLookupEnd: Int
         get() = noImpl
-    val connectStart: Int
+    open val connectStart: Int
         get() = noImpl
-    val connectEnd: Int
+    open val connectEnd: Int
         get() = noImpl
-    val secureConnectionStart: Int
+    open val secureConnectionStart: Int
         get() = noImpl
-    val requestStart: Int
+    open val requestStart: Int
         get() = noImpl
-    val responseStart: Int
+    open val responseStart: Int
         get() = noImpl
-    val responseEnd: Int
+    open val responseEnd: Int
         get() = noImpl
-    val domLoading: Int
+    open val domLoading: Int
         get() = noImpl
-    val domInteractive: Int
+    open val domInteractive: Int
         get() = noImpl
-    val domContentLoadedEventStart: Int
+    open val domContentLoadedEventStart: Int
         get() = noImpl
-    val domContentLoadedEventEnd: Int
+    open val domContentLoadedEventEnd: Int
         get() = noImpl
-    val domComplete: Int
+    open val domComplete: Int
         get() = noImpl
-    val loadEventStart: Int
+    open val loadEventStart: Int
         get() = noImpl
-    val loadEventEnd: Int
+    open val loadEventEnd: Int
         get() = noImpl
 }
 
-@native public interface PerformanceNavigation {
-    val type: Short
+@native public abstract class PerformanceNavigation {
+    open val type: Short
         get() = noImpl
-    val redirectCount: Short
+    open val redirectCount: Short
         get() = noImpl
 
     companion object {

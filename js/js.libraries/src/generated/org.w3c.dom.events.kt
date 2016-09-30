@@ -28,9 +28,9 @@ import org.w3c.xhr.*
     fun initUIEvent(typeArg: String, bubblesArg: Boolean, cancelableArg: Boolean, viewArg: Window?, detailArg: Int): Unit = noImpl
 }
 
-@native public interface UIEventInit : EventInit {
-    var view: Window?
-    var detail: Int
+@native public abstract class UIEventInit : EventInit() {
+    open var view: Window? = null
+    open var detail: Int = 0
 }
 
 @Suppress("NOTHING_TO_INLINE")
@@ -51,8 +51,8 @@ public inline fun UIEventInit(view: Window? = null, detail: Int = 0, bubbles: Bo
     fun initFocusEvent(typeArg: String, bubblesArg: Boolean, cancelableArg: Boolean, viewArg: Window?, detailArg: Int, relatedTargetArg: EventTarget?): Unit = noImpl
 }
 
-@native public interface FocusEventInit : UIEventInit {
-    var relatedTarget: EventTarget?
+@native public abstract class FocusEventInit : UIEventInit() {
+    open var relatedTarget: EventTarget? = null
 }
 
 @Suppress("NOTHING_TO_INLINE")
@@ -117,14 +117,14 @@ public inline fun FocusEventInit(relatedTarget: EventTarget? = null, view: Windo
     fun initMouseEvent(typeArg: String, bubblesArg: Boolean, cancelableArg: Boolean, viewArg: Window?, detailArg: Int, screenXArg: Int, screenYArg: Int, clientXArg: Int, clientYArg: Int, ctrlKeyArg: Boolean, altKeyArg: Boolean, shiftKeyArg: Boolean, metaKeyArg: Boolean, buttonArg: Short, relatedTargetArg: EventTarget?): Unit = noImpl
 }
 
-@native public interface MouseEventInit : EventModifierInit {
-    var screenX: Int
-    var screenY: Int
-    var clientX: Int
-    var clientY: Int
-    var button: Short
-    var buttons: Short
-    var relatedTarget: EventTarget?
+@native public abstract class MouseEventInit : EventModifierInit() {
+    open var screenX: Int = 0
+    open var screenY: Int = 0
+    open var clientX: Int = 0
+    open var clientY: Int = 0
+    open var button: Short = 0
+    open var buttons: Short = 0
+    open var relatedTarget: EventTarget? = null
 }
 
 @Suppress("NOTHING_TO_INLINE")
@@ -161,22 +161,22 @@ public inline fun MouseEventInit(screenX: Int = 0, screenY: Int = 0, clientX: In
     return o
 }
 
-@native public interface EventModifierInit : UIEventInit {
-    var ctrlKey: Boolean
-    var shiftKey: Boolean
-    var altKey: Boolean
-    var metaKey: Boolean
-    var modifierAltGraph: Boolean
-    var modifierCapsLock: Boolean
-    var modifierFn: Boolean
-    var modifierFnLock: Boolean
-    var modifierHyper: Boolean
-    var modifierNumLock: Boolean
-    var modifierOS: Boolean
-    var modifierScrollLock: Boolean
-    var modifierSuper: Boolean
-    var modifierSymbol: Boolean
-    var modifierSymbolLock: Boolean
+@native public abstract class EventModifierInit : UIEventInit() {
+    open var ctrlKey: Boolean = false
+    open var shiftKey: Boolean = false
+    open var altKey: Boolean = false
+    open var metaKey: Boolean = false
+    open var modifierAltGraph: Boolean = false
+    open var modifierCapsLock: Boolean = false
+    open var modifierFn: Boolean = false
+    open var modifierFnLock: Boolean = false
+    open var modifierHyper: Boolean = false
+    open var modifierNumLock: Boolean = false
+    open var modifierOS: Boolean = false
+    open var modifierScrollLock: Boolean = false
+    open var modifierSuper: Boolean = false
+    open var modifierSymbol: Boolean = false
+    open var modifierSymbolLock: Boolean = false
 }
 
 @Suppress("NOTHING_TO_INLINE")
@@ -224,11 +224,11 @@ public inline fun EventModifierInit(ctrlKey: Boolean = false, shiftKey: Boolean 
     }
 }
 
-@native public interface WheelEventInit : MouseEventInit {
-    var deltaX: Double
-    var deltaY: Double
-    var deltaZ: Double
-    var deltaMode: Int
+@native public abstract class WheelEventInit : MouseEventInit() {
+    open var deltaX: Double = 0.0
+    open var deltaY: Double = 0.0
+    open var deltaZ: Double = 0.0
+    open var deltaMode: Int = 0
 }
 
 @Suppress("NOTHING_TO_INLINE")
@@ -305,12 +305,12 @@ public inline fun WheelEventInit(deltaX: Double = 0.0, deltaY: Double = 0.0, del
     }
 }
 
-@native public interface KeyboardEventInit : EventModifierInit {
-    var key: String
-    var code: String
-    var location: Int
-    var repeat: Boolean
-    var isComposing: Boolean
+@native public abstract class KeyboardEventInit : EventModifierInit() {
+    open var key: String = ""
+    open var code: String = ""
+    open var location: Int = 0
+    open var repeat: Boolean = false
+    open var isComposing: Boolean = false
 }
 
 @Suppress("NOTHING_TO_INLINE")
@@ -351,8 +351,8 @@ public inline fun KeyboardEventInit(key: String = "", code: String = "", locatio
     fun initCompositionEvent(typeArg: String, bubblesArg: Boolean, cancelableArg: Boolean, viewArg: Window?, dataArg: String, locale: String): Unit = noImpl
 }
 
-@native public interface CompositionEventInit : UIEventInit {
-    var data: String
+@native public abstract class CompositionEventInit : UIEventInit() {
+    open var data: String = ""
 }
 
 @Suppress("NOTHING_TO_INLINE")
@@ -420,7 +420,7 @@ public inline fun CompositionEventInit(data: String = "", view: Window? = null, 
     }
 }
 
-@native public interface EventTarget {
+@native public abstract class EventTarget {
     fun addEventListener(type: String, callback: EventListener?, capture: Boolean = false): Unit = noImpl
     fun addEventListener(type: String, callback: ((Event) -> Unit)?, capture: Boolean = false): Unit = noImpl
     fun removeEventListener(type: String, callback: EventListener?, capture: Boolean = false): Unit = noImpl

@@ -20,15 +20,15 @@ import org.w3c.performance.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-@native public interface WebGLContextAttributes {
-    var alpha: Boolean
-    var depth: Boolean
-    var stencil: Boolean
-    var antialias: Boolean
-    var premultipliedAlpha: Boolean
-    var preserveDrawingBuffer: Boolean
-    var preferLowPowerToHighPerformance: Boolean
-    var failIfMajorPerformanceCaveat: Boolean
+@native public abstract class WebGLContextAttributes {
+    open var alpha: Boolean = true
+    open var depth: Boolean = true
+    open var stencil: Boolean = false
+    open var antialias: Boolean = true
+    open var premultipliedAlpha: Boolean = true
+    open var preserveDrawingBuffer: Boolean = false
+    open var preferLowPowerToHighPerformance: Boolean = false
+    open var failIfMajorPerformanceCaveat: Boolean = false
 }
 
 @Suppress("NOTHING_TO_INLINE")
@@ -47,54 +47,54 @@ public inline fun WebGLContextAttributes(alpha: Boolean = true, depth: Boolean =
     return o
 }
 
-@native public interface WebGLObject {
+@native public abstract class WebGLObject {
 }
 
-@native public interface WebGLBuffer : WebGLObject {
+@native public abstract class WebGLBuffer : WebGLObject() {
 }
 
-@native public interface WebGLFramebuffer : WebGLObject {
+@native public abstract class WebGLFramebuffer : WebGLObject() {
 }
 
-@native public interface WebGLProgram : WebGLObject {
+@native public abstract class WebGLProgram : WebGLObject() {
 }
 
-@native public interface WebGLRenderbuffer : WebGLObject {
+@native public abstract class WebGLRenderbuffer : WebGLObject() {
 }
 
-@native public interface WebGLShader : WebGLObject {
+@native public abstract class WebGLShader : WebGLObject() {
 }
 
-@native public interface WebGLTexture : WebGLObject {
+@native public abstract class WebGLTexture : WebGLObject() {
 }
 
-@native public interface WebGLUniformLocation {
+@native public abstract class WebGLUniformLocation {
 }
 
-@native public interface WebGLActiveInfo {
-    val size: Int
+@native public abstract class WebGLActiveInfo {
+    open val size: Int
         get() = noImpl
-    val type: Int
+    open val type: Int
         get() = noImpl
-    val name: String
-        get() = noImpl
-}
-
-@native public interface WebGLShaderPrecisionFormat {
-    val rangeMin: Int
-        get() = noImpl
-    val rangeMax: Int
-        get() = noImpl
-    val precision: Int
+    open val name: String
         get() = noImpl
 }
 
-@native public interface WebGLRenderingContext : RenderingContext {
-    val canvas: HTMLCanvasElement
+@native public abstract class WebGLShaderPrecisionFormat {
+    open val rangeMin: Int
         get() = noImpl
-    val drawingBufferWidth: Int
+    open val rangeMax: Int
         get() = noImpl
-    val drawingBufferHeight: Int
+    open val precision: Int
+        get() = noImpl
+}
+
+@native public abstract class WebGLRenderingContext : RenderingContext {
+    open val canvas: HTMLCanvasElement
+        get() = noImpl
+    open val drawingBufferWidth: Int
+        get() = noImpl
+    open val drawingBufferHeight: Int
         get() = noImpl
     fun getContextAttributes(): WebGLContextAttributes? = noImpl
     fun isContextLost(): Boolean = noImpl
@@ -557,8 +557,8 @@ public inline fun WebGLContextAttributes(alpha: Boolean = true, depth: Boolean =
         get() = noImpl
 }
 
-@native public interface WebGLContextEventInit : EventInit {
-    var statusMessage: String
+@native public abstract class WebGLContextEventInit : EventInit() {
+    abstract var statusMessage: String
 }
 
 @Suppress("NOTHING_TO_INLINE")
