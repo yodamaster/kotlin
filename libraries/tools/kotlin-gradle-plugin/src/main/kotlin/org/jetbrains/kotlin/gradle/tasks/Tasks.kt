@@ -315,7 +315,7 @@ open class KotlinCompile : AbstractKotlinCompile<K2JVMCompilerArguments>(), Kotl
             lookupTracker: LookupTrackerImpl,
             outputDir: File,
             relativePathOrCanonical: (File) -> String,
-            sources: List<File>,
+            allKotlinSources: List<File>,
             sourcesToCompile: Set<File>,
             targetId: TargetId
     ) {
@@ -385,7 +385,7 @@ open class KotlinCompile : AbstractKotlinCompile<K2JVMCompilerArguments>(), Kotl
                 is ChangesEither.Unknown -> {
                     logger.kotlinDebug { "Could not get changes for generated java files, recompiling all kotlin" }
                     isIncrementalDecided1 = false
-                    sources.toSet()
+                    allKotlinSources.toSet()
                 }
                 is ChangesEither.Known -> {
                     mapLookupSymbolsToFiles(caches.lookupCache, generatedJavaFilesChanges.lookupSymbols, logAction, relativePathOrCanonical, excludes = sourcesToCompile1)
