@@ -178,7 +178,6 @@ open class KotlinCompile : AbstractKotlinCompile<K2JVMCompilerArguments>(), Kotl
     override fun callCompiler(args: K2JVMCompilerArguments, allKotlinSources: List<File>, isIncrementalRequested: Boolean, modified: List<File>, removed: List<File>) {
         val outputDir = destinationDir
         var currentRemoved = removed.filter { it.isKotlinFile() }
-        val allGeneratedFiles = hashSetOf<GeneratedFile<TargetId>>()
         val logAction = { logStr: String -> logger.kotlinInfo(logStr) }
         val relativePathOrCanonical = { file: File -> relativePathOrCanonical(file) }
 
@@ -305,7 +304,6 @@ open class KotlinCompile : AbstractKotlinCompile<K2JVMCompilerArguments>(), Kotl
     }
 
     private fun compileIncrementally(
-            allGeneratedFiles: HashSet<GeneratedFile<TargetId>>,
             args: K2JVMCompilerArguments,
             caches: IncrementalCachesManager,
             currentRemoved: List<File>,
@@ -319,6 +317,7 @@ open class KotlinCompile : AbstractKotlinCompile<K2JVMCompilerArguments>(), Kotl
             sourcesToCompile: Set<File>,
             targetId: TargetId
     ) {
+        val allGeneratedFiles = hashSetOf<GeneratedFile<TargetId>>()
         var currentRemoved1 = currentRemoved
         var isIncrementalDecided1 = isIncrementalDecided
         var sourcesToCompile1 = sourcesToCompile
