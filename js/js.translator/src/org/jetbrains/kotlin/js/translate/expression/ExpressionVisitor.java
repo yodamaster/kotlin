@@ -512,11 +512,9 @@ public final class ExpressionVisitor extends TranslatorVisitor<JsNode> {
     @NotNull
     public JsNode visitObjectLiteralExpression(@NotNull KtObjectLiteralExpression expression, @NotNull TranslationContext context) {
         ClassDescriptor descriptor = BindingUtils.getClassDescriptor(context.bindingContext(), expression.getObjectDeclaration());
-        ClassTranslator.TranslationResult result = translateClassOrObject(expression.getObjectDeclaration(), descriptor, context);
-        List<JsPropertyInitializer> properties = result.getProperties();
-        context.getDefinitionPlace().getProperties().addAll(properties);
+         translateClassOrObject(expression.getObjectDeclaration(), descriptor, context);
 
-        JsExpression constructor = context.getQualifiedReference(descriptor);
+        JsExpression constructor = context.getInnerReference(descriptor);
         List<DeclarationDescriptor> closure = context.getClassOrConstructorClosure(descriptor);
         List<JsExpression> closureArgs = new ArrayList<JsExpression>();
         if (closure != null) {
@@ -544,7 +542,7 @@ public final class ExpressionVisitor extends TranslatorVisitor<JsNode> {
         if (superCall != null) {
             assert context.getDeclarationDescriptor() != null : "This expression should be inside declaration: " +
                     PsiUtilsKt.getTextWithLocation(expression);
-            TranslationContext superCallContext = context.newDeclaration(context.getDeclarationDescriptor(), result.getDefinitionPlace());
+            TranslationContext superCallContext = context.newDeclaration(context.getDeclarationDescriptor());
             closureArgs.addAll(CallArgumentTranslator.translate(superCall, null, superCallContext).getTranslateArguments());
         }
 
@@ -576,17 +574,17 @@ public final class ExpressionVisitor extends TranslatorVisitor<JsNode> {
     @Override
     public JsNode visitClass(@NotNull KtClass klass, TranslationContext context) {
         ClassDescriptor descriptor = BindingUtils.getClassDescriptor(context.bindingContext(), klass);
-        context.getDefinitionPlace().getProperties().addAll(translateClassOrObject(klass, descriptor, context).getProperties());
+        translateClassOrObject(klass, descriptor, context);
         return JsEmpty.INSTANCE;
     }
 
-    private static ClassTranslator.TranslationResult translateClassOrObject(
+    private static void translateClassOrObject(
             @NotNull KtClassOrObject declaration,
             @NotNull ClassDescriptor descriptor,
             @NotNull TranslationContext context
     ) {
         JsScope scope = context.getScopeForDescriptor(descriptor);
         TranslationContext classContext = context.innerWithUsageTracker(scope, descriptor);
-        return ClassTranslator.translate(declaration, classContext);
+        ClassTranslator.translate(declaration, classContext);
     }
 }
