@@ -182,17 +182,11 @@ open class KotlinCompile : AbstractKotlinCompile<K2JVMCompilerArguments>(), Kotl
     }
 
     override fun callCompiler(args: K2JVMCompilerArguments, sources: List<File>, isIncrementalRequested: Boolean, modified: List<File>, removed: List<File>) {
-        fun relativePathOrCanonical(file: File): String =
-                file.relativeToOrNull(project.rootProject.projectDir)?.path
-                        ?: file.canonicalPath
-
-        fun filesToString(files: Iterable<File>) =
-                "[" + files.map(::relativePathOrCanonical).sorted().joinToString(separator = ", \n") + "]"
-
         val outputDir = destinationDir
         var currentRemoved = removed.filter { it.isKotlinFile() }
         val allGeneratedFiles = hashSetOf<GeneratedFile<TargetId>>()
         val logAction = { logStr: String -> logger.kotlinInfo(logStr) }
+        val relativePathOrCanonical = { file: File -> relativePathOrCanonical(file) }
 
         fun getClasspathChanges(modifiedClasspath: List<File>, lastBuildInfo: BuildInfo?): ChangesEither {
             if (modifiedClasspath.isEmpty()) {
@@ -274,13 +268,13 @@ open class KotlinCompile : AbstractKotlinCompile<K2JVMCompilerArguments>(), Kotl
             lookupSymbols.addAll(classpathChanges.lookupSymbols)
 
             if (lookupSymbols.any()) {
-                val dirtyFilesFromLookups = mapLookupSymbolsToFiles(caches.lookupCache, lookupSymbols, logAction, ::relativePathOrCanonical)
+                val dirtyFilesFromLookups = mapLookupSymbolsToFiles(caches.lookupCache, lookupSymbols, logAction, relativePathOrCanonical)
                 dirtyFiles.addAll(dirtyFilesFromLookups)
             }
 
             val dirtyClassesFqNames = classpathChanges.fqNames.flatMap { withSubtypes(it, listOf(caches.incrementalCache)) }
             if (dirtyClassesFqNames.any()) {
-                val dirtyFilesFromFqNames = mapClassesFqNamesToFiles(listOf(caches.incrementalCache), dirtyClassesFqNames, logAction, ::relativePathOrCanonical)
+                val dirtyFilesFromFqNames = mapClassesFqNamesToFiles(listOf(caches.incrementalCache), dirtyClassesFqNames, logAction, relativePathOrCanonical)
                 dirtyFiles.addAll(dirtyFilesFromFqNames)
             }
 
@@ -294,28 +288,6 @@ open class KotlinCompile : AbstractKotlinCompile<K2JVMCompilerArguments>(), Kotl
             }
 
             return Pair(dirtyFiles, true)
-        }
-
-        fun cleanupOnError() {
-            logger.kotlinInfo("deleting $destinationDir on error")
-            destinationDir.deleteRecursively()
-        }
-
-        fun processCompilerExitCode(exitCode: ExitCode) {
-            if (exitCode != ExitCode.OK) {
-                cleanupOnError()
-            }
-
-            when (exitCode) {
-                ExitCode.COMPILATION_ERROR -> throw GradleException("Compilation error. See log for more details")
-                ExitCode.INTERNAL_ERROR -> throw GradleException("Internal compiler error. See log for more details")
-                ExitCode.SCRIPT_EXECUTION_ERROR -> throw GradleException("Script execution error. See log for more details")
-                ExitCode.OK -> {
-                    sourceAnnotationsRegistry?.flush()
-                    cacheVersions.forEach { it.saveIfNeeded() }
-                    logger.kotlinInfo("Compilation succeeded")
-                }
-            }
         }
 
         if (!incremental) {
@@ -359,11 +331,11 @@ open class KotlinCompile : AbstractKotlinCompile<K2JVMCompilerArguments>(), Kotl
 
             // can be empty if only removed sources are present
             if (sourcesToCompile.isNotEmpty()) {
-                logger.kotlinInfo("compile iteration: ${sourcesToCompile.joinToString(transform = ::relativePathOrCanonical)}")
+                logger.kotlinInfo("compile iteration: ${sourcesToCompile.joinToString(transform = relativePathOrCanonical)}")
             }
 
             val (existingSource, nonExistingSource) = sourcesToCompile.partition { it.isFile }
-            assert(nonExistingSource.isEmpty()) { "Trying to compile removed files: ${nonExistingSource.map(::relativePathOrCanonical)}" }
+            assert(nonExistingSource.isEmpty()) { "Trying to compile removed files: ${nonExistingSource.map(relativePathOrCanonical)}" }
 
             val text = existingSource.map { it.canonicalPath }.joinToString(separator = System.getProperty("line.separator"))
             dirtySourcesSinceLastTimeFile.writeText(text)
@@ -404,13 +376,13 @@ open class KotlinCompile : AbstractKotlinCompile<K2JVMCompilerArguments>(), Kotl
                     sources.toSet()
                 }
                 is ChangesEither.Known -> {
-                    mapLookupSymbolsToFiles(caches.lookupCache, generatedJavaFilesChanges.lookupSymbols, logAction, ::relativePathOrCanonical, excludes = sourcesToCompile)
+                    mapLookupSymbolsToFiles(caches.lookupCache, generatedJavaFilesChanges.lookupSymbols, logAction, relativePathOrCanonical, excludes = sourcesToCompile)
                 }
                 else -> throw IllegalStateException("Unknown ChangesEither implementation: $generatedJavaFiles")
             }
             sourcesToCompile = dirtyKotlinFilesFromJava +
-                               mapLookupSymbolsToFiles(caches.lookupCache, dirtyLookupSymbols, logAction, ::relativePathOrCanonical, excludes = sourcesToCompile) +
-                               mapClassesFqNamesToFiles(listOf(caches.incrementalCache), dirtyClassFqNames, logAction, ::relativePathOrCanonical, excludes = sourcesToCompile)
+                               mapLookupSymbolsToFiles(caches.lookupCache, dirtyLookupSymbols, logAction, relativePathOrCanonical, excludes = sourcesToCompile) +
+                               mapClassesFqNamesToFiles(listOf(caches.incrementalCache), dirtyClassFqNames, logAction, relativePathOrCanonical, excludes = sourcesToCompile)
 
             buildDirtyLookupSymbols.addAll(dirtyLookupSymbols)
             buildDirtyFqNames.addAll(dirtyClassFqNames)
@@ -439,6 +411,35 @@ open class KotlinCompile : AbstractKotlinCompile<K2JVMCompilerArguments>(), Kotl
         caches.close(flush = true)
         logger.kotlinDebug { "flushed incremental caches" }
         processCompilerExitCode(exitCode)
+    }
+
+    private fun relativePathOrCanonical(file: File): String =
+            file.relativeToOrNull(project.rootProject.projectDir)?.path
+                    ?: file.canonicalPath
+
+    private fun filesToString(files: Iterable<File>) =
+            "[" + files.map { relativePathOrCanonical(it) }.sorted().joinToString(separator = ", \n") + "]"
+
+    private fun cleanupOnError() {
+        logger.kotlinInfo("deleting $destinationDir on error")
+        destinationDir.deleteRecursively()
+    }
+
+    private fun processCompilerExitCode(exitCode: ExitCode) {
+        if (exitCode != ExitCode.OK) {
+            cleanupOnError()
+        }
+
+        when (exitCode) {
+            ExitCode.COMPILATION_ERROR -> throw GradleException("Compilation error. See log for more details")
+            ExitCode.INTERNAL_ERROR -> throw GradleException("Internal compiler error. See log for more details")
+            ExitCode.SCRIPT_EXECUTION_ERROR -> throw GradleException("Script execution error. See log for more details")
+            ExitCode.OK -> {
+                sourceAnnotationsRegistry?.flush()
+                cacheVersions.forEach { it.saveIfNeeded() }
+                logger.kotlinInfo("Compilation succeeded")
+            }
+        }
     }
 
     private data class CompileChangedResults(val exitCode: ExitCode, val generatedFiles: List<GeneratedFile<TargetId>>)
