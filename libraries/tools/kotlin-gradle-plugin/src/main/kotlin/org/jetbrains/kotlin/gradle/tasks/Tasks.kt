@@ -1,11 +1,9 @@
 package org.jetbrains.kotlin.gradle.tasks
 
-import org.apache.commons.io.FilenameUtils
 import org.codehaus.groovy.runtime.MethodClosure
 import org.gradle.api.GradleException
 import org.gradle.api.file.SourceDirectorySet
 import org.gradle.api.logging.Logger
-import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.SourceTask
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.compile.AbstractCompile
@@ -24,7 +22,6 @@ import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.cli.common.messages.OutputMessageUtil
 import org.jetbrains.kotlin.cli.js.K2JSCompiler
 import org.jetbrains.kotlin.cli.jvm.K2JVMCompiler
-import org.jetbrains.kotlin.com.intellij.ide.highlighter.JavaFileType
 import org.jetbrains.kotlin.com.intellij.openapi.util.io.FileUtil
 import org.jetbrains.kotlin.compilerRunner.ArgumentUtils
 import org.jetbrains.kotlin.compilerRunner.OutputItemsCollector
@@ -102,9 +99,6 @@ abstract class AbstractKotlinCompile<T : CommonCompilerArguments>() : AbstractCo
     }
 
     private fun getKotlinSources(): List<File> = (getSource() as Iterable<File>).filter { it.isKotlinFile() }
-
-    protected fun File.isKotlinFile(): Boolean =
-            FilenameUtils.isExtension(name.toLowerCase(), listOf("kt", "kts"))
 
     protected abstract fun callCompiler(args: T, sources: List<File>, isIncremental: Boolean, modified: List<File>, removed: List<File>)
 
@@ -239,10 +233,10 @@ open class KotlinCompile : AbstractKotlinCompile<K2JVMCompilerArguments>(), Kotl
             if (!incremental) return rebuild("incremental compilation is not enabled")
             if (!isIncrementalRequested) return rebuild("inputs' changes are unknown (first or clean build)")
 
-            val removedClassFiles = removed.filter(File::hasClassFileExtension)
+            val removedClassFiles = removed.filter(File::isClassFile)
             if (removedClassFiles.any()) return rebuild("Removed class files: ${filesToString(removedClassFiles)}")
 
-            val modifiedClassFiles = modified.filter(File::hasClassFileExtension)
+            val modifiedClassFiles = modified.filter(File::isClassFile)
             if (modifiedClassFiles.any()) return rebuild("Modified class files: ${filesToString(modifiedClassFiles)}")
 
             val modifiedClasspathEntries = modified.filter { it in classpath }
@@ -567,9 +561,6 @@ open class KotlinCompile : AbstractKotlinCompile<K2JVMCompilerArguments>(), Kotl
     private fun getJavaSourceRoots(): Set<File> =
             findRootsForSources(getSource().filter { it.isJavaFile() })
 
-    private fun File.isJavaFile() =
-            extension.equals(JavaFileType.INSTANCE.defaultExtension, ignoreCase = true)
-
     private fun File.isKapt2GeneratedDirectory(): Boolean {
         if (!kapt2GeneratedSourcesDir.isDirectory) return false
         return FileUtil.isAncestor(kapt2GeneratedSourcesDir, this, /* strict = */ false)
@@ -739,9 +730,3 @@ internal inline fun Logger.kotlinDebug(message: ()->String) {
         kotlinDebug(message())
     }
 }
-
-internal fun listClassFiles(path: String): Sequence<File> =
-        File(path).walk().filter { it.isFile && it.hasClassFileExtension() }
-
-private fun File.hasClassFileExtension(): Boolean =
-        extension.toLowerCase() == "class"
