@@ -100,7 +100,7 @@ abstract class AbstractKotlinCompile<T : CommonCompilerArguments>() : AbstractCo
 
     private fun getKotlinSources(): List<File> = (getSource() as Iterable<File>).filter { it.isKotlinFile() }
 
-    protected abstract fun callCompiler(args: T, sources: List<File>, isIncremental: Boolean, modified: List<File>, removed: List<File>)
+    protected abstract fun callCompiler(args: T, allKotlinSources: List<File>, isIncremental: Boolean, modified: List<File>, removed: List<File>)
 
 }
 
@@ -175,7 +175,7 @@ open class KotlinCompile : AbstractKotlinCompile<K2JVMCompilerArguments>(), Kotl
         return args
     }
 
-    override fun callCompiler(args: K2JVMCompilerArguments, sources: List<File>, isIncrementalRequested: Boolean, modified: List<File>, removed: List<File>) {
+    override fun callCompiler(args: K2JVMCompilerArguments, allKotlinSources: List<File>, isIncrementalRequested: Boolean, modified: List<File>, removed: List<File>) {
         val outputDir = destinationDir
         var currentRemoved = removed.filter { it.isKotlinFile() }
         val allGeneratedFiles = hashSetOf<GeneratedFile<TargetId>>()
@@ -227,7 +227,7 @@ open class KotlinCompile : AbstractKotlinCompile<K2JVMCompilerArguments>(), Kotl
                 logger.kotlinInfo("Non-incremental compilation will be performed: $reason")
                 caches.clean()
                 dirtySourcesSinceLastTimeFile.delete()
-                return Pair(sources.toSet(), false)
+                return Pair(allKotlinSources.toSet(), false)
             }
 
             if (!incremental) return rebuild("incremental compilation is not enabled")
@@ -286,7 +286,7 @@ open class KotlinCompile : AbstractKotlinCompile<K2JVMCompilerArguments>(), Kotl
 
         if (!incremental) {
             anyClassesCompiled = true
-            processCompilerExitCode(compileNotIncremental(sources, outputDir, args))
+            processCompilerExitCode(compileNotIncremental(allKotlinSources, outputDir, args))
             return
         }
 
@@ -301,7 +301,7 @@ open class KotlinCompile : AbstractKotlinCompile<K2JVMCompilerArguments>(), Kotl
 
         // TODO: decide what to do if no files are considered dirty - rebuild or skip the module
         var (sourcesToCompile, isIncrementalDecided) = calculateSourcesToCompile(javaFilesProcessor, caches, lastBuildInfo)
-        compileIncrementally(allGeneratedFiles, args, caches, currentRemoved, isIncrementalDecided, javaFilesProcessor, logAction, lookupTracker, outputDir, relativePathOrCanonical, sources, sourcesToCompile, targetId)
+        compileIncrementally(allGeneratedFiles, args, caches, currentRemoved, isIncrementalDecided, javaFilesProcessor, logAction, lookupTracker, outputDir, relativePathOrCanonical, allKotlinSources, sourcesToCompile, targetId)
     }
 
     private fun compileIncrementally(
@@ -641,11 +641,11 @@ open class Kotlin2JsCompile() : AbstractKotlinCompile<K2JSCompilerArguments>(), 
         return args
     }
 
-    override fun callCompiler(args: K2JSCompilerArguments, sources: List<File>, isIncremental: Boolean, modified: List<File>, removed: List<File>) {
+    override fun callCompiler(args: K2JSCompilerArguments, allKotlinSources: List<File>, isIncremental: Boolean, modified: List<File>, removed: List<File>) {
         val messageCollector = GradleMessageCollector(logger)
         logger.debug("Calling compiler")
         destinationDir.mkdirs()
-        args.freeArgs = args.freeArgs + sources.map { it.absolutePath }
+        args.freeArgs = args.freeArgs + allKotlinSources.map { it.absolutePath }
 
         if (args.outputFile == null) {
             throw GradleException("$name.kotlinOptions.outputFile should be specified.")
