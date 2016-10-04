@@ -20,6 +20,7 @@ import org.jetbrains.kotlin.incremental.snapshots.FileCollectionDiff
 import org.jetbrains.kotlin.modules.TargetId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.progress.CompilationCanceledStatus
+import org.jetbrains.kotlin.resolve.jvm.JvmClassName
 import java.io.File
 import java.util.*
 
@@ -34,11 +35,32 @@ internal class IncrementalJvmCompilerRunner(
         private val cacheVersions: List<CacheVersion>,
         private val reporter: IncReporter
 ) {
+    abstract class Extension {
+        val name: String
+            get() = this.javaClass.simpleName
+        open fun beforeCompile(compilationMode: CompilationMode) {}
+        open fun afterCompileIteration(exitCode: ExitCode, outdatedClasses: Iterable<JvmClassName>) {}
+    }
+
     var anyClassesCompiled: Boolean = false
             private set
     private val cacheDirectory = File(workingDir, CACHES_DIR_NAME)
     private val dirtySourcesSinceLastTimeFile = File(workingDir, DIRTY_SOURCES_FILE_NAME)
     private val lastBuildInfoFile = File(workingDir, LAST_BUILD_INFO_FILE_NAME)
+    private val extensions = ArrayList<Extension>()
+
+    fun addExtension(ext: Extension) {
+        extensions.add(ext)
+    }
+
+    private fun forEachExt(description: String, fn: (Extension)->Unit) {
+        reporter.report { "Running IC extensions at '$description'" }
+        for (ext in extensions) {
+            reporter.report { "Enter extension '${ext.name}'" }
+            fn(ext)
+            reporter.report { "Exit extension '${ext.name}'" }
+        }
+    }
 
     fun compile(
             allKotlinSources: List<File>,
@@ -80,7 +102,7 @@ internal class IncrementalJvmCompilerRunner(
 
     private data class CompileChangedResults(val exitCode: ExitCode, val generatedFiles: List<GeneratedFile<TargetId>>)
 
-    private sealed class CompilationMode {
+    sealed class CompilationMode {
         class Incremental(val dirtyFiles: Set<File>) : CompilationMode()
         class Rebuild : CompilationMode()
     }
@@ -227,10 +249,13 @@ internal class IncrementalJvmCompilerRunner(
             }
             is CompilationMode.Rebuild -> {
                 dirtySources = allKotlinSources.toMutableList()
-                // there is no point in updating annotation file since all files will be compiled anyway
                 kaptAnnotationsFileUpdater = null
             }
             else -> throw IllegalStateException("Unknown CompilationMode ${compilationMode.javaClass}")
+        }
+
+        forEachExt("Before IC") { ext ->
+            ext.beforeCompile(compilationMode)
         }
 
         @Suppress("NAME_SHADOWING")
@@ -259,12 +284,13 @@ internal class IncrementalJvmCompilerRunner(
 
             val compilerOutput = compileChanged(listOf(targetId), sourcesToCompile.toSet(), args, { caches.incrementalCache }, lookupTracker, messageCollector)
             exitCode = compilerOutput.exitCode
+            forEachExt("After IC iteration") { ext ->
+                ext.afterCompileIteration(exitCode, outdatedClasses)
+            }
 
             if (exitCode == ExitCode.OK) {
                 dirtySourcesSinceLastTimeFile.delete()
-                kaptAnnotationsFileUpdater?.updateAnnotations(outdatedClasses)
             } else {
-                kaptAnnotationsFileUpdater?.revert()
                 break
             }
 

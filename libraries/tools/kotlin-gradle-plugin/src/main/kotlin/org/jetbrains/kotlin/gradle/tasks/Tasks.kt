@@ -35,6 +35,7 @@ import org.jetbrains.kotlin.incremental.components.SourceRetentionAnnotationHand
 import org.jetbrains.kotlin.modules.TargetId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.progress.CompilationCanceledStatus
+import org.jetbrains.kotlin.resolve.jvm.JvmClassName
 import org.jetbrains.kotlin.utils.LibraryUtils
 import java.io.File
 import java.util.*
@@ -183,6 +184,8 @@ open class KotlinCompile : AbstractKotlinCompile<K2JVMCompilerArguments>(), Kotl
                 artifactFile,
                 cacheVersions,
                 reporter)
+        val kaptFileUpdateExtension = KaptFileUpdateExtension(kaptAnnotationsFileUpdater)
+        compiler.addExtension(kaptFileUpdateExtension)
         args.classpathAsList = classpath.toList()
         args.destinationAsFile = destinationDir
         compiler.compile(allKotlinSources, changedFiles, args, messageCollector)
