@@ -209,7 +209,6 @@ internal class IncrementalJvmCompilerRunner(
         return CompilationMode.Incremental(dirtyFiles)
     }
 
-
     private fun compileIncrementally(
             args: K2JVMCompilerArguments,
             caches: IncrementalCachesManager,
