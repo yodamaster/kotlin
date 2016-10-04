@@ -1075,7 +1075,7 @@ fun main(args: Array<String>) {
         }
     }
 
-    testGroup("plugins/plugins-tests/tests", "plugins/allopen/testData") {
+    testGroup("plugins/plugins-tests/tests", "plugins/allopen/allopen-cli/testData") {
         testClass<AbstractBytecodeListingTestForAllOpen>() {
             model("bytecodeListing", extension = "kt")
         }
