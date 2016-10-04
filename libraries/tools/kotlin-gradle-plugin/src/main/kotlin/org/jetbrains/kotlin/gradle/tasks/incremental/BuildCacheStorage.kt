@@ -58,6 +58,7 @@ internal class BuildCacheStorage(workingDir: File) : BasicMapsOwner(), ArtifactD
         }
     }
 
+    @Synchronized
     override fun clean() {
         try {
             close()

@@ -15,6 +15,7 @@ internal class ArtifactDifference(val buildTS: Long, val dirtyData: DirtyData)
 
 internal interface ArtifactDifferenceRegistryProvider {
     fun <T> withRegistry(report: (String)->Unit, fn: (ArtifactDifferenceRegistry)->T): T?
+    fun clean()
 }
 
 internal fun <T> ArtifactDifferenceRegistryProvider.withRegistry(

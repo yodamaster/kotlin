@@ -24,7 +24,7 @@ import java.io.File
 internal class ArtifactDifferenceRegistryProviderAndroidWrapper(
         private val provider: ArtifactDifferenceRegistryProvider,
         private val jarToAarMapping: Map<File, File>
-) : ArtifactDifferenceRegistryProvider {
+) : ArtifactDifferenceRegistryProvider by provider {
     override fun <T> withRegistry(report: (String)->Unit, fn: (ArtifactDifferenceRegistry)->T): T? {
         return provider.withRegistry(report) { originalRegistry ->
             val wrapped = ArtifactDifferenceRegistryAndroidWrapper(originalRegistry, jarToAarMapping)

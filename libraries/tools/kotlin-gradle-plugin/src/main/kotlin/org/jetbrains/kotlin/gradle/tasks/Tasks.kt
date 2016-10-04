@@ -198,6 +198,7 @@ open class KotlinCompile : AbstractKotlinCompile<K2JVMCompilerArguments>(), Kotl
         }
         catch (e: PersistentEnumeratorBase.CorruptedException) {
             caches.clean()
+            artifactDifferenceRegistryProvider?.clean()
 
             reporter.report { "Caches are corrupted. Rebuilding. $e" }
             // try to rebuild
