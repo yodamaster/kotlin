@@ -100,22 +100,12 @@ internal class IncrementalJvmCompilerRunner(
             messageCollector: MessageCollector
     ): ExitCode {
         val targetId = TargetId(name = args.moduleName, type = "java-production")
-        val lastBuildInfo = BuildInfo.read(lastBuildInfoFile)
         var caches = IncrementalCachesManager(targetId, cacheDirectory, File(args.destination))
-
-        reporter.report { "Last Kotlin Build info -- $lastBuildInfo" }
 
         return try {
             val javaFilesProcessor = ChangedJavaFilesProcessor()
-            val compilationMode = calculateSourcesToCompile(
-                    javaFilesProcessor,
-                    caches,
-                    lastBuildInfo,
-                    changedFiles,
-                    args.classpathAsList,
-                    dirtySourcesSinceLastTimeFile,
-                    reporter)
-            compileIncrementally(args, caches, javaFilesProcessor, allKotlinSources, targetId, compilationMode, reporter, messageCollector)
+            val compilationMode = calculateSourcesToCompile(javaFilesProcessor, caches, changedFiles, args.classpathAsList)
+            compileIncrementally(args, caches, javaFilesProcessor, allKotlinSources, targetId, compilationMode, messageCollector)
         }
         catch (e: PersistentEnumeratorBase.CorruptedException) {
             caches.clean()
@@ -126,7 +116,7 @@ internal class IncrementalJvmCompilerRunner(
             val javaFilesProcessor = ChangedJavaFilesProcessor()
             caches = IncrementalCachesManager(targetId, cacheDirectory, args.destinationAsFile)
             val compilationMode = CompilationMode.Rebuild()
-            compileIncrementally(args, caches, javaFilesProcessor, allKotlinSources, targetId, compilationMode, reporter, messageCollector)
+            compileIncrementally(args, caches, javaFilesProcessor, allKotlinSources, targetId, compilationMode, messageCollector)
         }
     }
 
@@ -140,11 +130,8 @@ internal class IncrementalJvmCompilerRunner(
     private fun calculateSourcesToCompile(
             javaFilesProcessor: ChangedJavaFilesProcessor,
             caches: IncrementalCachesManager,
-            lastBuildInfo: BuildInfo?,
             changedFiles: ChangedFiles,
-            classpath: Iterable<File>,
-            dirtySourcesSinceLastTimeFile: File,
-            reporter: IncReporter
+            classpath: Iterable<File>
     ): CompilationMode {
         fun rebuild(reason: ()->String): CompilationMode {
             reporter.report {"Non-incremental compilation will be performed: ${reason()}"}
@@ -163,6 +150,8 @@ internal class IncrementalJvmCompilerRunner(
 
         val classpathSet = classpath.toHashSet()
         val modifiedClasspathEntries = changedFiles.modified.filter {it in classpathSet}
+        val lastBuildInfo = BuildInfo.read(lastBuildInfoFile)
+        reporter.report { "Last Kotlin Build info -- $lastBuildInfo" }
         val classpathChanges = classpathChangesProvider?.getClasspathChanges(modifiedClasspathEntries, lastBuildInfo)
         if (classpathChanges !is ChangesEither.Known) {
             return rebuild {"could not get changes from modified classpath entries: ${reporter.pathsAsString(modifiedClasspathEntries)}"}
@@ -216,7 +205,6 @@ internal class IncrementalJvmCompilerRunner(
             allKotlinSources: List<File>,
             targetId: TargetId,
             compilationMode: CompilationMode,
-            reporter: IncReporter,
             messageCollector: MessageCollector
     ): ExitCode {
         val dirtySources: MutableList<File>
