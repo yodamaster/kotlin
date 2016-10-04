@@ -177,15 +177,27 @@ open class KotlinCompile : AbstractKotlinCompile<K2JVMCompilerArguments>(), Kotl
         val compiler = IncrementalJvmCompilerRunner(
                 taskBuildDirectory,
                 kaptAnnotationsFileUpdater,
-                artifactDifferenceRegistryProvider,
                 sourceAnnotationsRegistry,
                 getJavaSourceRoots(),
                 kapt2GeneratedSourcesDir,
-                artifactFile,
                 cacheVersions,
                 reporter)
+
+        // configure extensions
         val kaptFileUpdateExtension = KaptFileUpdateExtension(kaptAnnotationsFileUpdater)
         compiler.addExtension(kaptFileUpdateExtension)
+
+        if (artifactDifferenceRegistryProvider != null && artifactFile != null) {
+            val multiProjectExtension = MultiProjectICExtension(reporter, artifactDifferenceRegistryProvider!!, artifactFile!!)
+            compiler.addExtension(multiProjectExtension)
+            compiler.classpathChangesProvider = multiProjectExtension
+        }
+        else {
+            reporter.report { "Could not configure multi project ic extension. " +
+                    "artifact difference registry provider: $artifactDifferenceRegistryProvider, " +
+                    "artifact file: $artifactFile" }
+        }
+
         args.classpathAsList = classpath.toList()
         args.destinationAsFile = destinationDir
         compiler.compile(allKotlinSources, changedFiles, args, messageCollector)
