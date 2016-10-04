@@ -120,8 +120,6 @@ internal class IncrementalJvmCompilerRunner(
         }
     }
 
-    private data class CompileChangedResults(val exitCode: ExitCode, val generatedFiles: List<GeneratedFile<TargetId>>)
-
     sealed class CompilationMode {
         class Incremental(val dirtyFiles: Set<File>) : CompilationMode()
         class Rebuild : CompilationMode()
@@ -318,6 +316,8 @@ internal class IncrementalJvmCompilerRunner(
 
         return buildState.exitCode
     }
+
+    private data class CompileChangedResults(val exitCode: ExitCode, val generatedFiles: List<GeneratedFile<TargetId>>)
 
     private fun compileChanged(
             targets: List<TargetId>,
