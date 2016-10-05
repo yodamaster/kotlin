@@ -1,7 +1,6 @@
 package org.jetbrains.kotlin.incremental
 
 import org.jetbrains.kotlin.config.IncrementalCompilation
-import org.jetbrains.kotlin.incremental.CacheVersion
 import java.io.File
 
 internal const val GRADLE_CACHE_VERSION = 2
@@ -13,4 +12,4 @@ internal fun gradleCacheVersion(dataRoot: File): CacheVersion =
                 whenVersionChanged = CacheVersion.Action.REBUILD_ALL_KOTLIN,
                 whenTurnedOn = CacheVersion.Action.REBUILD_ALL_KOTLIN,
                 whenTurnedOff = CacheVersion.Action.REBUILD_ALL_KOTLIN,
-                isEnabled = { IncrementalCompilation.isExperimental() })
+                isEnabled = {IncrementalCompilation.isExperimental()})

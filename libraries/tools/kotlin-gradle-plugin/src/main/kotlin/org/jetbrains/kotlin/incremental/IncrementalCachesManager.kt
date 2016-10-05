@@ -1,10 +1,9 @@
 package org.jetbrains.kotlin.incremental
 
-import org.jetbrains.kotlin.incremental.LookupStorage
 import org.jetbrains.kotlin.modules.TargetId
 import java.io.File
 
-internal class IncrementalCachesManager (
+internal class IncrementalCachesManager(
         private val targetId: TargetId,
         private val cacheDirectory: File,
         private val outputDir: File
@@ -15,13 +14,13 @@ internal class IncrementalCachesManager (
     private var lookupCacheOpen = false
 
     val incrementalCache: GradleIncrementalCacheImpl by lazy {
-        val cache = GradleIncrementalCacheImpl(targetDataRoot = incrementalCacheDir.apply { mkdirs() }, targetOutputDir = outputDir, target = targetId)
+        val cache = GradleIncrementalCacheImpl(targetDataRoot = incrementalCacheDir.apply {mkdirs()}, targetOutputDir = outputDir, target = targetId)
         incrementalCacheOpen = true
         cache
     }
 
     val lookupCache: LookupStorage by lazy {
-        val cache = LookupStorage(lookupCacheDir.apply { mkdirs() })
+        val cache = LookupStorage(lookupCacheDir.apply {mkdirs()})
         lookupCacheOpen = true
         cache
     }

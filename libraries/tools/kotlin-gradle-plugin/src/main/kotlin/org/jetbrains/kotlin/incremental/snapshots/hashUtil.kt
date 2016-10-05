@@ -23,7 +23,7 @@ internal val File.md5: ByteArray
     get() {
         val messageDigest = MessageDigest.getInstance("MD5")
         val buffer = ByteArray(4048)
-        inputStream().use { input ->
+        inputStream().use {input ->
             while (true) {
                 val len = input.read(buffer)
                 if (len < 0) {

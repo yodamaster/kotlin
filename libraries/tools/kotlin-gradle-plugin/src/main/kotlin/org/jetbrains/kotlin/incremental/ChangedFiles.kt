@@ -15,8 +15,8 @@ internal fun ChangedFiles(taskInputs: IncrementalTaskInputs): ChangedFiles {
     val modified = ArrayList<File>()
     val removed = ArrayList<File>()
 
-    taskInputs.outOfDate { modified.add(it.file) }
-    taskInputs.removed { removed.add(it.file) }
+    taskInputs.outOfDate {modified.add(it.file)}
+    taskInputs.removed {removed.add(it.file)}
 
     return ChangedFiles.Known(modified, removed)
 }

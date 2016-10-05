@@ -16,9 +16,6 @@
 
 package org.jetbrains.kotlin.incremental.multiproject
 
-import org.jetbrains.kotlin.incremental.multiproject.ArtifactDifference
-import org.jetbrains.kotlin.incremental.multiproject.ArtifactDifferenceRegistry
-import org.jetbrains.kotlin.incremental.multiproject.ArtifactDifferenceRegistryProvider
 import java.io.File
 
 internal class ArtifactDifferenceRegistryProviderAndroidWrapper(
@@ -26,7 +23,7 @@ internal class ArtifactDifferenceRegistryProviderAndroidWrapper(
         private val jarToAarMapping: Map<File, File>
 ) : ArtifactDifferenceRegistryProvider by provider {
     override fun <T> withRegistry(report: (String)->Unit, fn: (ArtifactDifferenceRegistry)->T): T? {
-        return provider.withRegistry(report) { originalRegistry ->
+        return provider.withRegistry(report) {originalRegistry ->
             val wrapped = ArtifactDifferenceRegistryAndroidWrapper(originalRegistry, jarToAarMapping)
             fn(wrapped)
         }

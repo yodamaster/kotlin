@@ -9,8 +9,7 @@ internal data class BuildInfo(val startTS: Long) : Serializable {
                     ObjectInputStream(FileInputStream(file)).use {
                         it.readObject() as BuildInfo
                     }
-                }
-                catch (e: Exception) {
+                } catch (e: Exception) {
                     null
                 }
 

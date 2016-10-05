@@ -16,18 +16,6 @@
 
 package org.jetbrains.kotlin.incremental
 
-import org.gradle.api.logging.Logging
-import org.jetbrains.kotlin.build.GeneratedJvmClass
-import org.jetbrains.kotlin.incremental.CompilationResult
-import org.jetbrains.kotlin.incremental.IncrementalCacheImpl
-import org.jetbrains.kotlin.incremental.dumpCollection
-import org.jetbrains.kotlin.incremental.snapshots.FileCollectionDiff
-import org.jetbrains.kotlin.incremental.snapshots.FileSnapshotMap
-import org.jetbrains.kotlin.incremental.snapshots.SimpleFileSnapshotProviderImpl
-import org.jetbrains.kotlin.incremental.storage.BasicStringMap
-import org.jetbrains.kotlin.incremental.storage.PathStringDescriptor
-import org.jetbrains.kotlin.incremental.storage.StringCollectionExternalizer
-import org.jetbrains.kotlin.modules.TargetId
 import java.io.File
 
 internal class GradleIncrementalCacheImpl(targetDataRoot: java.io.File, targetOutputDir: java.io.File?, target: org.jetbrains.kotlin.modules.TargetId) : org.jetbrains.kotlin.incremental.IncrementalCacheImpl<org.jetbrains.kotlin.modules.TargetId>(targetDataRoot, targetOutputDir, target) {
@@ -45,10 +33,10 @@ internal class GradleIncrementalCacheImpl(targetDataRoot: java.io.File, targetOu
             fileSnapshotMap.compareAndUpdate(files, org.jetbrains.kotlin.incremental.snapshots.SimpleFileSnapshotProviderImpl())
 
     fun removeClassfilesBySources(sources: Iterable<java.io.File>): Unit =
-            sources.forEach { sourceToClassfilesMap.remove(it) }
+            sources.forEach {sourceToClassfilesMap.remove(it)}
 
     override fun saveFileToCache(generatedClass: org.jetbrains.kotlin.build.GeneratedJvmClass<org.jetbrains.kotlin.modules.TargetId>): org.jetbrains.kotlin.incremental.CompilationResult {
-        generatedClass.sourceFiles.forEach { sourceToClassfilesMap.add(it, generatedClass.outputFile) }
+        generatedClass.sourceFiles.forEach {sourceToClassfilesMap.add(it, generatedClass.outputFile)}
         return super.saveFileToCache(generatedClass)
     }
 
@@ -66,7 +54,7 @@ internal class GradleIncrementalCacheImpl(targetDataRoot: java.io.File, targetOu
             // TODO: do it in the code that uses cache, since cache should not generally delete anything outside of it!
             // but for a moment it is an easiest solution to implement
             get(file).forEach {
-                log.kotlinDebug { "Deleting $it on clearing cache for $file" }
+                log.kotlinDebug {"Deleting $it on clearing cache for $file"}
                 it.delete()
             }
             storage.remove(file.absolutePath)

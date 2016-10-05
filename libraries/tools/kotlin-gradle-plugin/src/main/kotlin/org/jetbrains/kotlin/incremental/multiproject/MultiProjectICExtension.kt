@@ -23,7 +23,7 @@ internal class MultiProjectICExtension(
             compileIterationState: IncrementalJvmCompilerRunner.CompileIterationState
     ) {
         if (buildState.exitCode != ExitCode.OK || buildState.compilationMode is IncrementalJvmCompilerRunner.CompilationMode.Rebuild) {
-            artifactDifferenceRegistryProvider.withRegistry(reporter) { registry ->
+            artifactDifferenceRegistryProvider.withRegistry(reporter) {registry ->
                 registry.remove(outputArtifact)
             }
         }
@@ -38,7 +38,7 @@ internal class MultiProjectICExtension(
         }
 
         reporter.report {
-            val dirtySymbolsSorted = buildState.dirtyLookupSymbols.map { it.scope + "#" + it.name }.sorted()
+            val dirtySymbolsSorted = buildState.dirtyLookupSymbols.map {it.scope + "#" + it.name}.sorted()
             "Added artifact difference for $outputArtifact (ts: $buildTS): " +
                     "[\n\t${dirtySymbolsSorted.joinToString(",\n\t")}]"
         }

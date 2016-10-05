@@ -27,8 +27,6 @@ import org.jetbrains.kotlin.com.intellij.psi.PsiFileFactory
 import org.jetbrains.kotlin.com.intellij.psi.PsiJavaFile
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.gradle.tasks.kotlinDebug
-import org.jetbrains.kotlin.incremental.ChangesEither
-import org.jetbrains.kotlin.incremental.LookupSymbol
 import org.jetbrains.kotlin.incremental.snapshots.FileCollectionDiff
 import java.io.File
 import java.util.*
@@ -46,11 +44,11 @@ internal class ChangedJavaFilesProcessor {
     }
 
     val allChangedSymbols: Collection<LookupSymbol>
-            get() = allSymbols
+        get() = allSymbols
 
     fun process(filesDiff: FileCollectionDiff): ChangesEither {
         if (filesDiff.removed.any()) {
-            log.kotlinDebug { "Some java files are removed: [${filesDiff.removed.joinToString()}]" }
+            log.kotlinDebug {"Some java files are removed: [${filesDiff.removed.joinToString()}]"}
             return ChangesEither.Unknown()
         }
 
@@ -60,11 +58,11 @@ internal class ChangedJavaFilesProcessor {
 
             val psiFile = javaFile.psiFile()
             if (psiFile !is PsiJavaFile) {
-                log.kotlinDebug { "Expected PsiJavaFile, got ${psiFile?.javaClass}" }
+                log.kotlinDebug {"Expected PsiJavaFile, got ${psiFile?.javaClass}"}
                 return ChangesEither.Unknown()
             }
 
-            psiFile.classes.forEach { it.addLookupSymbols(symbols) }
+            psiFile.classes.forEach {it.addLookupSymbols(symbols)}
         }
         allSymbols.addAll(symbols)
         return ChangesEither.Known(lookupSymbols = symbols)
@@ -74,9 +72,9 @@ internal class ChangedJavaFilesProcessor {
         val fqn = qualifiedName.orEmpty()
 
         symbols.add(LookupSymbol(name.orEmpty(), if (fqn == name) "" else fqn.removeSuffix("." + name!!)))
-        methods.forEach { symbols.add(LookupSymbol(it.name, fqn)) }
-        fields.forEach { symbols.add(LookupSymbol(it.name.orEmpty(), fqn)) }
-        innerClasses.forEach { it.addLookupSymbols(symbols) }
+        methods.forEach {symbols.add(LookupSymbol(it.name, fqn))}
+        fields.forEach {symbols.add(LookupSymbol(it.name.orEmpty(), fqn))}
+        innerClasses.forEach {it.addLookupSymbols(symbols)}
     }
 
     private fun File.psiFile(): PsiFile? =

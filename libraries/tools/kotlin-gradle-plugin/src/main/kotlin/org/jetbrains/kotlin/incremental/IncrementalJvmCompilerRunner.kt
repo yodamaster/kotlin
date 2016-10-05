@@ -14,7 +14,6 @@ import org.jetbrains.kotlin.com.intellij.util.io.PersistentEnumeratorBase
 import org.jetbrains.kotlin.compilerRunner.ArgumentUtils
 import org.jetbrains.kotlin.compilerRunner.OutputItemsCollector
 import org.jetbrains.kotlin.compilerRunner.OutputItemsCollectorImpl
-import org.jetbrains.kotlin.incremental.ChangedFiles
 import org.jetbrains.kotlin.incremental.components.LookupTracker
 import org.jetbrains.kotlin.incremental.snapshots.FileCollectionDiff
 import org.jetbrains.kotlin.modules.TargetId
@@ -35,10 +34,17 @@ internal class IncrementalJvmCompilerRunner(
 ) {
     interface Extension {
         val name: String
-        fun beforeBuild(buildState: BuildState) {}
-        fun afterCompileIteration(buildState: BuildState, compileIterationState: CompileIterationState) {}
-        fun afterBuild(buildState: BuildState) {}
-        fun onCacheCorruption() {}
+        fun beforeBuild(buildState: BuildState) {
+        }
+
+        fun afterCompileIteration(buildState: BuildState, compileIterationState: CompileIterationState) {
+        }
+
+        fun afterBuild(buildState: BuildState) {
+        }
+
+        fun onCacheCorruption() {
+        }
     }
 
     interface BuildState {
@@ -72,7 +78,7 @@ internal class IncrementalJvmCompilerRunner(
     }
 
     var anyClassesCompiled: Boolean = false
-            private set
+        private set
     private val cacheDirectory = File(workingDir, CACHES_DIR_NAME)
     private val dirtySourcesSinceLastTimeFile = File(workingDir, DIRTY_SOURCES_FILE_NAME)
     private val lastBuildInfoFile = File(workingDir, LAST_BUILD_INFO_FILE_NAME)
@@ -80,16 +86,16 @@ internal class IncrementalJvmCompilerRunner(
     var classpathChangesProvider: ClasspathChangesProvider? = null
 
     fun addExtension(ext: Extension) {
-        reporter.report { "Registered IC extension '${ext.name}'" }
+        reporter.report {"Registered IC extension '${ext.name}'"}
         extensions.add(ext)
     }
 
     private fun forEachExt(description: String, fn: (Extension)->Unit) {
-        reporter.report { "Running IC extensions at '$description'" }
+        reporter.report {"Running IC extensions at '$description'"}
         for (ext in extensions) {
-            reporter.report { "Entered extension '${ext.name}'" }
+            reporter.report {"Entered extension '${ext.name}'"}
             fn(ext)
-            reporter.report { "Exited extension '${ext.name}'" }
+            reporter.report {"Exited extension '${ext.name}'"}
         }
     }
 
@@ -106,12 +112,11 @@ internal class IncrementalJvmCompilerRunner(
             val javaFilesProcessor = ChangedJavaFilesProcessor()
             val compilationMode = calculateSourcesToCompile(javaFilesProcessor, caches, changedFiles, args.classpathAsList)
             compileIncrementally(args, caches, javaFilesProcessor, allKotlinSources, targetId, compilationMode, messageCollector)
-        }
-        catch (e: PersistentEnumeratorBase.CorruptedException) {
+        } catch (e: PersistentEnumeratorBase.CorruptedException) {
             caches.clean()
             forEachExt("Cache corruption", Extension::onCacheCorruption)
 
-            reporter.report { "Caches are corrupted. Rebuilding. $e" }
+            reporter.report {"Caches are corrupted. Rebuilding. $e"}
             // try to rebuild
             val javaFilesProcessor = ChangedJavaFilesProcessor()
             caches = IncrementalCachesManager(targetId, cacheDirectory, args.destinationAsFile)
@@ -149,7 +154,7 @@ internal class IncrementalJvmCompilerRunner(
         val classpathSet = classpath.toHashSet()
         val modifiedClasspathEntries = changedFiles.modified.filter {it in classpathSet}
         val lastBuildInfo = BuildInfo.read(lastBuildInfoFile)
-        reporter.report { "Last Kotlin Build info -- $lastBuildInfo" }
+        reporter.report {"Last Kotlin Build info -- $lastBuildInfo"}
         val classpathChanges = classpathChangesProvider?.getClasspathChanges(modifiedClasspathEntries, lastBuildInfo)
         if (classpathChanges !is ChangesEither.Known) {
             return rebuild {"could not get changes from modified classpath entries: ${reporter.pathsAsString(modifiedClasspathEntries)}"}
@@ -209,7 +214,7 @@ internal class IncrementalJvmCompilerRunner(
 
         when (compilationMode) {
             is CompilationMode.Incremental -> {
-                dirtySources = allKotlinSources.filterTo(ArrayList()) { it in compilationMode.dirtyFiles }
+                dirtySources = allKotlinSources.filterTo(ArrayList()) {it in compilationMode.dirtyFiles}
                 args.classpathAsList += args.destinationAsFile
             }
             is CompilationMode.Rebuild -> {
@@ -223,7 +228,7 @@ internal class IncrementalJvmCompilerRunner(
         BuildInfo.write(currentBuildInfo, lastBuildInfoFile)
         val buildState = BuildStateImpl(compilationMode, currentBuildInfo)
 
-        forEachExt("Before build") { ext ->
+        forEachExt("Before build") {ext ->
             ext.beforeBuild(buildState)
         }
 
@@ -234,19 +239,19 @@ internal class IncrementalJvmCompilerRunner(
             caches.incrementalCache.markOutputClassesDirty(dirtySources)
             caches.incrementalCache.removeClassfilesBySources(dirtySources)
 
-            val (sourcesToCompile, removedKotlinSources) = dirtySources.partition { it.isFile }
+            val (sourcesToCompile, removedKotlinSources) = dirtySources.partition {it.isFile}
             if (sourcesToCompile.isNotEmpty()) {
-                reporter.report { "compile iteration: ${reporter.report { reporter.pathsAsString(sourcesToCompile) }}" }
+                reporter.report {"compile iteration: ${reporter.report {reporter.pathsAsString(sourcesToCompile)}}"}
             }
 
-            val text = sourcesToCompile.map { it.canonicalPath }.joinToString(separator = System.getProperty("line.separator"))
+            val text = sourcesToCompile.map {it.canonicalPath}.joinToString(separator = System.getProperty("line.separator"))
             dirtySourcesSinceLastTimeFile.writeText(text)
 
-            val compilerOutput = compileChanged(listOf(targetId), sourcesToCompile.toSet(), args, { caches.incrementalCache }, lookupTracker, messageCollector)
+            val compilerOutput = compileChanged(listOf(targetId), sourcesToCompile.toSet(), args, {caches.incrementalCache}, lookupTracker, messageCollector)
             buildState.exitCode = compilerOutput.exitCode
             buildState.generatedFiles.addAll(compilerOutput.generatedFiles)
 
-            forEachExt("After IC iteration") { ext ->
+            forEachExt("After IC iteration") {ext ->
                 ext.afterCompileIteration(buildState, compileIterationState)
             }
 
@@ -258,11 +263,11 @@ internal class IncrementalJvmCompilerRunner(
 
             val compilationResult = updateIncrementalCaches(listOf(targetId), compilerOutput.generatedFiles,
                     compiledWithErrors = buildState.exitCode != ExitCode.OK,
-                    getIncrementalCache = { caches.incrementalCache })
+                    getIncrementalCache = {caches.incrementalCache})
 
             caches.lookupCache.update(lookupTracker, sourcesToCompile, removedKotlinSources)
 
-            val generatedJavaFiles = kapt2GeneratedSourcesDir.walk().filter { it.isJavaFile() }.toList()
+            val generatedJavaFiles = kapt2GeneratedSourcesDir.walk().filter {it.isJavaFile()}.toList()
             val generatedJavaFilesDiff = caches.incrementalCache.compareAndUpdateFileSnapshots(generatedJavaFiles)
 
             if (compilationMode is CompilationMode.Rebuild) {
@@ -274,7 +279,7 @@ internal class IncrementalJvmCompilerRunner(
             val compiledInThisIterationSet = sourcesToCompile.toHashSet()
             val dirtyKotlinFilesFromJava = when (generatedJavaFilesChanges) {
                 is ChangesEither.Unknown -> {
-                    reporter.report { "Could not get changes for generated java files, recompiling all kotlin" }
+                    reporter.report {"Could not get changes for generated java files, recompiling all kotlin"}
                     buildState.compilationMode = CompilationMode.Rebuild()
                     allKotlinSources.toSet()
                 }
@@ -284,7 +289,7 @@ internal class IncrementalJvmCompilerRunner(
                 else -> throw IllegalStateException("Unknown ChangesEither implementation: $generatedJavaFiles")
             }
 
-            with (dirtySources) {
+            with(dirtySources) {
                 clear()
                 addAll(dirtyKotlinFilesFromJava)
                 addAll(mapLookupSymbolsToFiles(caches.lookupCache, dirtyLookupSymbols, reporter, excludes = compiledInThisIterationSet))
@@ -302,16 +307,16 @@ internal class IncrementalJvmCompilerRunner(
             buildState.dirtyLookupSymbols.addAll(javaFilesProcessor.allChangedSymbols)
         }
 
-        forEachExt("After build") { ext ->
+        forEachExt("After build") {ext ->
             ext.beforeBuild(buildState)
         }
 
         caches.close(flush = true)
-        reporter.report { "flushed incremental caches" }
+        reporter.report {"flushed incremental caches"}
 
         if (buildState.exitCode == ExitCode.OK) {
             sourceAnnotationsRegistry?.flush()
-            cacheVersions.forEach { it.saveIfNeeded() }
+            cacheVersions.forEach {it.saveIfNeeded()}
         }
 
         return buildState.exitCode
@@ -344,14 +349,14 @@ internal class IncrementalJvmCompilerRunner(
         sourceAnnotationsRegistry?.clear()
 
         try {
-            val incrementalCaches = makeIncrementalCachesMap(targets, { listOf<TargetId>() }, getIncrementalCache, { this })
+            val incrementalCaches = makeIncrementalCachesMap(targets, {listOf<TargetId>()}, getIncrementalCache, {this})
             val compilationCanceledStatus = object : CompilationCanceledStatus {
                 override fun checkCanceled() {
                 }
             }
 
-            reporter.report { "compiling with args: ${ArgumentUtils.convertArgumentsToStringList(args)}" }
-            reporter.report { "compiling with classpath: ${classpath.toList().sorted().joinToString()}" }
+            reporter.report {"compiling with args: ${ArgumentUtils.convertArgumentsToStringList(args)}"}
+            reporter.report {"compiling with classpath: ${classpath.toList().sorted().joinToString()}"}
             val compileServices = makeCompileServices(incrementalCaches, lookupTracker, compilationCanceledStatus, sourceAnnotationsRegistry)
             val exitCode = compiler.exec(messageCollector, compileServices, args)
             return CompileChangedResults(
@@ -361,8 +366,7 @@ internal class IncrementalJvmCompilerRunner(
                             representativeTarget = targets.first(),
                             getSources = {sourcesToCompile},
                             getOutputDir = {outputDir}))
-        }
-        finally {
+        } finally {
             moduleFile.delete()
         }
     }
@@ -388,9 +392,13 @@ internal class IncrementalJvmCompilerRunner(
 }
 
 internal var K2JVMCompilerArguments.destinationAsFile: File
-        get() = File(destination)
-        set(value) { destination = destinationAsFile.path }
+    get() = File(destination)
+    set(value) {
+        destination = destinationAsFile.path
+    }
 
 internal var K2JVMCompilerArguments.classpathAsList: List<File>
     get() = classpath.split(File.pathSeparator).map(::File)
-    set(value) { classpath = value.joinToString(separator = File.pathSeparator, transform = { it.path }) }
+    set(value) {
+        classpath = value.joinToString(separator = File.pathSeparator, transform = {it.path})
+    }

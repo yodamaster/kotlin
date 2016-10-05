@@ -29,7 +29,7 @@ internal class FileSnapshotMap(storageFile: File) : BasicStringMap<FileSnapshot>
         val newOrModified = ArrayList<File>()
         val removed = ArrayList<File>()
 
-        val newPaths = newFiles.mapTo(HashSet()) { it.canonicalPath }
+        val newPaths = newFiles.mapTo(HashSet()) {it.canonicalPath}
         for (oldPath in storage.keys) {
             if (oldPath !in newPaths) {
                 storage.remove(oldPath)

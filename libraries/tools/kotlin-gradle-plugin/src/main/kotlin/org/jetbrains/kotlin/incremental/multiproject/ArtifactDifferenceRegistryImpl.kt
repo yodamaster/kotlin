@@ -1,8 +1,6 @@
 package org.jetbrains.kotlin.incremental.multiproject
 
 import org.jetbrains.kotlin.com.intellij.util.io.DataExternalizer
-import org.jetbrains.kotlin.incremental.multiproject.ArtifactDifference
-import org.jetbrains.kotlin.incremental.multiproject.ArtifactDifferenceRegistry
 import org.jetbrains.kotlin.incremental.DirtyData
 import org.jetbrains.kotlin.incremental.LookupSymbol
 import org.jetbrains.kotlin.incremental.storage.BasicStringMap
@@ -30,7 +28,7 @@ internal class ArtifactDifferenceRegistryImpl(
         val oldVal = storage[key] ?: emptyList()
         val newVal = ArrayList(oldVal)
         newVal.add(difference)
-        newVal.sortBy { it.buildTS }
+        newVal.sortBy {it.buildTS}
         storage[key] = newVal.takeLast(MAX_BUILDS_PER_ARTIFACT)
     }
 
@@ -39,7 +37,7 @@ internal class ArtifactDifferenceRegistryImpl(
     }
 
     override fun dumpValue(value: Collection<ArtifactDifference>): String =
-            value.sortedBy { it.buildTS }.joinToString(separator = ",\n\t") { diff ->
+            value.sortedBy {it.buildTS}.joinToString(separator = ",\n\t") {diff ->
                 "{ " +
                         "timestamp: ${diff.buildTS}, " +
                         "lookup symbols: [${diff.dirtyData.dirtyLookupSymbols.dumpLookupSymbols()}], " +
@@ -52,7 +50,7 @@ private fun <T> Collection<T>.takeLast(n: Int): Collection<T> =
         drop(Math.max(size - n, 0))
 
 private fun Collection<LookupSymbol>.dumpLookupSymbols(): String =
-        map { "${it.scope}#${it.name}" }.sorted().joinToString()
+        map {"${it.scope}#${it.name}"}.sorted().joinToString()
 
 private fun Collection<FqName>.dumpFqNames(): String =
         map(FqName::asString).sorted().joinToString()
@@ -73,7 +71,7 @@ private object ArtifactDifferenceCollectionExternalizer : DataExternalizer<Colle
             }
 
     override fun save(output: DataOutput, value: Collection<ArtifactDifference>) {
-        output.writeCollection(value) { diff ->
+        output.writeCollection(value) {diff ->
             writeLong(diff.buildTS)
             writeCollection(diff.dirtyData.dirtyLookupSymbols) {
                 writeUTF(it.scope)
@@ -86,7 +84,7 @@ private object ArtifactDifferenceCollectionExternalizer : DataExternalizer<Colle
     }
 }
 
-private inline fun <T> DataInput.readCollectionTo(col: MutableCollection<T>, readT: DataInput.() -> T): Collection<T> {
+private inline fun <T> DataInput.readCollectionTo(col: MutableCollection<T>, readT: DataInput.()->T): Collection<T> {
     val size = readInt()
 
     repeat(size) {
@@ -96,7 +94,7 @@ private inline fun <T> DataInput.readCollectionTo(col: MutableCollection<T>, rea
     return col
 }
 
-private inline fun <T> DataOutput.writeCollection(col: Collection<T>, writeT: DataOutput.(T) -> Unit) {
+private inline fun <T> DataOutput.writeCollection(col: Collection<T>, writeT: DataOutput.(T)->Unit) {
     writeInt(col.size)
-    col.forEach { writeT(it) }
+    col.forEach {writeT(it)}
 }
