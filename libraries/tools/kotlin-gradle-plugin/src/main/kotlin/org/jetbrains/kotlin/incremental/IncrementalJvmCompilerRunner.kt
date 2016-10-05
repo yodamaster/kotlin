@@ -1,4 +1,4 @@
-package org.jetbrains.kotlin.gradle.tasks
+package org.jetbrains.kotlin.incremental
 
 import org.jetbrains.kotlin.annotation.AnnotationFileUpdater
 import org.jetbrains.kotlin.annotation.SourceAnnotationsRegistry
@@ -14,7 +14,7 @@ import org.jetbrains.kotlin.com.intellij.util.io.PersistentEnumeratorBase
 import org.jetbrains.kotlin.compilerRunner.ArgumentUtils
 import org.jetbrains.kotlin.compilerRunner.OutputItemsCollector
 import org.jetbrains.kotlin.compilerRunner.OutputItemsCollectorImpl
-import org.jetbrains.kotlin.incremental.*
+import org.jetbrains.kotlin.incremental.ChangedFiles
 import org.jetbrains.kotlin.incremental.components.LookupTracker
 import org.jetbrains.kotlin.incremental.snapshots.FileCollectionDiff
 import org.jetbrains.kotlin.modules.TargetId

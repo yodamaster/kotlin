@@ -7,8 +7,8 @@ import org.gradle.api.tasks.compile.AbstractCompile
 import org.gradle.api.tasks.compile.JavaCompile
 import org.jetbrains.kotlin.com.intellij.openapi.util.io.FileUtil
 import org.jetbrains.kotlin.gradle.plugin.kotlinDebug
-import org.jetbrains.kotlin.gradle.tasks.ArtifactDifferenceRegistry
-import org.jetbrains.kotlin.gradle.tasks.ArtifactDifferenceRegistryProvider
+import org.jetbrains.kotlin.incremental.multiproject.ArtifactDifferenceRegistry
+import org.jetbrains.kotlin.incremental.multiproject.ArtifactDifferenceRegistryProvider
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.File
 
