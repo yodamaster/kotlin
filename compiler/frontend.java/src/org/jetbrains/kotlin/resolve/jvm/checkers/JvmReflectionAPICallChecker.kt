@@ -31,7 +31,7 @@ import org.jetbrains.kotlin.storage.getValue
  * of reflection API which will fail at runtime.
  */
 class JvmReflectionAPICallChecker(private val module: ModuleDescriptor, storageManager: StorageManager) : AbstractReflectionApiCallChecker(module, storageManager) {
-    override val isReflectionAvailable by storageManager.createLazyValue {
+    override val isWholeReflectionApiAvailable by storageManager.createLazyValue {
         module.findClassAcrossModuleDependencies(JvmAbi.REFLECTION_FACTORY_IMPL) != null
     }
 

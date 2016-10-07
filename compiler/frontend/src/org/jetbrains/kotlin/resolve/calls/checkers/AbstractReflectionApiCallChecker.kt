@@ -33,7 +33,7 @@ import org.jetbrains.kotlin.util.OperatorNameConventions
  * Checks that there are no usages of reflection API which will fail at runtime.
  */
 abstract class AbstractReflectionApiCallChecker(private val module: ModuleDescriptor, storageManager: StorageManager) : CallChecker {
-    protected abstract val isReflectionAvailable: Boolean
+    protected abstract val isWholeReflectionApiAvailable: Boolean
     protected abstract fun report(element: PsiElement, context: CallCheckerContext)
 
     private val kPropertyClasses by storageManager.createLazyValue {
@@ -44,6 +44,8 @@ abstract class AbstractReflectionApiCallChecker(private val module: ModuleDescri
     private val ANY_MEMBER_NAMES = setOf("equals", "hashCode", "toString")
 
     final override fun check(resolvedCall: ResolvedCall<*>, reportOn: PsiElement, context: CallCheckerContext) {
+        if (isWholeReflectionApiAvailable) return
+
         // Do not report the diagnostic on built-in sources
         if (isReflectionSource(reportOn)) return
 

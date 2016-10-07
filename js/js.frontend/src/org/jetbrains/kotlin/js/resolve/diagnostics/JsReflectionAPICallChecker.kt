@@ -29,8 +29,8 @@ import org.jetbrains.kotlin.storage.StorageManager
 import org.jetbrains.kotlin.storage.getValue
 
 class JsReflectionAPICallChecker(private val module: ModuleDescriptor, storageManager: StorageManager) : AbstractReflectionApiCallChecker(module, storageManager) {
-    override val isReflectionAvailable: Boolean
-        get() = true
+    override val isWholeReflectionApiAvailable: Boolean
+        get() = false
 
     override fun report(element: PsiElement, context: CallCheckerContext) {
         context.trace.report(UNSUPPORTED.on(element, "This reflection API is not supported yet in JavaScript"))
