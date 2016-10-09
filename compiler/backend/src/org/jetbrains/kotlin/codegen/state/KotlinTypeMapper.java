@@ -609,7 +609,7 @@ public class KotlinTypeMapper {
 
         DeclarationDescriptor functionParent = descriptor.getOriginal().getContainingDeclaration();
 
-        FunctionDescriptor functionDescriptor = unwrapFakeOverride(descriptor.getOriginal());
+        FunctionDescriptor functionDescriptor = unwrapFakeOverride(descriptor.getOriginal(), superCall && !isJvm8Target);
 
         JvmMethodSignature signature;
         Type owner;
