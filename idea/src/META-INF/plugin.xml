@@ -1553,7 +1553,7 @@
                      language="kotlin"
     />
 
-    <localInspection implementationClass="org.jetbrains.kotlin.idea.inspections.UnsafeCastFromDynamic"
+    <localInspection implementationClass="org.jetbrains.kotlin.idea.inspections.UnsafeCastFromDynamicInspection"
                      displayName="Implicit (unsafe) cast from dynamic type"
                      groupName="Kotlin"
                      enabledByDefault="true"
