@@ -160,6 +160,7 @@ public abstract class KotlinWithLibraryConfigurator implements KotlinProjectConf
         RuntimeLibraryFiles files = getExistingJarFiles();
         File runtimeJar = files.getRuntimeJar();
         File reflectJar = files.getReflectJar();
+        File scriptRuntimeJar = files.getScriptRuntimeJar();
 
         switch (libraryState) {
             case LIBRARY:
@@ -171,6 +172,9 @@ public abstract class KotlinWithLibraryConfigurator implements KotlinProjectConf
                         copyFileToDir(runtimeJar, dirToCopyJarTo, collector);
                         if (reflectJar != null) {
                             copyFileToDir(reflectJar, dirToCopyJarTo, collector);
+                        }
+                        if (scriptRuntimeJar != null) {
+                            copyFileToDir(scriptRuntimeJar, dirToCopyJarTo, collector);
                         }
                         break;
                     }
@@ -184,18 +188,19 @@ public abstract class KotlinWithLibraryConfigurator implements KotlinProjectConf
                 switch (jarState) {
                     case EXISTS: {
                         addJarsToExistingLibrary(
-                                project, files.getRuntimeDestination(dirToCopyJarTo), files.getReflectDestination(dirToCopyJarTo), collector
+                                project, files.getRuntimeDestination(dirToCopyJarTo), files.getReflectDestination(dirToCopyJarTo), files.getScriptRuntimeDestination(dirToCopyJarTo), collector
                         );
                         break;
                     }
                     case COPY: {
                         File copiedRuntimeJar = copyFileToDir(runtimeJar, dirToCopyJarTo, collector);
                         File copiedReflectJar = copyFileToDir(reflectJar, dirToCopyJarTo, collector);
-                        addJarsToExistingLibrary(project, copiedRuntimeJar, copiedReflectJar, collector);
+                        File copiedScriptRuntimeJar = copyFileToDir(scriptRuntimeJar, dirToCopyJarTo, collector);
+                        addJarsToExistingLibrary(project, copiedRuntimeJar, copiedReflectJar, copiedScriptRuntimeJar, collector);
                         break;
                     }
                     case DO_NOT_COPY: {
-                        addJarsToExistingLibrary(project, runtimeJar, reflectJar, collector);
+                        addJarsToExistingLibrary(project, runtimeJar, reflectJar, scriptRuntimeJar, collector);
                         break;
                     }
                 }
@@ -204,18 +209,19 @@ public abstract class KotlinWithLibraryConfigurator implements KotlinProjectConf
                 switch (jarState) {
                     case EXISTS: {
                         addJarsToNewLibrary(
-                                project, files.getRuntimeDestination(dirToCopyJarTo), files.getReflectDestination(dirToCopyJarTo), collector
+                                project, files.getRuntimeDestination(dirToCopyJarTo), files.getReflectDestination(dirToCopyJarTo), files.getScriptRuntimeDestination(dirToCopyJarTo), collector
                         );
                         break;
                     }
                     case COPY: {
                         File copiedRuntimeJar = copyFileToDir(runtimeJar, dirToCopyJarTo, collector);
                         File copiedReflectJar = copyFileToDir(reflectJar, dirToCopyJarTo, collector);
-                        addJarsToNewLibrary(project, copiedRuntimeJar, copiedReflectJar, collector);
+                        File copiedScriptRuntimeJar = copyFileToDir(scriptRuntimeJar, dirToCopyJarTo, collector);
+                        addJarsToNewLibrary(project, copiedRuntimeJar, copiedReflectJar, copiedScriptRuntimeJar, collector);
                         break;
                     }
                     case DO_NOT_COPY: {
-                        addJarsToNewLibrary(project, runtimeJar, reflectJar, collector);
+                        addJarsToNewLibrary(project, runtimeJar, reflectJar, scriptRuntimeJar, collector);
                         break;
                     }
                 }
@@ -373,7 +379,7 @@ public abstract class KotlinWithLibraryConfigurator implements KotlinProjectConf
         return DependencyScope.COMPILE;
     }
 
-    private void addJarsToExistingLibrary(@NotNull Project project, @NotNull File runtimeJar, @Nullable File reflectJar, @NotNull NotificationMessageCollector collector) {
+    private void addJarsToExistingLibrary(@NotNull Project project, @NotNull File runtimeJar, @Nullable File reflectJar, @Nullable File scriptRuntimeJar, @NotNull NotificationMessageCollector collector) {
         Library library = getKotlinLibrary(project);
         assert library != null : "Kotlin library should present, instead createNewLibrary should be invoked";
 
@@ -381,6 +387,9 @@ public abstract class KotlinWithLibraryConfigurator implements KotlinProjectConf
         model.addRoot(VfsUtil.getUrlForLibraryRoot(runtimeJar), OrderRootType.CLASSES);
         if (reflectJar != null) {
             model.addRoot(VfsUtil.getUrlForLibraryRoot(reflectJar), OrderRootType.CLASSES);
+        }
+        if (scriptRuntimeJar != null) {
+            model.addRoot(VfsUtil.getUrlForLibraryRoot(scriptRuntimeJar), OrderRootType.CLASSES);
         }
 
         ApplicationManager.getApplication().runWriteAction(new Runnable() {
@@ -397,6 +406,7 @@ public abstract class KotlinWithLibraryConfigurator implements KotlinProjectConf
             @NotNull Project project,
             @NotNull final File runtimeJar,
             @Nullable final File reflectJar,
+            @Nullable final File scriptRuntimeJar,
             @NotNull NotificationMessageCollector collector
     ) {
         final LibraryTable table = LibraryTablesRegistrar.getInstance().getLibraryTable(project);
@@ -409,6 +419,9 @@ public abstract class KotlinWithLibraryConfigurator implements KotlinProjectConf
                 model.addRoot(VfsUtil.getUrlForLibraryRoot(runtimeJar), OrderRootType.CLASSES);
                 if (reflectJar != null) {
                     model.addRoot(VfsUtil.getUrlForLibraryRoot(reflectJar), OrderRootType.CLASSES);
+                }
+                if (scriptRuntimeJar != null) {
+                    model.addRoot(VfsUtil.getUrlForLibraryRoot(scriptRuntimeJar), OrderRootType.CLASSES);
                 }
                 model.commit();
             }

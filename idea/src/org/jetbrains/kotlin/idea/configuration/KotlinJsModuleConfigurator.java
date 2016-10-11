@@ -86,6 +86,7 @@ public class KotlinJsModuleConfigurator extends KotlinWithLibraryConfigurator {
         return new RuntimeLibraryFiles(
                 assertFileExists(paths.getJsStdLibJarPath()),
                 null,
+                null,
                 assertFileExists(paths.getJsStdLibSrcJarPath())
         );
     }
