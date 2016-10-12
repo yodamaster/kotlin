@@ -37,7 +37,6 @@ import org.junit.Test
 import java.io.File
 import java.lang.Exception
 import java.lang.reflect.InvocationTargetException
-import java.net.URISyntaxException
 import java.net.URL
 import java.net.URLClassLoader
 import java.util.concurrent.Future
