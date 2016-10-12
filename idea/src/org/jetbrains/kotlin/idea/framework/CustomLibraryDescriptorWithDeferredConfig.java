@@ -173,7 +173,6 @@ public abstract class CustomLibraryDescriptorWithDeferredConfig extends CustomLi
 
         File runtimeJar;
         File reflectJar;
-        File scriptRuntimeJar;
         File runtimeSrcJar;
 
         File stdJarInDefaultPath = files.getRuntimeDestination(defaultPathToJarFile);
@@ -185,13 +184,6 @@ public abstract class CustomLibraryDescriptorWithDeferredConfig extends CustomLi
                 reflectJar = files.getReflectJar();
                 assert reflectJar != null : "getReflectDestination != null, but getReflectJar == null";
                 deferredCopyFileRequests.addCopyWithReplaceRequest(reflectJar, runtimeJar.getParent());
-            }
-
-            scriptRuntimeJar = files.getScriptRuntimeDestination(defaultPathToJarFile);
-            if (scriptRuntimeJar != null && !scriptRuntimeJar.exists()) {
-                scriptRuntimeJar = files.getScriptRuntimeJar();
-                assert scriptRuntimeJar != null : "getScriptRuntimeDestination != null, but getScriptRuntimeJar == null";
-                deferredCopyFileRequests.addCopyWithReplaceRequest(scriptRuntimeJar, runtimeJar.getParent());
             }
 
             runtimeSrcJar = files.getRuntimeSourcesDestination(defaultPathToJarFile);
@@ -215,7 +207,6 @@ public abstract class CustomLibraryDescriptorWithDeferredConfig extends CustomLi
 
             runtimeJar = files.getRuntimeJar();
             reflectJar = files.getReflectJar();
-            scriptRuntimeJar = files.getScriptRuntimeJar();
             runtimeSrcJar = files.getRuntimeSourcesJar();
         }
 
@@ -234,7 +225,7 @@ public abstract class CustomLibraryDescriptorWithDeferredConfig extends CustomLi
     @Nullable
     public NewLibraryConfiguration createNewLibraryWithDefaultSettings(@Nullable VirtualFile contextDirectory) {
         RuntimeLibraryFiles files = getConfigurator().getExistingJarFiles();
-        return createConfiguration(Arrays.asList(files.getRuntimeJar(), files.getReflectJar(), files.getScriptRuntimeJar()), files.getRuntimeSourcesJar());
+        return createConfiguration(Arrays.asList(files.getRuntimeJar(), files.getReflectJar()), files.getRuntimeSourcesJar());
     }
 
     @NotNull

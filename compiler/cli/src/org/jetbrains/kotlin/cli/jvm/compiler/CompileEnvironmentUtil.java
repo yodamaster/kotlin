@@ -128,7 +128,6 @@ public class CompileEnvironmentUtil {
         }
 
         copyJarImpl(stream, runtimePath);
-        copyJarImpl(stream, scriptRuntimePath);
     }
 
     private static void copyJarImpl(JarOutputStream stream, File jarPath) throws IOException {
