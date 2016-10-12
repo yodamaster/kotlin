@@ -23,6 +23,9 @@ class SpringGradleSubplugin : Plugin<Project> {
     override fun apply(project: Project) {
         project.plugins.apply(AllOpenGradlePlugin::class.java)
         val allOpenExtension = AllOpenGradlePlugin.getAllOpenExtension(project)
-        allOpenExtension.annotation("org.springframework.stereotype.Component")
+        allOpenExtension.annotations("org.springframework.stereotype.Component",
+                                     "org.springframework.transaction.annotation.Transactional",
+                                     "org.springframework.scheduling.annotation.Async",
+                                     "org.springframework.cache.annotation.Cacheable")
     }
 }
