@@ -10,6 +10,6 @@ public annotation class NoArg2
 @NoArg2
 @kotlin.Metadata
 public final class Test {
-    public method <init>(): void
+    public synthetic method <init>(): void
     public method <init>(@org.jetbrains.annotations.NotNull p0: java.lang.String): void
 }

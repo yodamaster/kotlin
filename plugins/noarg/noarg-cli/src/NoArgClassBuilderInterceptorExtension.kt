@@ -114,7 +114,7 @@ class NoArgClassBuilderInterceptorExtension : ClassBuilderInterceptorExtension {
         override fun done() {
             val superClassInternalName = this.superClassInternalName
             if (hasSpecialAnnotation && !noArgConstructorGenerated && superClassInternalName.isNotEmpty()) {
-                super.newMethod(JvmDeclarationOrigin.NO_ORIGIN, Opcodes.ACC_PUBLIC, "<init>", "()V", null, null).apply {
+                super.newMethod(JvmDeclarationOrigin.NO_ORIGIN, Opcodes.ACC_PUBLIC or Opcodes.ACC_SYNTHETIC, "<init>", "()V", null, null).apply {
                     visitCode()
                     visitVarInsn(Opcodes.ALOAD, 0)
                     visitMethodInsn(Opcodes.INVOKESPECIAL, superClassInternalName, "<init>", "()V", false)

@@ -21,7 +21,7 @@ public final class Test {
 
 @kotlin.Metadata
 public final class Test2 {
-    public method <init>(): void
+    public synthetic method <init>(): void
     public method <init>(@org.jetbrains.annotations.NotNull p0: java.lang.String, p1: long): void
     public synthetic method <init>(p0: java.lang.String, p1: long, p2: int, p3: kotlin.jvm.internal.DefaultConstructorMarker): void
 }
