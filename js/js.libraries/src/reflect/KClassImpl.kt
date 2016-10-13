@@ -24,10 +24,10 @@ internal class KClassImpl<T : Any>(
 
     private val metadata = jClass.asDynamic().`$metadata$`
     // TODO: use FQN
-    private val hashCode = metadata.simpleName.hashCode()
+    private val hashCode = simpleName?.hashCode() ?: 0
 
-    override val simpleName: String
-        get() = metadata.simpleName
+    override val simpleName: String?
+        get() = metadata?.simpleName
 
     override val annotations: List<Annotation>
         get() = TODO()
