@@ -10,10 +10,10 @@ inline fun <reified T : Any> foo(b: Boolean = false): KClass<T> {
 }
 
 fun box(): String {
-    assertEquals(A::class, foo<A>())
-    assertEquals(B::class, foo<B>())
-    assertEquals(O::class, foo<O>())
-    assertEquals(E::class, foo<E>())
+    check(A::class, foo<A>())
+    check(B::class, foo<B>())
+    check(O::class, foo<O>())
+    check(E::class, foo<E>())
 
     return "OK"
 }
