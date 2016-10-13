@@ -37,6 +37,9 @@ import org.w3c.xhr.*
     open var _camel_cased_attribute: String
         get() = noImpl
         set(value) = noImpl
+    open var _webkit_cased_attribute: String
+        get() = noImpl
+        set(value) = noImpl
     open var alignContent: String
         get() = noImpl
         set(value) = noImpl
@@ -841,27 +844,10 @@ import org.w3c.xhr.*
 }
 
 @native public abstract class CSSNamespaceRule : CSSRule() {
-    open var namespaceURI: String
+    open val namespaceURI: String
         get() = noImpl
-        set(value) = noImpl
-    open var prefix: String
+    open val prefix: String
         get() = noImpl
-        set(value) = noImpl
-}
-
-@native public abstract class PseudoElement : GeometryNode {
-    open val cascadedStyle: CSSStyleDeclaration
-        get() = noImpl
-    open val defaultStyle: CSSStyleDeclaration
-        get() = noImpl
-    open val rawComputedStyle: CSSStyleDeclaration
-        get() = noImpl
-    open val usedStyle: CSSStyleDeclaration
-        get() = noImpl
-    fun getBoxQuads(options: BoxQuadOptions = noImpl): Array<DOMQuad> = noImpl
-    fun convertQuadFromNode(quad: DOMQuad, from: GeometryNode, options: ConvertCoordinateOptions = noImpl): DOMQuad = noImpl
-    fun convertRectFromNode(rect: DOMRectReadOnly, from: GeometryNode, options: ConvertCoordinateOptions = noImpl): DOMQuad = noImpl
-    fun convertPointFromNode(point: DOMPointInit, from: GeometryNode, options: ConvertCoordinateOptions = noImpl): DOMPoint = noImpl
 }
 
 @native public abstract class CSS {

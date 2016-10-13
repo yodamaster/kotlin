@@ -122,8 +122,8 @@ public inline fun WebGLContextAttributes(alpha: Boolean = true, depth: Boolean =
     fun clearStencil(s: Int): Unit = noImpl
     fun colorMask(red: Boolean, green: Boolean, blue: Boolean, alpha: Boolean): Unit = noImpl
     fun compileShader(shader: WebGLShader?): Unit = noImpl
-    fun compressedTexImage2D(target: Int, level: Int, internalformat: Int, width: Int, height: Int, border: Int, data: ArrayBufferView): Unit = noImpl
-    fun compressedTexSubImage2D(target: Int, level: Int, xoffset: Int, yoffset: Int, width: Int, height: Int, format: Int, data: ArrayBufferView): Unit = noImpl
+    fun compressedTexImage2D(target: Int, level: Int, internalformat: Int, width: Int, height: Int, border: Int, data: dynamic): Unit = noImpl
+    fun compressedTexSubImage2D(target: Int, level: Int, xoffset: Int, yoffset: Int, width: Int, height: Int, format: Int, data: dynamic): Unit = noImpl
     fun copyTexImage2D(target: Int, level: Int, internalformat: Int, x: Int, y: Int, width: Int, height: Int, border: Int): Unit = noImpl
     fun copyTexSubImage2D(target: Int, level: Int, xoffset: Int, yoffset: Int, x: Int, y: Int, width: Int, height: Int): Unit = noImpl
     fun createBuffer(): WebGLBuffer? = noImpl
@@ -187,7 +187,7 @@ public inline fun WebGLContextAttributes(alpha: Boolean = true, depth: Boolean =
     fun linkProgram(program: WebGLProgram?): Unit = noImpl
     fun pixelStorei(pname: Int, param: Int): Unit = noImpl
     fun polygonOffset(factor: Float, units: Float): Unit = noImpl
-    fun readPixels(x: Int, y: Int, width: Int, height: Int, format: Int, type: Int, pixels: ArrayBufferView?): Unit = noImpl
+    fun readPixels(x: Int, y: Int, width: Int, height: Int, format: Int, type: Int, pixels: dynamic): Unit = noImpl
     fun renderbufferStorage(target: Int, internalformat: Int, width: Int, height: Int): Unit = noImpl
     fun sampleCoverage(value: Float, invert: Boolean): Unit = noImpl
     fun scissor(x: Int, y: Int, width: Int, height: Int): Unit = noImpl
@@ -198,12 +198,12 @@ public inline fun WebGLContextAttributes(alpha: Boolean = true, depth: Boolean =
     fun stencilMaskSeparate(face: Int, mask: Int): Unit = noImpl
     fun stencilOp(fail: Int, zfail: Int, zpass: Int): Unit = noImpl
     fun stencilOpSeparate(face: Int, fail: Int, zfail: Int, zpass: Int): Unit = noImpl
-    fun texImage2D(target: Int, level: Int, internalformat: Int, width: Int, height: Int, border: Int, format: Int, type: Int, pixels: ArrayBufferView?): Unit = noImpl
-    fun texImage2D(target: Int, level: Int, internalformat: Int, format: Int, type: Int, source: dynamic): Unit = noImpl
+    fun texImage2D(target: Int, level: Int, internalformat: Int, width: Int, height: Int, border: Int, format: Int, type: Int, pixels: dynamic): Unit = noImpl
+    fun texImage2D(target: Int, level: Int, internalformat: Int, format: Int, type: Int, source: TexImageSource?): Unit = noImpl
     fun texParameterf(target: Int, pname: Int, param: Float): Unit = noImpl
     fun texParameteri(target: Int, pname: Int, param: Int): Unit = noImpl
-    fun texSubImage2D(target: Int, level: Int, xoffset: Int, yoffset: Int, width: Int, height: Int, format: Int, type: Int, pixels: ArrayBufferView?): Unit = noImpl
-    fun texSubImage2D(target: Int, level: Int, xoffset: Int, yoffset: Int, format: Int, type: Int, source: dynamic): Unit = noImpl
+    fun texSubImage2D(target: Int, level: Int, xoffset: Int, yoffset: Int, width: Int, height: Int, format: Int, type: Int, pixels: dynamic): Unit = noImpl
+    fun texSubImage2D(target: Int, level: Int, xoffset: Int, yoffset: Int, format: Int, type: Int, source: TexImageSource?): Unit = noImpl
     fun uniform1f(location: WebGLUniformLocation?, x: Float): Unit = noImpl
     fun uniform1fv(location: WebGLUniformLocation?, v: Float32Array): Unit = noImpl
     fun uniform1fv(location: WebGLUniformLocation?, v: Array<Float>): Unit = noImpl
@@ -236,19 +236,15 @@ public inline fun WebGLContextAttributes(alpha: Boolean = true, depth: Boolean =
     fun uniformMatrix4fv(location: WebGLUniformLocation?, transpose: Boolean, value: Array<Float>): Unit = noImpl
     fun useProgram(program: WebGLProgram?): Unit = noImpl
     fun validateProgram(program: WebGLProgram?): Unit = noImpl
-    fun vertexAttrib1f(indx: Int, x: Float): Unit = noImpl
-    fun vertexAttrib1fv(indx: Int, values: Float32Array): Unit = noImpl
-    fun vertexAttrib1fv(indx: Int, values: Array<Float>): Unit = noImpl
-    fun vertexAttrib2f(indx: Int, x: Float, y: Float): Unit = noImpl
-    fun vertexAttrib2fv(indx: Int, values: Float32Array): Unit = noImpl
-    fun vertexAttrib2fv(indx: Int, values: Array<Float>): Unit = noImpl
-    fun vertexAttrib3f(indx: Int, x: Float, y: Float, z: Float): Unit = noImpl
-    fun vertexAttrib3fv(indx: Int, values: Float32Array): Unit = noImpl
-    fun vertexAttrib3fv(indx: Int, values: Array<Float>): Unit = noImpl
-    fun vertexAttrib4f(indx: Int, x: Float, y: Float, z: Float, w: Float): Unit = noImpl
-    fun vertexAttrib4fv(indx: Int, values: Float32Array): Unit = noImpl
-    fun vertexAttrib4fv(indx: Int, values: Array<Float>): Unit = noImpl
-    fun vertexAttribPointer(indx: Int, size: Int, type: Int, normalized: Boolean, stride: Int, offset: Int): Unit = noImpl
+    fun vertexAttrib1f(index: Int, x: Float): Unit = noImpl
+    fun vertexAttrib1fv(index: Int, values: dynamic): Unit = noImpl
+    fun vertexAttrib2f(index: Int, x: Float, y: Float): Unit = noImpl
+    fun vertexAttrib2fv(index: Int, values: dynamic): Unit = noImpl
+    fun vertexAttrib3f(index: Int, x: Float, y: Float, z: Float): Unit = noImpl
+    fun vertexAttrib3fv(index: Int, values: dynamic): Unit = noImpl
+    fun vertexAttrib4f(index: Int, x: Float, y: Float, z: Float, w: Float): Unit = noImpl
+    fun vertexAttrib4fv(index: Int, values: dynamic): Unit = noImpl
+    fun vertexAttribPointer(index: Int, size: Int, type: Int, normalized: Boolean, stride: Int, offset: Int): Unit = noImpl
     fun viewport(x: Int, y: Int, width: Int, height: Int): Unit = noImpl
 
     companion object {
@@ -558,21 +554,22 @@ public inline fun WebGLContextAttributes(alpha: Boolean = true, depth: Boolean =
 }
 
 @native public abstract class WebGLContextEventInit : EventInit() {
-    abstract var statusMessage: String
+    open var statusMessage: String = ""
 }
 
 @Suppress("NOTHING_TO_INLINE")
-public inline fun WebGLContextEventInit(statusMessage: String, bubbles: Boolean = false, cancelable: Boolean = false): WebGLContextEventInit {
+public inline fun WebGLContextEventInit(statusMessage: String = "", bubbles: Boolean = false, cancelable: Boolean = false, composed: Boolean = false): WebGLContextEventInit {
     val o = js("({})")
 
     o["statusMessage"] = statusMessage
     o["bubbles"] = bubbles
     o["cancelable"] = cancelable
+    o["composed"] = composed
 
     return o
 }
 
-@native public open class ArrayBuffer(length: Int) : Transferable {
+@native public open class ArrayBuffer(length: Int) {
     open val byteLength: Int
         get() = noImpl
     fun slice(begin: Int, end: Int = noImpl): ArrayBuffer = noImpl
@@ -582,7 +579,7 @@ public inline fun WebGLContextEventInit(statusMessage: String, bubbles: Boolean 
     }
 }
 
-@native public open class Int8Array : ArrayBufferView {
+@native public open class Int8Array {
     constructor(length: Int)
     constructor(array: Int8Array)
     constructor(array: Array<Byte>)
@@ -609,7 +606,7 @@ public inline fun WebGLContextEventInit(statusMessage: String, bubbles: Boolean 
     }
 }
 
-@native public open class Uint8Array : ArrayBufferView {
+@native public open class Uint8Array {
     constructor(length: Int)
     constructor(array: Uint8Array)
     constructor(array: Array<Byte>)
@@ -636,7 +633,7 @@ public inline fun WebGLContextEventInit(statusMessage: String, bubbles: Boolean 
     }
 }
 
-@native public open class Uint8ClampedArray : ArrayBufferView {
+@native public open class Uint8ClampedArray {
     constructor(length: Int)
     constructor(array: Uint8ClampedArray)
     constructor(array: Array<Byte>)
@@ -663,7 +660,7 @@ public inline fun WebGLContextEventInit(statusMessage: String, bubbles: Boolean 
     }
 }
 
-@native public open class Int16Array : ArrayBufferView {
+@native public open class Int16Array {
     constructor(length: Int)
     constructor(array: Int16Array)
     constructor(array: Array<Short>)
@@ -690,7 +687,7 @@ public inline fun WebGLContextEventInit(statusMessage: String, bubbles: Boolean 
     }
 }
 
-@native public open class Uint16Array : ArrayBufferView {
+@native public open class Uint16Array {
     constructor(length: Int)
     constructor(array: Uint16Array)
     constructor(array: Array<Short>)
@@ -717,7 +714,7 @@ public inline fun WebGLContextEventInit(statusMessage: String, bubbles: Boolean 
     }
 }
 
-@native public open class Int32Array : ArrayBufferView {
+@native public open class Int32Array {
     constructor(length: Int)
     constructor(array: Int32Array)
     constructor(array: Array<Int>)
@@ -744,7 +741,7 @@ public inline fun WebGLContextEventInit(statusMessage: String, bubbles: Boolean 
     }
 }
 
-@native public open class Uint32Array : ArrayBufferView {
+@native public open class Uint32Array {
     constructor(length: Int)
     constructor(array: Uint32Array)
     constructor(array: Array<Int>)
@@ -771,7 +768,7 @@ public inline fun WebGLContextEventInit(statusMessage: String, bubbles: Boolean 
     }
 }
 
-@native public open class Float32Array : ArrayBufferView {
+@native public open class Float32Array {
     constructor(length: Int)
     constructor(array: Float32Array)
     constructor(array: Array<Float>)
@@ -798,7 +795,7 @@ public inline fun WebGLContextEventInit(statusMessage: String, bubbles: Boolean 
     }
 }
 
-@native public open class Float64Array : ArrayBufferView {
+@native public open class Float64Array {
     constructor(length: Int)
     constructor(array: Float64Array)
     constructor(array: Array<Double>)
@@ -825,7 +822,7 @@ public inline fun WebGLContextEventInit(statusMessage: String, bubbles: Boolean 
     }
 }
 
-@native public open class DataView(buffer: ArrayBuffer, byteOffset: Int = noImpl, byteLength: Int = noImpl) : ArrayBufferView {
+@native public open class DataView(buffer: ArrayBuffer, byteOffset: Int = noImpl, byteLength: Int = noImpl) {
     open val buffer: ArrayBuffer
         get() = noImpl
     open val byteOffset: Int
@@ -848,5 +845,8 @@ public inline fun WebGLContextEventInit(statusMessage: String, bubbles: Boolean 
     fun setUint32(byteOffset: Int, value: Int, littleEndian: Boolean = noImpl): Unit = noImpl
     fun setFloat32(byteOffset: Int, value: Float, littleEndian: Boolean = noImpl): Unit = noImpl
     fun setFloat64(byteOffset: Int, value: Double, littleEndian: Boolean = noImpl): Unit = noImpl
+}
+
+@native public @marker interface TexImageSource {
 }
 

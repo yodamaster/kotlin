@@ -95,12 +95,14 @@ import org.w3c.workers.*
 }
 
 @native public open class FormData(form: HTMLFormElement = noImpl) {
-    fun append(name: String, value: dynamic): Unit = noImpl
+    fun append(name: String, value: String): Unit = noImpl
+    fun append(name: String, value: Blob, filename: String = noImpl): Unit = noImpl
     fun delete(name: String): Unit = noImpl
     fun get(name: String): dynamic = noImpl
     fun getAll(name: String): Array<dynamic> = noImpl
     fun has(name: String): Boolean = noImpl
-    fun set(name: String, value: dynamic): Unit = noImpl
+    fun set(name: String, value: String): Unit = noImpl
+    fun set(name: String, value: Blob, filename: String = noImpl): Unit = noImpl
 }
 
 @native public open class ProgressEvent(type: String, eventInitDict: ProgressEventInit = noImpl) : Event(type, eventInitDict) {
@@ -119,7 +121,7 @@ import org.w3c.workers.*
 }
 
 @Suppress("NOTHING_TO_INLINE")
-public inline fun ProgressEventInit(lengthComputable: Boolean = false, loaded: Int = 0, total: Int = 0, bubbles: Boolean = false, cancelable: Boolean = false): ProgressEventInit {
+public inline fun ProgressEventInit(lengthComputable: Boolean = false, loaded: Int = 0, total: Int = 0, bubbles: Boolean = false, cancelable: Boolean = false, composed: Boolean = false): ProgressEventInit {
     val o = js("({})")
 
     o["lengthComputable"] = lengthComputable
@@ -127,6 +129,7 @@ public inline fun ProgressEventInit(lengthComputable: Boolean = false, loaded: I
     o["total"] = total
     o["bubbles"] = bubbles
     o["cancelable"] = cancelable
+    o["composed"] = composed
 
     return o
 }

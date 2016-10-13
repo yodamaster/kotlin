@@ -20,7 +20,7 @@ import org.w3c.notifications.*
 import org.w3c.workers.*
 import org.w3c.xhr.*
 
-@native public abstract class Performance {
+@native public abstract class Performance : EventTarget() {
     open val timing: PerformanceTiming
         get() = noImpl
     open val navigation: PerformanceNavigation
