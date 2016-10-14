@@ -17,8 +17,6 @@
 (function (Kotlin) {
     "use strict";
 
-    var CharSequence = Kotlin.createTraitNow(null);
-
     // Shims for String
     if (typeof String.prototype.startsWith === "undefined") {
         String.prototype.startsWith = function(searchString, position) {
@@ -182,23 +180,21 @@
     };
 
     Kotlin.intUpto = function (from, to) {
-        return new Kotlin.NumberRange(from, to);
+        return new Kotlin.kotlin.ranges.IntRange(from, to);
     };
 
     Kotlin.intDownto = function (from, to) {
-        return new Kotlin.Progression(from, to, -1);
+        return new Kotlin.kotlin.ranges.IntProgression(from, to, -1);
     };
 
     Kotlin.Throwable = Error;
 
-
     function createClassNowWithMessage(base) {
-        return Kotlin.createClassNow(base,
-                   /** @constructs */
-                   function (message) {
-                       this.message = (message !== void 0) ? message : null;
-                   }
-               );
+        function Class(message) {
+            this.message = (message !== void 0) ? message : null;
+        }
+        Class.prototype = Object.create(base.prototype);
+        return Class;
     }
 
     Kotlin.Error = createClassNowWithMessage(Kotlin.Throwable);
@@ -215,11 +211,11 @@
     Kotlin.AssertionError = createClassNowWithMessage(Kotlin.Error);
 
     Kotlin.throwNPE = function (message) {
-        throw new Kotlin.NullPointerException(message);
+        throw new Kotlin.kotlin.ranges.NullPointerException(message);
     };
 
     Kotlin.throwCCE = function () {
-        throw new Kotlin.ClassCastException("Illegal cast");
+        throw new Kotlin.kotlin.ClassCastException("Illegal cast");
     };
 
     function throwAbstractFunctionInvocationError(funName) {
@@ -789,6 +785,22 @@
         Kotlin.out.print(s);
     };
 
+    Kotlin.collectionsMax = function (c, comp) {
+        if (c.isEmpty()) {
+            //TODO: which exception?
+            throw new Error();
+        }
+        var it = c.iterator();
+        var max = it.next();
+        while (it.hasNext()) {
+            var el = it.next();
+            if (comp.compare(max, el) < 0) {
+                max = el;
+            }
+        }
+        return max;
+    };
+
     lazyInitClasses.RangeIterator = Kotlin.createClass(
         function () {
             return [Kotlin.kotlin.collections.Iterator];
@@ -1090,22 +1102,6 @@
         compare: throwAbstractFunctionInvocationError("Comparator#compare")
     });
 
-    Kotlin.collectionsMax = function (c, comp) {
-        if (c.isEmpty()) {
-            //TODO: which exception?
-            throw new Error();
-        }
-        var it = c.iterator();
-        var max = it.next();
-        while (it.hasNext()) {
-            var el = it.next();
-            if (comp.compare(max, el) < 0) {
-                max = el;
-            }
-        }
-        return max;
-    };
-
     Kotlin.collectionsSort = function (mutableList, comparator) {
         var boundComparator = void 0;
         if (comparator !== void 0) {
@@ -1143,42 +1139,6 @@
 
         return array;
     };
-
-
-    Kotlin.StringBuilder = Kotlin.createClassNow([CharSequence],
-        function (content) {
-            this.string = typeof(content) == "string" ? content : "";
-        }, {
-        length: {
-            get: function() {
-                return this.string.length;
-            }
-        },
-        substring: function(start, end) {
-            return this.string.substring(start, end);
-        },
-        charAt: function(index) {
-            return this.string.charAt(index);
-        },
-        append: function (obj, from, to) {
-            if (from == void 0 && to == void 0) {
-                this.string = this.string + obj.toString();
-            } else if (to == void 0) {
-                this.string = this.string + obj.toString().substring(from);
-            } else {
-                this.string = this.string + obj.toString().substring(from, to);
-            }
-
-            return this;
-        },
-        reverse: function () {
-            this.string = this.string.split("").reverse().join("");
-            return this;
-        },
-        toString: function () {
-            return this.string;
-        }
-    });
 
     Kotlin.splitString = function (str, regex, limit) {
         return str.split(new RegExp(regex), limit);
@@ -1225,8 +1185,8 @@
         return result;
     };
 
-    Kotlin.arrayIterator = function (array) {
-        return new Kotlin.ArrayIterator(array);
+    Kotlin.deleteProperty = function (object, property) {
+        delete object[property];
     };
 
     Kotlin.jsonAddProperties = function (obj1, obj2) {
@@ -1237,7 +1197,5 @@
         }
         return obj1;
     };
-
-    Kotlin.createDefinition(lazyInitClasses, Kotlin);
 })(Kotlin);
 
