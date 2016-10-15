@@ -2607,7 +2607,13 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
                 if (setter != null &&
                     !couldUseDirectAccessToProperty(propertyDescriptor, false, isDelegatedProperty, context) &&
                     !isConstOrHasJvmFieldAnnotation(propertyDescriptor)) {
-                    callableSetter = typeMapper.mapToCallableMethod(setter, isSuper);
+
+                    //additional check cause incremental compilation problem KT-14012, see also KotlinTypeMapper.mangleMemberNameIfRequired
+                    if (!Visibilities.isPrivate(setter.getVisibility()) ||
+                        DescriptorToSourceUtils.getContainingFile(context.getContextDescriptor()) ==
+                        DescriptorToSourceUtils.getContainingFile(setter)) {
+                        callableSetter = typeMapper.mapToCallableMethod(setter, isSuper);
+                    }
                 }
             }
         }
