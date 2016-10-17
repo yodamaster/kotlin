@@ -1119,7 +1119,7 @@ fun main(args: Array<String>) {
         }
     }
 
-    generateTestDataForReservedWords()
+    //generateTestDataForReservedWords()
 
     testGroup("js/js.tests/test", "js/js.translator/testData") {
         testClass<AbstractBoxJsTest>() {
