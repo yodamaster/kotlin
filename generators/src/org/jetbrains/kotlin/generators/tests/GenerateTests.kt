@@ -1119,6 +1119,7 @@ fun main(args: Array<String>) {
         }
     }
 
+    // TODO: repair these tests
     //generateTestDataForReservedWords()
 
     testGroup("js/js.tests/test", "js/js.translator/testData") {
