@@ -190,7 +190,7 @@
     Kotlin.Throwable = Error;
 
     Kotlin.throwNPE = function (message) {
-        throw new Kotlin.kotlin.ranges.NullPointerException(message);
+        throw new Kotlin.kotlin.NullPointerException(message);
     };
 
     Kotlin.throwCCE = function () {
