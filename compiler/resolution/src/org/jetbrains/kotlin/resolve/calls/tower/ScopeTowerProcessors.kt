@@ -158,7 +158,9 @@ fun <C : Candidate<VariableDescriptor>> createVariableAndObjectProcessor(scopeTo
 )
 
 fun <C : Candidate<FunctionDescriptor>> createSimpleFunctionProcessor(scopeTower: ImplicitScopeTower, name: Name,
-                                                                      context: CandidateFactory<FunctionDescriptor, C>, explicitReceiver: DetailedReceiver?, classValueReceiver: Boolean = true
+                                                                      context: CandidateFactory<FunctionDescriptor, C>,
+                                                                      explicitReceiver: DetailedReceiver?,
+                                                                      classValueReceiver: Boolean = true
 ) = createSimpleProcessor(scopeTower, context, explicitReceiver, classValueReceiver) { getFunctions(name, it) }
 
 

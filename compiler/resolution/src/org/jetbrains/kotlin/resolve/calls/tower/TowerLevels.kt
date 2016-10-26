@@ -164,7 +164,7 @@ internal class QualifierScopeTowerLevel(scopeTower: ImplicitScopeTower, val qual
             }
 
     override fun getFunctions(name: Name, extensionReceiver: ReceiverValueWithSmartCastInfo?) = qualifier.staticScope
-            .getContributedFunctionsAndConstructors(name, location, scopeTower.syntheticConstructorsProvider, extensionReceiver).map {
+            .getContributedFunctionsAndConstructors(name, extensionReceiver, scopeTower).map {
                 createCandidateDescriptor(it, dispatchReceiver = null)
             }
 }
@@ -188,7 +188,7 @@ internal open class ScopeBasedTowerLevel protected constructor(
             }
 
     override fun getFunctions(name: Name, extensionReceiver: ReceiverValueWithSmartCastInfo?): Collection<CandidateWithBoundDispatchReceiver<FunctionDescriptor>>
-            = resolutionScope.getContributedFunctionsAndConstructors(name, location, scopeTower.syntheticConstructorsProvider, extensionReceiver).map {
+            = resolutionScope.getContributedFunctionsAndConstructors(name, extensionReceiver, scopeTower).map {
                 createCandidateDescriptor(it, dispatchReceiver = null)
             }
 }
@@ -265,10 +265,10 @@ private fun KotlinType?.getInnerConstructors(name: Name, location: LookupLocatio
 
 private fun ResolutionScope.getContributedFunctionsAndConstructors(
         name: Name,
-        location: LookupLocation,
-        syntheticConstructorsProvider: SyntheticConstructorsProvider,
-        extensionReceiver: ReceiverValueWithSmartCastInfo?
+        extensionReceiver: ReceiverValueWithSmartCastInfo?,
+        scopeTower: ImplicitScopeTower
 ): Collection<FunctionDescriptor> {
+    val location = scopeTower.location
     val classifier = getContributedClassifier(name, location)
     val functions = ArrayList<FunctionDescriptor>(getContributedFunctions(name, location))
 
@@ -279,7 +279,7 @@ private fun ResolutionScope.getContributedFunctionsAndConstructors(
     return functions +
            (getClassWithConstructors(classifier)?.constructors?.filter { it.dispatchReceiverParameter == null } ?: emptyList()) +
            (classifier?.getTypeAliasConstructors()?.filter { it.dispatchReceiverParameter == null } ?: emptyList()) +
-           (classifier?.let { syntheticConstructorsProvider.getSyntheticConstructors(it, location) }
+           (classifier?.let { scopeTower.syntheticConstructorsProvider.getSyntheticConstructors(it, location) }
                     ?.filter { it.dispatchReceiverParameter == null } ?: emptyList())
 }
 
