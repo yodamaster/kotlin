@@ -31,7 +31,10 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.hasClassValueDescriptor
 import org.jetbrains.kotlin.resolve.descriptorUtil.hasHidesMembersAnnotation
 import org.jetbrains.kotlin.resolve.descriptorUtil.hasLowPriorityInOverloadResolution
 import org.jetbrains.kotlin.resolve.scopes.*
-import org.jetbrains.kotlin.resolve.scopes.receivers.*
+import org.jetbrains.kotlin.resolve.scopes.receivers.CastImplicitClassReceiver
+import org.jetbrains.kotlin.resolve.scopes.receivers.ImplicitClassReceiver
+import org.jetbrains.kotlin.resolve.scopes.receivers.QualifierReceiver
+import org.jetbrains.kotlin.resolve.scopes.receivers.ReceiverValueWithSmartCastInfo
 import org.jetbrains.kotlin.resolve.scopes.utils.collectFunctions
 import org.jetbrains.kotlin.resolve.scopes.utils.collectVariables
 import org.jetbrains.kotlin.resolve.selectMostSpecificInEachOverridableGroup
@@ -161,7 +164,7 @@ internal class QualifierScopeTowerLevel(scopeTower: ImplicitScopeTower, val qual
             }
 
     override fun getFunctions(name: Name, extensionReceiver: ReceiverValueWithSmartCastInfo?) = qualifier.staticScope
-            .getContributedFunctionsAndConstructors(name, location, scopeTower.syntheticConstructorsProvider).map {
+            .getContributedFunctionsAndConstructors(name, location, scopeTower.syntheticConstructorsProvider, extensionReceiver).map {
                 createCandidateDescriptor(it, dispatchReceiver = null)
             }
 }
@@ -185,7 +188,7 @@ internal open class ScopeBasedTowerLevel protected constructor(
             }
 
     override fun getFunctions(name: Name, extensionReceiver: ReceiverValueWithSmartCastInfo?): Collection<CandidateWithBoundDispatchReceiver<FunctionDescriptor>>
-            = resolutionScope.getContributedFunctionsAndConstructors(name, location, scopeTower.syntheticConstructorsProvider).map {
+            = resolutionScope.getContributedFunctionsAndConstructors(name, location, scopeTower.syntheticConstructorsProvider, extensionReceiver).map {
                 createCandidateDescriptor(it, dispatchReceiver = null)
             }
 }
@@ -263,10 +266,17 @@ private fun KotlinType?.getInnerConstructors(name: Name, location: LookupLocatio
 private fun ResolutionScope.getContributedFunctionsAndConstructors(
         name: Name,
         location: LookupLocation,
-        syntheticConstructorsProvider: SyntheticConstructorsProvider
+        syntheticConstructorsProvider: SyntheticConstructorsProvider,
+        extensionReceiver: ReceiverValueWithSmartCastInfo?
 ): Collection<FunctionDescriptor> {
     val classifier = getContributedClassifier(name, location)
-    return getContributedFunctions(name, location) +
+    val functions = ArrayList<FunctionDescriptor>(getContributedFunctions(name, location))
+
+    if (extensionReceiver?.receiverValue is CoroutineReceiverValue) {
+        functions.mapNotNullTo(functions) { it.createCoroutineSuspensionFunctionView() }
+    }
+
+    return functions +
            (getClassWithConstructors(classifier)?.constructors?.filter { it.dispatchReceiverParameter == null } ?: emptyList()) +
            (classifier?.getTypeAliasConstructors()?.filter { it.dispatchReceiverParameter == null } ?: emptyList()) +
            (classifier?.let { syntheticConstructorsProvider.getSyntheticConstructors(it, location) }
