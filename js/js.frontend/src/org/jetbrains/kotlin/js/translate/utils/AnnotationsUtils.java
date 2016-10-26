@@ -143,7 +143,7 @@ public final class AnnotationsUtils {
         return false;
     }
 
-    public static boolean hasAnnotationOrInsideAnnotatedClass(
+    private static boolean hasAnnotationOrInsideAnnotatedClass(
             @NotNull DeclarationDescriptor descriptor,
             @NotNull PredefinedAnnotation annotation
     ) {
