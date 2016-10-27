@@ -2,6 +2,12 @@ package
 
 public suspend fun notMember(/*0*/ x: kotlin.coroutines.Continuation<kotlin.Int>): kotlin.Unit
 public suspend fun Controller.correctExtension(/*0*/ x: kotlin.coroutines.Continuation<kotlin.Int>): kotlin.Unit
+public suspend fun kotlin.String.implicitControllerParameter1(/*0*/ x: kotlin.coroutines.Continuation<kotlin.Int>, /*1*/ y: Controller): kotlin.Unit
+public suspend fun Controller.implicitControllerParameter2(/*0*/ x: kotlin.coroutines.Continuation<kotlin.Int>, /*1*/ y: Controller): kotlin.Unit
+public suspend fun kotlin.String.implicitControllerParameter3(/*0*/ x: kotlin.coroutines.Continuation<kotlin.Int>, /*1*/ y: Controller?): kotlin.Unit
+public suspend fun kotlin.String.implicitControllerParameter4(/*0*/ x: kotlin.coroutines.Continuation<kotlin.Int>, /*1*/ y: Controller = ...): kotlin.Unit
+public suspend fun kotlin.String.implicitControllerParameter5(/*0*/ x: kotlin.coroutines.Continuation<kotlin.Int>, /*1*/ vararg y: Controller /*kotlin.Array<out Controller>*/): kotlin.Unit
+public suspend fun kotlin.String.implicitControllerParameter6(/*0*/ x: kotlin.coroutines.Continuation<kotlin.Int>, /*1*/ y: kotlin.String): kotlin.Unit
 public suspend fun kotlin.String.wrongExtension(/*0*/ x: kotlin.coroutines.Continuation<kotlin.Int>): kotlin.Unit
 
 @kotlin.coroutines.AllowSuspendExtensions public final class Controller {
@@ -17,5 +23,15 @@ public suspend fun kotlin.String.wrongExtension(/*0*/ x: kotlin.coroutines.Conti
     public final suspend fun valid(/*0*/ x: kotlin.coroutines.Continuation<kotlin.Int>): kotlin.Unit
     public final suspend fun varargs(/*0*/ vararg x: kotlin.coroutines.Continuation<kotlin.Any> /*kotlin.Array<out kotlin.coroutines.Continuation<kotlin.Any>>*/): kotlin.Unit
     public final suspend fun wrongParam(/*0*/ x: kotlin.collections.Collection<kotlin.Int>): kotlin.Unit
+    public final suspend fun kotlin.String.implicitControllerParameter1(/*0*/ x: kotlin.coroutines.Continuation<kotlin.Int>, /*1*/ y: Controller): kotlin.Unit
+    public final suspend fun Controller.implicitControllerParameter2(/*0*/ x: kotlin.coroutines.Continuation<kotlin.Int>, /*1*/ y: Controller): kotlin.Unit
     public final suspend fun kotlin.String.memberExtension(/*0*/ x: kotlin.coroutines.Continuation<kotlin.Int>): kotlin.Unit
+}
+
+public final class NotController {
+    public constructor NotController()
+    public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+    public final suspend fun kotlin.String.implicitControllerParameter(/*0*/ x: kotlin.coroutines.Continuation<kotlin.Int>, /*1*/ y: Controller): kotlin.Unit
 }

@@ -9,8 +9,24 @@
 suspend fun Controller.correctExtension(x: Continuation<Int>) {
 }
 
+suspend fun String.implicitControllerParameter1(x: Continuation<Int>, y: Controller) {}
+// controversial case
+suspend fun Controller.implicitControllerParameter2(x: Continuation<Int>, y: Controller) {}
+<!INAPPLICABLE_MODIFIER!>suspend<!> fun String.implicitControllerParameter3(x: Continuation<Int>, y: Controller?) {}
+<!INAPPLICABLE_MODIFIER!>suspend<!> fun String.implicitControllerParameter4(x: Continuation<Int>, y: Controller = Controller()) {}
+<!INAPPLICABLE_MODIFIER!>suspend<!> fun String.implicitControllerParameter5(x: Continuation<Int>, vararg y: Controller) {}
+<!INAPPLICABLE_MODIFIER!>suspend<!> fun String.implicitControllerParameter6(x: Continuation<Int>, y: String) {}
+
+class NotController {
+    suspend fun String.implicitControllerParameter(x: Continuation<Int>, y: Controller) {}
+}
+
 @AllowSuspendExtensions
 class Controller {
+    suspend fun String.implicitControllerParameter1(x: Continuation<Int>, y: Controller) {}
+    // controversial case
+    suspend fun Controller.implicitControllerParameter2(x: Continuation<Int>, y: Controller) {}
+
     suspend fun valid(x: Continuation<Int>) {
 
     }
