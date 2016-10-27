@@ -17,12 +17,10 @@
 package org.jetbrains.kotlin.resolve.calls
 
 import com.google.common.collect.Lists
-import com.google.common.collect.Sets
 import org.jetbrains.kotlin.builtins.ReflectionTypes
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.annotations.AnnotationDescriptor
 import org.jetbrains.kotlin.descriptors.impl.TypeAliasConstructorDescriptor
-import org.jetbrains.kotlin.diagnostics.Errors
 import org.jetbrains.kotlin.diagnostics.Errors.*
 import org.jetbrains.kotlin.progress.ProgressIndicatorAndCompilationCanceledStatus
 import org.jetbrains.kotlin.psi.*
@@ -53,6 +51,7 @@ import org.jetbrains.kotlin.types.TypeUtils.noExpectedType
 import org.jetbrains.kotlin.types.checker.ErrorTypesAreEqualToAnything
 import org.jetbrains.kotlin.types.checker.KotlinTypeChecker
 import org.jetbrains.kotlin.types.expressions.DoubleColonExpressionResolver
+import org.jetbrains.kotlin.utils.addIfNotNull
 import java.util.*
 
 class CandidateResolver(
@@ -349,47 +348,64 @@ class CandidateResolver(
                 val expression = argument.getArgumentExpression() ?: continue
 
                 val expectedType = getEffectiveExpectedType(parameterDescriptor, argument)
-
                 val newContext = context.replaceDataFlowInfo(infoForArguments.getInfo(argument)).replaceExpectedType(expectedType)
                 val typeInfoForCall = argumentTypeResolver.getArgumentTypeInfo(expression, newContext, resolveFunctionArgumentBodies)
                 val type = typeInfoForCall.type
                 infoForArguments.updateInfo(argument, typeInfoForCall.dataFlowInfo)
 
-                var matchStatus = ArgumentMatchStatus.SUCCESS
-                var resultingType: KotlinType? = type
-                if (type == null || (type.isError && !type.isFunctionPlaceholder)) {
-                    matchStatus = ArgumentMatchStatus.ARGUMENT_HAS_NO_TYPE
+                checkTypeForValueArgument(context, newContext, candidateCall, type, argumentTypes, argument)?.let {
+                    resultStatus = it
                 }
-                else if (!noExpectedType(expectedType)) {
-                    if (!ArgumentTypeResolver.isSubtypeOfForArgumentType(type, expectedType)) {
-                        val smartCast = smartCastValueArgumentTypeIfPossible(expression, newContext.expectedType, type, newContext)
-                        if (smartCast == null) {
-                            resultStatus = OTHER_ERROR
-                            matchStatus = ArgumentMatchStatus.TYPE_MISMATCH
-                        }
-                        else {
-                            resultingType = smartCast
-                        }
-                    }
-                    else if (ErrorUtils.containsUninferredParameter(expectedType)) {
-                        matchStatus = ArgumentMatchStatus.MATCH_MODULO_UNINFERRED_TYPES
-                    }
-
-                    val spreadElement = argument.getSpreadElement()
-                    if (spreadElement != null && !type.isFlexible() && type.isMarkedNullable) {
-                        val dataFlowValue = DataFlowValueFactory.createDataFlowValue(expression, type, context)
-                        val smartCastResult = SmartCastManager.checkAndRecordPossibleCast(dataFlowValue, expectedType, expression, context,
-                                                                                          call = null, recordExpressionType = false)
-                        if (smartCastResult == null || !smartCastResult.isCorrect) {
-                            context.trace.report(Errors.SPREAD_OF_NULLABLE.on(spreadElement))
-                        }
-                    }
-                }
-                argumentTypes.add(resultingType)
-                candidateCall.recordArgumentMatchStatus(argument, matchStatus)
             }
         }
         return ValueArgumentsCheckingResult(resultStatus, argumentTypes)
+    }
+
+    private fun <C : CallResolutionContext<out C>, D : CallableDescriptor> checkTypeForValueArgument(
+            context: C,
+            newContext: C,
+            candidateCall: MutableResolvedCall<D>,
+            expressionType: KotlinType?,
+            argumentTypes: MutableList<KotlinType>,
+            argument: ValueArgument
+    ): ResolutionStatus? {
+        val expression = argument.getArgumentExpression() ?: return null
+        val expectedType = newContext.expectedType
+        var resultStatus: ResolutionStatus? = null
+        var matchStatus = ArgumentMatchStatus.SUCCESS
+        var resultingType: KotlinType? = expressionType
+        if (expressionType == null || (expressionType.isError && !expressionType.isFunctionPlaceholder)) {
+            matchStatus = ArgumentMatchStatus.ARGUMENT_HAS_NO_TYPE
+        }
+        else if (!noExpectedType(expectedType)) {
+            if (!ArgumentTypeResolver.isSubtypeOfForArgumentType(expressionType, expectedType)) {
+                val smartCast = smartCastValueArgumentTypeIfPossible(expression, newContext.expectedType, expressionType, newContext)
+                if (smartCast == null) {
+                    resultStatus = OTHER_ERROR
+                    matchStatus = ArgumentMatchStatus.TYPE_MISMATCH
+                }
+                else {
+                    resultingType = smartCast
+                }
+            }
+            else if (ErrorUtils.containsUninferredParameter(expectedType)) {
+                matchStatus = ArgumentMatchStatus.MATCH_MODULO_UNINFERRED_TYPES
+            }
+
+            val spreadElement = argument.getSpreadElement()
+            if (spreadElement != null && !expressionType.isFlexible() && expressionType.isMarkedNullable) {
+                val dataFlowValue = DataFlowValueFactory.createDataFlowValue(expression, expressionType, context)
+                val smartCastResult = SmartCastManager.checkAndRecordPossibleCast(dataFlowValue, expectedType, expression, context,
+                                                                                  call = null, recordExpressionType = false)
+                if (smartCastResult == null || !smartCastResult.isCorrect) {
+                    context.trace.report(SPREAD_OF_NULLABLE.on(spreadElement))
+                }
+            }
+        }
+
+        argumentTypes.addIfNotNull(resultingType)
+        candidateCall.recordArgumentMatchStatus(argument, matchStatus)
+        return resultStatus
     }
 
     private fun smartCastValueArgumentTypeIfPossible(
