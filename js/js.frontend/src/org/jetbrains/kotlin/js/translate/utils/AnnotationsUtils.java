@@ -18,10 +18,7 @@ package org.jetbrains.kotlin.js.translate.utils;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.kotlin.descriptors.ClassDescriptor;
-import org.jetbrains.kotlin.descriptors.DeclarationDescriptor;
-import org.jetbrains.kotlin.descriptors.PropertyAccessorDescriptor;
-import org.jetbrains.kotlin.descriptors.PropertyDescriptor;
+import org.jetbrains.kotlin.descriptors.*;
 import org.jetbrains.kotlin.descriptors.annotations.AnnotationDescriptor;
 import org.jetbrains.kotlin.descriptors.annotations.AnnotationWithTarget;
 import org.jetbrains.kotlin.descriptors.annotations.Annotations;
@@ -145,7 +142,7 @@ public final class AnnotationsUtils {
                 return true;
             }
         }
-        return false;
+        return descriptor instanceof MemberDescriptor && ((MemberDescriptor) descriptor).isPlatform();
     }
 
     private static boolean hasAnnotationOrInsideAnnotatedClass(
