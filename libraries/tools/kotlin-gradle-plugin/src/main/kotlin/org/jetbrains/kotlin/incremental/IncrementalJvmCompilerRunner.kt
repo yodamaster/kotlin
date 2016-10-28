@@ -364,6 +364,7 @@ internal class IncrementalJvmCompilerRunner(
                         registry.remove(artifactFile)
                     }
                 }
+                anyClassesCompiled = true
                 break
             }
 
