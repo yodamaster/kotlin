@@ -196,7 +196,8 @@ open class KotlinCompile : AbstractKotlinCompile<K2JVMCompilerArguments>(), Kotl
         args.classpathAsList = classpath.toList()
         args.destinationAsFile = destinationDir
         try {
-            compiler.compile(allKotlinSources, args, messageCollector, { changedFiles })
+            val exitCode = compiler.compile(allKotlinSources, args, messageCollector, { changedFiles })
+            processCompilerExitCode(exitCode)
         }
         catch (e: Throwable) {
             cleanupOnError()
