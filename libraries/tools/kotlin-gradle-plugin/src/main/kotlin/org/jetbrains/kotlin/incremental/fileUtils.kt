@@ -37,4 +37,4 @@ internal fun File.relativeOrCanonical(base: File): String =
         relativeToOrNull(base)?.path ?: canonicalPath
 
 internal fun Iterable<File>.pathsAsStringRelativeTo(base: File): String =
-        "[" + map { it.relativeOrCanonical(base) }.sorted().joinToString(separator = ", \n") + "]"
+        map { it.relativeOrCanonical(base) }.sorted().joinToString()
