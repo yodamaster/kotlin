@@ -317,7 +317,7 @@ internal class IncrementalJvmCompilerRunner(
 
             val (sourcesToCompile, removedKotlinSources) = dirtySources.partition(File::exists)
             if (sourcesToCompile.isNotEmpty()) {
-                reporter.report { "compile iteration: ${reporter.report { reporter.pathsAsString(sourcesToCompile) }}" }
+                reporter.report { "compile iteration: ${reporter.pathsAsString(sourcesToCompile)}" }
             }
 
             // todo: more optimal to save only last iteration, but it will require adding standalone-ic specific logs
