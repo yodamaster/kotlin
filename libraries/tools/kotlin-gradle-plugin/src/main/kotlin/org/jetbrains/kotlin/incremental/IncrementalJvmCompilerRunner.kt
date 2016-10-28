@@ -412,8 +412,6 @@ internal class IncrementalJvmCompilerRunner(
             }
         }
 
-
-
         if (exitCode == ExitCode.OK) {
             sourceAnnotationsRegistry?.flush()
             cacheVersions.forEach { it.saveIfNeeded() }
