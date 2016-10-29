@@ -58,6 +58,12 @@ class Kapt3KotlinGradleSubplugin : KotlinGradleSubplugin<KotlinCompile> {
         return File(project.project.buildDir, "generated/source/kapt3/$sourceSetName")
     }
 
+    fun getKaptStubsDir(project: Project, sourceSetName: String): File {
+        val dir = File(project.project.buildDir, "tmp/kapt3/stubs/$sourceSetName")
+        dir.mkdirs()
+        return dir
+    }
+
     private fun Project.findKaptConfiguration(sourceSetName: String): Configuration? {
         return project.configurations.findByName(getKaptConfigurationName(sourceSetName))
     }
@@ -123,6 +129,7 @@ class Kapt3KotlinGradleSubplugin : KotlinGradleSubplugin<KotlinCompile> {
         
         if (project.hasProperty(VERBOSE_OPTION_NAME) && project.property(VERBOSE_OPTION_NAME) == "true") {
             pluginOptions += SubpluginOption("verbose", "true")
+            pluginOptions += SubpluginOption("stubs", getKaptStubsDir(project, sourceSetName).canonicalPath)
         }
 
         val androidPlugin = variantData?.let {
