@@ -22,18 +22,21 @@ import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.diagnostics.Errors
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall
-import org.jetbrains.kotlin.resolve.coroutine.CoroutineReceiverValue
+import org.jetbrains.kotlin.resolve.coroutine.findClosestCoroutineReceiver
+import org.jetbrains.kotlin.resolve.coroutine.isSuspensionPointView
 import org.jetbrains.kotlin.resolve.inline.InlineUtil
 
 object CoroutineSuspendCallChecker : CallChecker {
     override fun check(resolvedCall: ResolvedCall<*>, reportOn: PsiElement, context: CallCheckerContext) {
         val descriptor = resolvedCall.candidateDescriptor as? FunctionDescriptor ?: return
-        if (!descriptor.isSuspend || descriptor.initialSignatureDescriptor == null) return
+        if (!descriptor.isSuspend || !descriptor.isSuspensionPointView()) return
 
-        val dispatchReceiverOwner = (resolvedCall.dispatchReceiver as? CoroutineReceiverValue)?.declarationDescriptor ?: return
+        // Here we assume that suspension point may only use the closest coroutine receiver
+        val controllerReceiverOwner = context.scope.findClosestCoroutineReceiver()?.declarationDescriptor ?: return
+
         val callElement = resolvedCall.call.callElement as KtExpression
 
-        if (!InlineUtil.checkNonLocalReturnUsage(dispatchReceiverOwner, callElement, context.resolutionContext)) {
+        if (!InlineUtil.checkNonLocalReturnUsage(controllerReceiverOwner, callElement, context.resolutionContext)) {
             context.trace.report(Errors.NON_LOCAL_SUSPENSION_POINT.on(reportOn))
         }
     }

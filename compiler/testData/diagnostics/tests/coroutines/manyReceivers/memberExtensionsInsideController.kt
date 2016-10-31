@@ -38,13 +38,13 @@ fun test() {
             threeControllers2()
             this@builder1.threeControllers2()
 
-            "".<!CONTROLLER_PARAMETER_TYPE_MISMATCH, NON_LOCAL_SUSPENSION_POINT!>foo<!>()
+            "".<!CONTROLLER_PARAMETER_TYPE_MISMATCH!>foo<!>()
 
-            "".<!NON_LOCAL_SUSPENSION_POINT!>bar<!>()
-            "".<!CONTROLLER_PARAMETER_TYPE_MISMATCH, NON_LOCAL_SUSPENSION_POINT!>bar<!><Int>()
+            "".bar()
+            "".<!CONTROLLER_PARAMETER_TYPE_MISMATCH!>bar<!><Int>()
 
             <!UNRESOLVED_REFERENCE_WRONG_RECEIVER!>threeControllers<!>()
-            this@builder1.<!CONTROLLER_PARAMETER_TYPE_MISMATCH, NON_LOCAL_SUSPENSION_POINT!>threeControllers<!>()
+            this@builder1.<!CONTROLLER_PARAMETER_TYPE_MISMATCH!>threeControllers<!>()
         }
     }
 }

@@ -5,8 +5,12 @@ public fun foo(): kotlin.Unit
 public fun noinline(/*0*/ x: () -> kotlin.Unit): kotlin.Unit
 public inline fun run(/*0*/ x: () -> kotlin.Unit): kotlin.Unit
 public inline fun runCross(/*0*/ crossinline x: () -> kotlin.Unit): kotlin.Unit
+public suspend fun </*0*/ E> Controller<E>.anotherExtension(/*0*/ x: E, /*1*/ y: kotlin.coroutines.Continuation<kotlin.Int>): kotlin.Unit
+public suspend fun </*0*/ E> kotlin.String.anotherImplicitParameter(/*0*/ x: E, /*1*/ y: kotlin.coroutines.Continuation<kotlin.Int>, /*2*/ c: Controller<E>): kotlin.Unit
+public suspend fun </*0*/ E> kotlin.String.implicitParameter(/*0*/ y: kotlin.coroutines.Continuation<kotlin.Int>, /*1*/ c: Controller<E>): kotlin.Unit
+public suspend fun </*0*/ E> Controller<E>.suspendExtension(/*0*/ y: kotlin.coroutines.Continuation<kotlin.Int>): kotlin.Unit
 
-public final class Controller</*0*/ T> {
+@kotlin.coroutines.AllowSuspendExtensions public final class Controller</*0*/ T> {
     public constructor Controller</*0*/ T>()
     public final suspend fun another(/*0*/ a: T, /*1*/ x: kotlin.coroutines.Continuation<kotlin.Int>): kotlin.Unit
     public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
