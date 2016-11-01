@@ -32,6 +32,7 @@ import org.jetbrains.kotlin.resolve.calls.smartcasts.DataFlowInfo
 import org.jetbrains.kotlin.resolve.calls.tasks.ExplicitReceiverKind
 import org.jetbrains.kotlin.resolve.calls.tasks.TracingStrategy
 import org.jetbrains.kotlin.resolve.calls.util.CallMaker
+import org.jetbrains.kotlin.resolve.coroutine.CoroutineReceiverValue
 import org.jetbrains.kotlin.resolve.coroutine.REPLACED_SUSPENSION_POINT_KEY
 import org.jetbrains.kotlin.resolve.coroutine.SUSPENSION_POINT_KEY
 import org.jetbrains.kotlin.resolve.coroutine.isSuspensionPointView
@@ -123,12 +124,15 @@ fun createResolvedCallForHandleExceptionCall(
     val valueArguments = listOf(exceptionArgument, continuationThisArgument)
     val call = CallMaker.makeCall(callElement, null, null, null, valueArguments)
 
-    val resolvedCall = ResolvedCallImpl(
-            call,
-            handleExceptionFunction,
-            coroutineLambdaDescriptor.extensionReceiverParameter!!.value, null, ExplicitReceiverKind.NO_EXPLICIT_RECEIVER,
-            null, DelegatingBindingTrace(BindingTraceContext().bindingContext, "Temporary trace for handleException resolution"),
-            TracingStrategy.EMPTY, MutableDataFlowInfoForArguments.WithoutArgumentsCheck(DataFlowInfo.EMPTY))
+    val resolvedCall =
+            ResolvedCallImpl(
+                call,
+                handleExceptionFunction,
+                CoroutineReceiverValue(coroutineLambdaDescriptor, coroutineLambdaDescriptor.extensionReceiverParameter!!.type),
+                null, ExplicitReceiverKind.NO_EXPLICIT_RECEIVER,
+                null, DelegatingBindingTrace(BindingTraceContext().bindingContext, "Temporary trace for handleException resolution"),
+                TracingStrategy.EMPTY, MutableDataFlowInfoForArguments.WithoutArgumentsCheck(DataFlowInfo.EMPTY)
+            )
 
     handleExceptionFunction.valueParameters.zip(valueArguments).forEach {
         resolvedCall.recordValueArgument(it.first, ExpressionValueArgument(it.second))

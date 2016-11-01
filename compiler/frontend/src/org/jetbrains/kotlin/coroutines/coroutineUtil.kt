@@ -73,10 +73,13 @@ fun FakeCallResolver.resolveCoroutineHandleResultCallIfNeeded(
                     functionDescriptor.builtIns.nothingType)
 
     fun tryToResolveCall(firstArgument: KtExpression): Boolean {
-        val resolutionResults = resolveFakeCall(
-                context.replaceBindingTrace(temporaryBindingTrace), functionDescriptor.extensionReceiverParameter!!.value,
-                OperatorNameConventions.COROUTINE_HANDLE_RESULT, callElement, callElement, FakeCallKind.OTHER,
-                listOf(firstArgument, continuation))
+        val resolutionResults =
+                resolveFakeCall(
+                        context,
+                        CoroutineReceiverValue(functionDescriptor, functionDescriptor.extensionReceiverParameter!!.type),
+                        OperatorNameConventions.COROUTINE_HANDLE_RESULT, callElement, callElement, FakeCallKind.OTHER,
+                        listOf(firstArgument, continuation)
+                )
 
         if (resolutionResults.isSuccess && resolutionResults.resultingDescriptor.isOperator) {
             context.trace.record(BindingContext.RETURN_HANDLE_RESULT_RESOLVED_CALL, callElement, resolutionResults.resultingCall)
