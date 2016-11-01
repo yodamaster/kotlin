@@ -103,12 +103,7 @@ internal class ParametersBuilder private constructor() {
         var nextDeclarationIndex = (params.maxBy { it.declarationIndex }?.declarationIndex ?: -1) + 1
 
         return Parameters(params.map { param ->
-            if (param is CapturedParamInfo) {
-                param.cloneWithNewDeclarationIndex(nextDeclarationIndex++)
-            }
-            else {
-                param
-            }
+            (param as? CapturedParamInfo)?.cloneWithNewDeclarationIndex(nextDeclarationIndex++) ?: param
         })
     }
 

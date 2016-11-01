@@ -18,22 +18,23 @@ package org.jetbrains.kotlin.coroutines
 
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.descriptors.CallableDescriptor
-import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor
 import org.jetbrains.kotlin.descriptors.impl.AnonymousFunctionDescriptor
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.resolve.BindingContext
-import org.jetbrains.kotlin.resolve.DescriptorUtils
 import org.jetbrains.kotlin.resolve.TemporaryBindingTrace
 import org.jetbrains.kotlin.resolve.calls.context.ResolutionContext
+import org.jetbrains.kotlin.resolve.calls.model.ImplicitAdditionalReceiverValueArgument
+import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall
+import org.jetbrains.kotlin.resolve.coroutine.CoroutineReceiverValue
 import org.jetbrains.kotlin.resolve.descriptorUtil.builtIns
-import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameUnsafe
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.expressions.ExpressionTypingUtils
 import org.jetbrains.kotlin.types.expressions.FakeCallKind
 import org.jetbrains.kotlin.types.expressions.FakeCallResolver
 import org.jetbrains.kotlin.util.OperatorNameConventions
+import org.jetbrains.kotlin.utils.addToStdlib.firstIsInstanceOrNull
 
 /**
  * @returns type of first value parameter if function is 'operator handleResult' in coroutines controller
@@ -102,3 +103,8 @@ fun FakeCallResolver.resolveCoroutineHandleResultCallIfNeeded(
     }
 }
 
+fun ResolvedCall<*>.getCoroutineReceiver(): CoroutineReceiverValue? =
+        sequenceOf(
+                dispatchReceiver, extensionReceiver,
+                (valueArguments[resultingDescriptor.valueParameters.lastOrNull()] as? ImplicitAdditionalReceiverValueArgument)?.receiver
+        ).firstIsInstanceOrNull<CoroutineReceiverValue>()

@@ -32,10 +32,7 @@ import org.jetbrains.kotlin.resolve.calls.smartcasts.DataFlowInfo
 import org.jetbrains.kotlin.resolve.calls.tasks.ExplicitReceiverKind
 import org.jetbrains.kotlin.resolve.calls.tasks.TracingStrategy
 import org.jetbrains.kotlin.resolve.calls.util.CallMaker
-import org.jetbrains.kotlin.resolve.coroutine.CoroutineReceiverValue
-import org.jetbrains.kotlin.resolve.coroutine.REPLACED_SUSPENSION_POINT_KEY
-import org.jetbrains.kotlin.resolve.coroutine.SUSPENSION_POINT_KEY
-import org.jetbrains.kotlin.resolve.coroutine.isSuspensionPointView
+import org.jetbrains.kotlin.resolve.coroutine.*
 import org.jetbrains.kotlin.types.TypeConstructorSubstitution
 import org.jetbrains.kotlin.types.TypeSubstitutor
 import org.jetbrains.kotlin.types.typeUtil.asTypeProjection
@@ -84,15 +81,32 @@ fun ResolvedCall<*>.replaceSuspensionFunctionViewWithRealDescriptor(
             null, DelegatingBindingTrace(BindingTraceContext().bindingContext, "Temporary trace for unwrapped suspension function"),
             TracingStrategy.EMPTY, MutableDataFlowInfoForArguments.WithoutArgumentsCheck(DataFlowInfo.EMPTY))
 
+    val newValueParameters = newCandidateDescriptor.valueParameters
+    val isLastParameterUsedForController = newValueParameters.lastOrNull()?.isImplicitControllerParameter() ?: return null
+
     this.valueArguments.forEach {
-        newCall.recordValueArgument(newCandidateDescriptor.valueParameters[it.key.index], it.value)
+        // If there is special last parameter for controller, like in
+        // `fun <V> File.read(f: CompletableFuture<V>, machine: Continuation<V>, c: Controller): Unit`
+        // skip Continuation parameter when when we come to the last parameter of original declaration
+        val parameterIndexToUse =
+                if (isLastParameterUsedForController && it.key.index == function.valueParameters.lastIndex)
+                    it.key.index + 1
+                else
+                    it.key.index
+
+        newCall.recordValueArgument(newValueParameters[parameterIndexToUse], it.value)
     }
 
     val psiFactory = KtPsiFactory(project)
     val arguments = psiFactory.createCallArguments("(this)").arguments.single()
     val thisExpression = arguments.getArgumentExpression()!!
+
+
     newCall.recordValueArgument(
-            newCandidateDescriptor.valueParameters.last(),
+            if (isLastParameterUsedForController)
+                newValueParameters.getOrNull(newValueParameters.lastIndex - 1) ?: return null
+            else
+                newValueParameters.last(),
             ExpressionValueArgument(arguments))
 
     val newTypeArguments = newCandidateDescriptor.typeParameters.map {

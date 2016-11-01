@@ -4681,6 +4681,51 @@ public class IrBlackBoxCodegenTestGenerated extends AbstractIrBlackBoxCodegenTes
             doTest(fileName);
         }
 
+        @TestMetadata("compiler/testData/codegen/box/coroutines/controllerParameter")
+        @TestDataPath("$PROJECT_ROOT")
+        @RunWith(JUnit3RunnerWithInners.class)
+        public static class ControllerParameter extends AbstractIrBlackBoxCodegenTest {
+            public void testAllFilesPresentInControllerParameter() throws Exception {
+                KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("compiler/testData/codegen/box/coroutines/controllerParameter"), Pattern.compile("^(.+)\\.kt$"), true);
+            }
+
+            @TestMetadata("arguments.kt")
+            public void testArguments() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/coroutines/controllerParameter/arguments.kt");
+                doTest(fileName);
+            }
+
+            @TestMetadata("defaultArguments.kt")
+            public void testDefaultArguments() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/coroutines/controllerParameter/defaultArguments.kt");
+                doTest(fileName);
+            }
+
+            @TestMetadata("inlineSuspend.kt")
+            public void testInlineSuspend() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/coroutines/controllerParameter/inlineSuspend.kt");
+                doTest(fileName);
+            }
+
+            @TestMetadata("memberExtension.kt")
+            public void testMemberExtension() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/coroutines/controllerParameter/memberExtension.kt");
+                doTest(fileName);
+            }
+
+            @TestMetadata("memberExtensionWith.kt")
+            public void testMemberExtensionWith() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/coroutines/controllerParameter/memberExtensionWith.kt");
+                doTest(fileName);
+            }
+
+            @TestMetadata("simple.kt")
+            public void testSimple() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/coroutines/controllerParameter/simple.kt");
+                doTest(fileName);
+            }
+        }
+
         @TestMetadata("compiler/testData/codegen/box/coroutines/intLikeVarSpilling")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)

@@ -100,6 +100,9 @@ class InlineCodegenForDefaultBody(
         //so we no need to load variables on stack to further method call
     }
 
+    override fun putValueIfNeeded(parameterType: Type, value: StackValue, parameterIndex: Int) {
+    }
+
     override fun putCapturedValueOnStack(stackValue: StackValue, valueType: Type, paramIndex: Int) {
         throw UnsupportedOperationException("Shouldn't be called")
     }

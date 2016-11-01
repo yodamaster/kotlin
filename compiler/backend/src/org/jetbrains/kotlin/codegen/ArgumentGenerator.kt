@@ -16,10 +16,7 @@
 
 package org.jetbrains.kotlin.codegen
 
-import org.jetbrains.kotlin.resolve.calls.model.DefaultValueArgument
-import org.jetbrains.kotlin.resolve.calls.model.ExpressionValueArgument
-import org.jetbrains.kotlin.resolve.calls.model.ResolvedValueArgument
-import org.jetbrains.kotlin.resolve.calls.model.VarargValueArgument
+import org.jetbrains.kotlin.resolve.calls.model.*
 import org.jetbrains.kotlin.utils.mapToIndex
 
 class ArgumentAndDeclIndex(val arg: ResolvedValueArgument, val declIndex: Int)
@@ -65,6 +62,9 @@ abstract class ArgumentGenerator {
                 is VarargValueArgument -> {
                     generateVararg(declIndex, argument)
                 }
+                is ImplicitAdditionalReceiverValueArgument -> {
+                    generateImplicitArgument(declIndex, argument)
+                }
                 else -> {
                     generateOther(declIndex, argument)
                 }
@@ -86,6 +86,10 @@ abstract class ArgumentGenerator {
 
     protected open fun generateVararg(i: Int, argument: VarargValueArgument) {
         throw UnsupportedOperationException("Unsupported vararg value argument #$i: $argument")
+    }
+
+    protected open fun generateImplicitArgument(declIndex: Int, argument: ImplicitAdditionalReceiverValueArgument) {
+        throw UnsupportedOperationException("Unsupported expression implicit argument: $argument")
     }
 
     protected open fun generateOther(i: Int, argument: ResolvedValueArgument) {

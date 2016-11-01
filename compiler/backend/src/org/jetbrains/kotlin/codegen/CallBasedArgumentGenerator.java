@@ -89,6 +89,12 @@ public class CallBasedArgumentGenerator extends ArgumentGenerator {
     }
 
     @Override
+    protected void generateImplicitArgument(int i, @NotNull ImplicitAdditionalReceiverValueArgument argument) {
+        StackValue receiverValue = codegen.generateReceiverValue(argument.getReceiver(), /* isSuper = */ false);
+        callGenerator.putValueIfNeeded(valueParameterTypes.get(i), receiverValue, i);
+    }
+
+    @Override
     protected void reorderArgumentsIfNeeded(@NotNull List<ArgumentAndDeclIndex> actualArgsWithDeclIndex) {
         callGenerator.reorderArgumentsIfNeeded(actualArgsWithDeclIndex, valueParameterTypes);
     }

@@ -68,6 +68,10 @@ abstract class CallGenerator {
             value.put(value.type, codegen.v)
         }
 
+        override fun putValueIfNeeded(parameterType: Type, value: StackValue, parameterIndex: Int) {
+            putValueIfNeeded(parameterType, value)
+        }
+
         override fun reorderArgumentsIfNeeded(actualArgsWithDeclIndex: List<ArgumentAndDeclIndex>, valueParameterTypes: List<Type>) {
             val mark = codegen.myFrameMap.mark()
             val reordered = actualArgsWithDeclIndex.withIndex().dropWhile {
@@ -105,17 +109,26 @@ abstract class CallGenerator {
     abstract fun afterParameterPut(
             type: Type,
             stackValue: StackValue?,
-            parameterIndex: Int)
+            parameterIndex: Int
+    )
 
     abstract fun genValueAndPut(
             valueParameterDescriptor: ValueParameterDescriptor,
             argumentExpression: KtExpression,
             parameterType: Type,
-            parameterIndex: Int)
+            parameterIndex: Int
+    )
 
     abstract fun putValueIfNeeded(
             parameterType: Type,
-            value: StackValue)
+            value: StackValue
+    )
+
+    abstract fun putValueIfNeeded(
+            parameterType: Type,
+            value: StackValue,
+            parameterIndex: Int
+    )
 
     abstract fun putCapturedValueOnStack(
             stackValue: StackValue,

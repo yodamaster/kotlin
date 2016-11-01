@@ -78,6 +78,7 @@ import org.jetbrains.kotlin.resolve.constants.CompileTimeConstant;
 import org.jetbrains.kotlin.resolve.constants.ConstantValue;
 import org.jetbrains.kotlin.resolve.constants.evaluate.ConstantExpressionEvaluator;
 import org.jetbrains.kotlin.resolve.constants.evaluate.ConstantExpressionEvaluatorKt;
+import org.jetbrains.kotlin.resolve.coroutine.CoroutineReceiverValue;
 import org.jetbrains.kotlin.resolve.descriptorUtil.DescriptorUtilsKt;
 import org.jetbrains.kotlin.resolve.inline.InlineUtil;
 import org.jetbrains.kotlin.resolve.jvm.AsmTypes;
@@ -1899,7 +1900,7 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
 
     @NotNull
     public StackValue genCoroutineInstanceValueFromResolvedCall(@NotNull ResolvedCall<?> resolvedCall) {
-        ExtensionReceiver controllerReceiver = getControllerReceiverFromResolvedCall(resolvedCall);
+        ExtensionReceiver controllerReceiver = getCoroutineReceiverFromResolvedCall(resolvedCall);
         ClassDescriptor coroutineClassDescriptor =
                 bindingContext.get(CodegenBinding.CLASS_FOR_CALLABLE, controllerReceiver.getDeclarationDescriptor());
         assert coroutineClassDescriptor != null : "Coroutine class descriptor should not be null";
@@ -1908,18 +1909,13 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
         return StackValue.thisOrOuter(this, coroutineClassDescriptor, false, false);
     }
 
-    private static ExtensionReceiver getControllerReceiverFromResolvedCall(@NotNull ResolvedCall<?> resolvedCall) {
-        ReceiverValue controllerReceiver =
-                resolvedCall.getDispatchReceiver() != null
-                ? resolvedCall.getDispatchReceiver()
-                : resolvedCall.getExtensionReceiver();
+    @NotNull
+    private static CoroutineReceiverValue getCoroutineReceiverFromResolvedCall(@NotNull ResolvedCall<?> resolvedCall) {
+        CoroutineReceiverValue coroutineReceiver = CoroutineUtilKt.getCoroutineReceiver(resolvedCall);
+        assert coroutineReceiver != null
+                : "No coroutine receiver found for successful handleResult/suspend call: " + resolvedCall.getResultingDescriptor();
 
-        assert controllerReceiver != null : "Both dispatch and extension receivers are null for handleResult/suspend to " + resolvedCall.getResultingDescriptor();
-        assert controllerReceiver instanceof ExtensionReceiver
-                : "Argument for handleResult call to " + resolvedCall.getResultingDescriptor() +
-                  " should be a coroutine receiver parameter, but " + controllerReceiver + " found";
-
-        return (ExtensionReceiver) controllerReceiver;
+        return coroutineReceiver;
     }
 
     @NotNull

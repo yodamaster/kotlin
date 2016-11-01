@@ -893,7 +893,8 @@ public class InlineCodegen extends CallGenerator {
         putValueIfNeeded(parameterType, value, -1);
     }
 
-    private void putValueIfNeeded(@NotNull Type parameterType, @NotNull StackValue value, int index) {
+     @Override
+     public void putValueIfNeeded(@NotNull Type parameterType, @NotNull StackValue value, int index) {
         if (shouldPutValue(parameterType, value)) {
             value.put(parameterType, codegen.v);
         }
