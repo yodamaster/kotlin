@@ -47,7 +47,6 @@ public class LazyTopDownAnalyzerForTopLevel {
 
     @NotNull
     public TopDownAnalysisContext analyzeFiles(
-            @NotNull TopDownAnalysisMode topDownAnalysisMode,
             @NotNull Collection<KtFile> files,
             @NotNull List<? extends PackageFragmentProvider> additionalProviders
     ) {
@@ -63,15 +62,12 @@ public class LazyTopDownAnalyzerForTopLevel {
 
         ((ModuleDescriptorImpl) codeAnalyzer.getModuleDescriptor()).initialize(provider);
 
-        return analyzeDeclarations(topDownAnalysisMode, files);
+        return analyzeDeclarations(files);
     }
 
     @NotNull
-    public TopDownAnalysisContext analyzeDeclarations(
-            @NotNull TopDownAnalysisMode topDownAnalysisMode,
-            @NotNull Collection<? extends PsiElement> elements
-    ) {
-        TopDownAnalysisContext c = lazyTopDownAnalyzer.analyzeDeclarations(topDownAnalysisMode, elements, DataFlowInfoFactory.EMPTY);
+    public TopDownAnalysisContext analyzeDeclarations(@NotNull Collection<? extends PsiElement> elements) {
+        TopDownAnalysisContext c = lazyTopDownAnalyzer.analyzeDeclarations(elements, DataFlowInfoFactory.EMPTY);
 
         resolveImportsInAllFiles(c, codeAnalyzer);
 

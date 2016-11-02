@@ -31,7 +31,7 @@ import org.jetbrains.kotlin.kapt3.util.KaptLogger
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.BindingTrace
-import org.jetbrains.kotlin.resolve.jvm.extensions.AnalysisCompletedHandlerExtension
+import org.jetbrains.kotlin.resolve.jvm.extensions.AnalysisHandlerExtension
 import java.io.File
 import java.net.URLClassLoader
 import java.util.*
@@ -48,7 +48,7 @@ class Kapt3Extension(
         val aptOnly: Boolean,
         val pluginInitializedTime: Long,
         val logger: KaptLogger
-) : AnalysisCompletedHandlerExtension {
+) : AnalysisHandlerExtension {
     private var annotationProcessingComplete = false
 
     private fun setAnnotationProcessingComplete(): Boolean {

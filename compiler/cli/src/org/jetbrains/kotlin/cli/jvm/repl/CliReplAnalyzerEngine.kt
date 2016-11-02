@@ -61,8 +61,10 @@ class CliReplAnalyzerEngine(private val environment: KotlinCoreEnvironment) {
                 JvmPackagePartProvider(environment)
         )
 
+        val topDownAnalysisMode = TopDownAnalysisMode.LocalDeclarations
+        trace.record(BindingContext.TOP_DOWN_ANALYSIS_MODE, Unit, topDownAnalysisMode)
         this.topDownAnalysisContext = TopDownAnalysisContext(
-                TopDownAnalysisMode.LocalDeclarations, DataFlowInfoFactory.EMPTY, container.resolveSession.declarationScopeProvider
+                topDownAnalysisMode, DataFlowInfoFactory.EMPTY, container.resolveSession.declarationScopeProvider
         )
         this.topDownAnalyzer = container.lazyTopDownAnalyzerForTopLevel
         this.resolveSession = container.resolveSession
@@ -100,7 +102,7 @@ class CliReplAnalyzerEngine(private val environment: KotlinCoreEnvironment) {
         scriptDeclarationFactory.setDelegateFactory(FileBasedDeclarationProviderFactory(resolveSession.storageManager, listOf(linePsi)))
         replState.submitLine(linePsi)
 
-        val context = topDownAnalyzer.analyzeDeclarations(topDownAnalysisContext.topDownAnalysisMode, listOf(linePsi))
+        val context = topDownAnalyzer.analyzeDeclarations(listOf(linePsi))
 
         if (trace.get(BindingContext.FILE_TO_PACKAGE_FRAGMENT, linePsi) == null) {
             trace.record(BindingContext.FILE_TO_PACKAGE_FRAGMENT, linePsi, resolveSession.getPackageFragment(FqName.ROOT))

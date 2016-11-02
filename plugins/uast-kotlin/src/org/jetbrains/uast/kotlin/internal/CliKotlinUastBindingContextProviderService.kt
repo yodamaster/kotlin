@@ -12,25 +12,25 @@ import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.BindingTrace
-import org.jetbrains.kotlin.resolve.jvm.extensions.AnalysisCompletedHandlerExtension
+import org.jetbrains.kotlin.resolve.jvm.extensions.AnalysisHandlerExtension
 import org.jetbrains.uast.kotlin.KotlinUastBindingContextProviderService
 
 class CliKotlinUastBindingContextProviderService : KotlinUastBindingContextProviderService {
-    val Project.analysisCompletedHandler: UastAnalysisCompletedHandlerExtension?
-        get() = getExtensions(AnalysisCompletedHandlerExtension.extensionPointName)
-                .filterIsInstance<UastAnalysisCompletedHandlerExtension>()
+    val Project.analysisHandler: UastAnalysisHandlerExtension?
+        get() = getExtensions(AnalysisHandlerExtension.extensionPointName)
+                .filterIsInstance<UastAnalysisHandlerExtension>()
                 .firstOrNull()
 
     override fun getBindingContext(element: KtElement): BindingContext {
-        return element.project.analysisCompletedHandler?.getBindingContext() ?: BindingContext.EMPTY
+        return element.project.analysisHandler?.getBindingContext() ?: BindingContext.EMPTY
     }
 
     override fun getTypeMapper(element: KtElement): KotlinTypeMapper? {
-        return element.project.analysisCompletedHandler?.getTypeMapper()
+        return element.project.analysisHandler?.getTypeMapper()
     }
 }
 
-class UastAnalysisCompletedHandlerExtension : AnalysisCompletedHandlerExtension {
+class UastAnalysisHandlerExtension : AnalysisHandlerExtension {
     private var context: BindingContext? = null
     private var typeMapper: KotlinTypeMapper? = null
 

@@ -175,10 +175,8 @@ private object KotlinResolveDataProvider {
                     LanguageVersionSettingsImpl.DEFAULT // TODO: see KT-12410
             ).get<LazyTopDownAnalyzerForTopLevel>()
 
-            lazyTopDownAnalyzer.analyzeDeclarations(
-                    TopDownAnalysisMode.TopLevelDeclarations,
-                    listOf(analyzableElement)
-            )
+            trace.record(BindingContext.TOP_DOWN_ANALYSIS_MODE, Unit, TopDownAnalysisMode.TopLevelDeclarations)
+            lazyTopDownAnalyzer.analyzeDeclarations(listOf(analyzableElement))
             return AnalysisResult.success(
                     trace.bindingContext,
                     module

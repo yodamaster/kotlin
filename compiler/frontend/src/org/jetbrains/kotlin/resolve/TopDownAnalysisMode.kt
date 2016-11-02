@@ -16,7 +16,15 @@
 
 package org.jetbrains.kotlin.resolve
 
-enum class TopDownAnalysisMode(val isLocalDeclarations: Boolean) {
-    LocalDeclarations(true),
-    TopLevelDeclarations(false)
+enum class TopDownAnalysisMode(val isLocalDeclarations: Boolean, shouldAlwaysResolveBodies: Boolean) {
+    LocalDeclarations(isLocalDeclarations = true, shouldAlwaysResolveBodies = true),
+    TopLevelDeclarations(isLocalDeclarations = false, shouldAlwaysResolveBodies = true),
+
+    /**
+     * Do not resolve declaration (function/property) bodies if the return type is explicitly written.
+     */
+    Light(isLocalDeclarations = true, shouldAlwaysResolveBodies = false);
+
+    val shouldAlwaysResolveBodies = shouldAlwaysResolveBodies
+        @JvmName("shouldAlwaysResolveBodies") get
 }

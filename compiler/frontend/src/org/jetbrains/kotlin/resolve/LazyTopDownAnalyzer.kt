@@ -29,10 +29,11 @@ import org.jetbrains.kotlin.resolve.calls.smartcasts.DataFlowInfo
 import org.jetbrains.kotlin.resolve.lazy.*
 import org.jetbrains.kotlin.resolve.lazy.descriptors.LazyClassDescriptor
 import org.jetbrains.kotlin.resolve.lazy.descriptors.LazyScriptDescriptor
+import org.jetbrains.kotlin.utils.sure
 import java.util.*
 
 class LazyTopDownAnalyzer(
-        private val trace: BindingTrace,
+        val trace: BindingTrace,
         private val declarationResolver: DeclarationResolver,
         private val overrideResolver: OverrideResolver,
         private val overloadResolver: OverloadResolver,
@@ -47,8 +48,8 @@ class LazyTopDownAnalyzer(
         private val identifierChecker: IdentifierChecker,
         private val classifierUsageCheckers: Iterable<ClassifierUsageChecker>
 ) {
-    fun analyzeDeclarations(topDownAnalysisMode: TopDownAnalysisMode, declarations: Collection<PsiElement>, outerDataFlowInfo: DataFlowInfo): TopDownAnalysisContext {
-
+    fun analyzeDeclarations(declarations: Collection<PsiElement>, outerDataFlowInfo: DataFlowInfo): TopDownAnalysisContext {
+        val topDownAnalysisMode = trace[BindingContext.TOP_DOWN_ANALYSIS_MODE, Unit].sure { "TopDownAnalysisMode was not set" }
         val c = TopDownAnalysisContext(topDownAnalysisMode, outerDataFlowInfo, declarationScopeProvider)
 
         val topLevelFqNames = HashMultimap.create<FqName, KtElement>()

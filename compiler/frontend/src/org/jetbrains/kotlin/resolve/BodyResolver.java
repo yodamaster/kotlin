@@ -101,9 +101,14 @@ public class BodyResolver {
 
         resolvePropertyDeclarationBodies(c);
 
-        resolveAnonymousInitializers(c);
+        if (c.getTopDownAnalysisMode().shouldAlwaysResolveBodies()) {
+            resolveAnonymousInitializers(c);
+        }
+
         resolvePrimaryConstructorParameters(c);
-        resolveSecondaryConstructors(c);
+        if (c.getTopDownAnalysisMode().shouldAlwaysResolveBodies()) {
+            resolveSecondaryConstructors(c);
+        }
 
         resolveFunctionBodies(c);
 
@@ -228,7 +233,11 @@ public class BodyResolver {
 
     public void resolveBodies(@NotNull BodiesResolveContext c) {
         resolveBehaviorDeclarationBodies(c);
-        controlFlowAnalyzer.process(c);
+
+        if (c.getTopDownAnalysisMode().shouldAlwaysResolveBodies()) {
+            controlFlowAnalyzer.process(c);
+        }
+
         declarationsChecker.process(c);
         functionAnalyzerExtension.process(c);
     }
@@ -758,12 +767,16 @@ public class BodyResolver {
             LexicalScope scope = c.getDeclaringScope(declaration);
             assert scope != null : "Scope is null: " + PsiUtilsKt.getElementTextWithContext(declaration);
 
-            if (!c.getTopDownAnalysisMode().isLocalDeclarations() && !(bodyResolveCache instanceof BodyResolveCache.ThrowException) &&
-                expressionTypingServices.getStatementFilter() != StatementFilter.NONE) {
-                bodyResolveCache.resolveFunctionBody(declaration).addOwnDataTo(trace, true);
-            }
-            else {
-                resolveFunctionBody(c.getOuterDataFlowInfo(), trace, declaration, entry.getValue(), scope);
+            boolean isUnitFunction = !declaration.hasInitializer() && !declaration.hasDeclaredReturnType();
+
+            if ((!isUnitFunction && !declaration.hasDeclaredReturnType()) || c.getTopDownAnalysisMode().shouldAlwaysResolveBodies()) {
+                if (!c.getTopDownAnalysisMode().isLocalDeclarations() && !(bodyResolveCache instanceof BodyResolveCache.ThrowException) &&
+                    expressionTypingServices.getStatementFilter() != StatementFilter.NONE) {
+                    bodyResolveCache.resolveFunctionBody(declaration).addOwnDataTo(trace, true);
+                }
+                else {
+                    resolveFunctionBody(c.getOuterDataFlowInfo(), trace, declaration, entry.getValue(), scope);
+                }
             }
         }
     }

@@ -91,11 +91,12 @@ class LocalClassifierAnalyzer(
                 )
         )
 
-        container.get<LazyTopDownAnalyzer>().analyzeDeclarations(
-                TopDownAnalysisMode.LocalDeclarations,
-                listOf(classOrObject),
-                context.dataFlowInfo
-        )
+        container.get<LazyTopDownAnalyzer>().apply {
+            if (trace[BindingContext.TOP_DOWN_ANALYSIS_MODE, Unit] != TopDownAnalysisMode.Light) {
+                trace.record(BindingContext.TOP_DOWN_ANALYSIS_MODE, Unit, TopDownAnalysisMode.LocalDeclarations)
+            }
+            analyzeDeclarations(listOf(classOrObject), context.dataFlowInfo)
+        }
     }
 }
 

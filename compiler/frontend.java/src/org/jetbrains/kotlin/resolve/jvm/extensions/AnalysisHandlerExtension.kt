@@ -23,15 +23,23 @@ import org.jetbrains.kotlin.extensions.ProjectExtensionDescriptor
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.resolve.BindingTrace
 
-interface AnalysisCompletedHandlerExtension {
-    companion object : ProjectExtensionDescriptor<AnalysisCompletedHandlerExtension>(
+interface AnalysisHandlerExtension {
+    companion object : ProjectExtensionDescriptor<AnalysisHandlerExtension>(
             "org.jetbrains.kotlin.analyzeCompleteHandlerExtension",
-            AnalysisCompletedHandlerExtension::class.java
+            AnalysisHandlerExtension::class.java
     )
+
+    fun beforeAnalysis(
+            project: Project,
+            module: ModuleDescriptor,
+            files: Collection<KtFile>,
+            bindingTrace: BindingTrace
+    ) {}
 
     fun analysisCompleted(
             project: Project,
             module: ModuleDescriptor,
             bindingTrace: BindingTrace,
-            files: Collection<KtFile>): AnalysisResult?
+            files: Collection<KtFile>
+    ): AnalysisResult? = null
 }

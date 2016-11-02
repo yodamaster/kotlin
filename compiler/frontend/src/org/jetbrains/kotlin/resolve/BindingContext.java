@@ -18,6 +18,7 @@ package org.jetbrains.kotlin.resolve;
 
 import com.google.common.collect.ImmutableMap;
 import com.intellij.psi.PsiElement;
+import kotlin.Unit;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.ReadOnly;
@@ -242,6 +243,8 @@ public interface BindingContext {
             new BasicWritableSlice<FqNameUnsafe, ClassDescriptor>(DO_NOTHING, true);
     WritableSlice<KtFile, PackageFragmentDescriptor> FILE_TO_PACKAGE_FRAGMENT = Slices.createSimpleSlice();
     WritableSlice<FqName, Collection<KtFile>> PACKAGE_TO_FILES = Slices.createSimpleSlice();
+
+    WritableSlice<Unit, TopDownAnalysisMode> TOP_DOWN_ANALYSIS_MODE = new BasicWritableSlice<Unit, TopDownAnalysisMode>(DO_NOTHING);
 
     @SuppressWarnings("UnusedDeclaration")
     @Deprecated // This field is needed only for the side effects of its initializer
