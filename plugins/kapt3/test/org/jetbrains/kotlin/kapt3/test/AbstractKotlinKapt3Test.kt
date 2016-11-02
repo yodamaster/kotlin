@@ -16,15 +16,22 @@
 
 package org.jetbrains.kotlin.kapt3.test
 
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.text.StringUtil
 import com.sun.tools.javac.comp.CompileStates
 import com.sun.tools.javac.tree.JCTree.JCCompilationUnit
 import org.jetbrains.kotlin.codegen.CodegenTestCase
 import org.jetbrains.kotlin.codegen.CodegenTestUtil
 import org.jetbrains.kotlin.codegen.state.KotlinTypeMapper
+import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.kapt3.*
 import org.jetbrains.kotlin.kapt3.stubs.ClassFileToSourceStubConverter
 import org.jetbrains.kotlin.kapt3.util.KaptLogger
+import org.jetbrains.kotlin.psi.KtFile
+import org.jetbrains.kotlin.resolve.BindingContext
+import org.jetbrains.kotlin.resolve.BindingTrace
+import org.jetbrains.kotlin.resolve.TopDownAnalysisMode
+import org.jetbrains.kotlin.resolve.jvm.extensions.AnalysisHandlerExtension
 import org.jetbrains.kotlin.test.ConfigurationKind
 import org.jetbrains.kotlin.test.KotlinTestUtils
 import org.jetbrains.kotlin.test.util.trimTrailingWhitespacesAndAddNewlineAtEOF
@@ -41,6 +48,19 @@ abstract class AbstractKotlinKapt3Test : CodegenTestCase() {
         val javaSources = javaFilesDir?.let { arrayOf(it) } ?: emptyArray()
 
         createEnvironmentWithMockJdkAndIdeaAnnotations(ConfigurationKind.ALL, *javaSources)
+
+        // Use light analysis mode in tests
+        AnalysisHandlerExtension.registerExtension(myEnvironment.project, object : AnalysisHandlerExtension {
+            override fun beforeAnalysis(
+                    project: Project,
+                    module: ModuleDescriptor,
+                    files: Collection<KtFile>,
+                    bindingTrace: BindingTrace
+            ) {
+                bindingTrace.record(BindingContext.TOP_DOWN_ANALYSIS_MODE, Unit, TopDownAnalysisMode.Light)
+            }
+        })
+
         loadMultiFiles(files)
 
         val txtFile = File(wholeFile.parentFile, wholeFile.nameWithoutExtension + ".txt")
@@ -49,7 +69,8 @@ abstract class AbstractKotlinKapt3Test : CodegenTestCase() {
         val typeMapper = factory.generationState.typeMapper
 
         val logger = KaptLogger(isVerbose = true)
-        val kaptContext = KaptContext(logger, classBuilderFactory.compiledClasses, classBuilderFactory.origins)
+        val kaptContext = KaptContext(logger, classBuilderFactory.compiledClasses,
+                                      classBuilderFactory.origins, processorOptions = emptyMap())
         try {
             check(kaptContext, typeMapper, txtFile)
         } finally {
@@ -83,12 +104,12 @@ abstract class AbstractClassFileToSourceStubConverterTest : AbstractKotlinKapt3T
     }
 }
 
-abstract class AbstractKotlinKaptRunnerTest : AbstractKotlinKapt3Test() {
+abstract class AbstractKotlinKaptContextTest : AbstractKotlinKapt3Test() {
     override fun check(kaptRunner: KaptContext, typeMapper: KotlinTypeMapper, txtFile: File) {
         val compilationUnits = convert(kaptRunner, typeMapper)
         val sourceOutputDir = Files.createTempDirectory("kaptRunner").toFile()
         try {
-            kaptRunner.doAnnotationProcessing(emptyList(), listOf(KaptRunnerTest.simpleProcessor()),
+            kaptRunner.doAnnotationProcessing(emptyList(), listOf(JavaKaptContextTest.simpleProcessor()),
                                               classpath = listOf(), sourcesOutputDir = sourceOutputDir, classesOutputDir = sourceOutputDir,
                                               additionalSources = compilationUnits)
 
