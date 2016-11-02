@@ -32,7 +32,7 @@ fun writeKotlinMetadata(cb: ClassBuilder, kind: KotlinClassHeader.Kind, action: 
 }
 
 fun writeSyntheticClassMetadata(cb: ClassBuilder) {
-    writeKotlinMetadata(cb, KotlinClassHeader.Kind.SYNTHETIC_CLASS) { av ->
+    writeKotlinMetadata(cb, KotlinClassHeader.Kind.SYNTHETIC_CLASS) { _ ->
         // Do nothing
     }
 }

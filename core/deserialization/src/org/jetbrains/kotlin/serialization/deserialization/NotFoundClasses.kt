@@ -53,7 +53,7 @@ class NotFoundClasses(private val storageManager: StorageManager, private val mo
 
     private val typeAliases = storageManager.createMemoizedFunction<ClassRequest, TypeAliasDescriptor> { request ->
         computeClassifier(request, {
-            owner, name, isInner, numberOfTypeParametersCount ->
+            owner, name, _, numberOfTypeParametersCount ->
             MockTypeAliasDescriptor(storageManager, owner, name, numberOfTypeParametersCount)
         })
     }

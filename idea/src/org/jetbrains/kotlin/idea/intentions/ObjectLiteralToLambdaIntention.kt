@@ -85,7 +85,7 @@ class ObjectLiteralToLambdaIntention : SelfTargetingRangeIntention<KtObjectLiter
     override fun applyTo(element: KtObjectLiteralExpression, editor: Editor?) {
         val commentSaver = CommentSaver(element)
 
-        val (baseTypeRef, baseType, singleFunction) = extractData(element)!!
+        val (_, baseType, singleFunction) = extractData(element)!!
 
         val returnSaver = ReturnSaver(singleFunction)
 

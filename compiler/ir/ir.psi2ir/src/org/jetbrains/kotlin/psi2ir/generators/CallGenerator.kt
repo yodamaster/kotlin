@@ -37,7 +37,7 @@ class CallGenerator(statementGenerator: StatementGenerator): StatementGeneratorE
             is PropertyDescriptor ->
                 generatePropertyGetterCall(descriptor, startOffset, endOffset, call)
             is VariableDescriptor ->
-                call.callReceiver.call { dispatchReceiverValue, extensionReceiverValue ->
+                call.callReceiver.call { _, _ ->
                     generateGetVariable(startOffset, endOffset, descriptor, getTypeArguments(call.original), origin)
                 }
             is FunctionDescriptor ->
@@ -161,7 +161,7 @@ class CallGenerator(statementGenerator: StatementGenerator): StatementGeneratorE
             irArgumentValues[valueParameter] = irArgumentValue
         }
 
-        resolvedCall.valueArgumentsByIndex!!.forEachIndexed { index, valueArgument ->
+        resolvedCall.valueArgumentsByIndex!!.forEachIndexed { index, _ ->
             val valueParameter = valueParameters[index]
             irCall.putValueArgument(index, irArgumentValues[valueParameter]?.load())
         }

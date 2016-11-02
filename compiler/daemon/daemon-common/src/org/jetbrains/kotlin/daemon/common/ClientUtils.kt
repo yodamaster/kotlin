@@ -43,8 +43,8 @@ fun makePortFromRunFilenameExtractor(digest: String): (String) -> Int? {
 
 fun walkDaemons(registryDir: File,
                 compilerId: CompilerId,
-                filter: (File, Int) -> Boolean = { f, p -> true },
-                report: (DaemonReportCategory, String) -> Unit = { cat, msg -> }
+                filter: (File, Int) -> Boolean = { _, _ -> true },
+                report: (DaemonReportCategory, String) -> Unit = { _, _ -> }
 ): Sequence<CompileService> {
     val classPathDigest = compilerId.compilerClasspath.map { File(it).absolutePath }.distinctStringsDigest().toHexString()
     val portExtractor = makePortFromRunFilenameExtractor(classPathDigest)

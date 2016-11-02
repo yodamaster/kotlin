@@ -72,7 +72,7 @@ class FunctionReader(private val context: TranslationContext) {
         val config = context.config as LibrarySourcesConfig
         val libs = config.libraries.map { File(it) }
 
-        JsLibraryUtils.traverseJsLibraries(libs) { fileContent, path ->
+        JsLibraryUtils.traverseJsLibraries(libs) { fileContent, _ ->
             var current = 0
 
             while (true) {

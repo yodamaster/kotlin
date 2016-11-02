@@ -62,7 +62,7 @@ abstract class AbstractMoveStatementTest : AbstractCodeMoverTest() {
 
 abstract class AbstractMoveLeftRightTest : AbstractCodeMoverTest() {
     protected fun doTest(path: String) {
-        doTest(path) { isApplicableExpected, direction ->  }
+        doTest(path) { _, _ ->  }
     }
 }
 

@@ -39,7 +39,7 @@ annotation class ColorsAnnotation(val colors: Array<RGBColors>)
 class ProcessorTests : AbstractProcessorTest() {
     override val testDataDir = "plugins/annotation-processing/testData/processors"
     
-    fun testSimple() = test("Simple", "Anno") { set, roundEnv, env ->
+    fun testSimple() = test("Simple", "Anno") { set, roundEnv, _ ->
         assertEquals(1, set.size)
         val annotated = roundEnv.getElementsAnnotatedWith(set.first())
         assertEquals(3, annotated.size)
@@ -53,7 +53,7 @@ class ProcessorTests : AbstractProcessorTest() {
         }
     }
     
-    fun testSeveralAnnotations() = test("SeveralAnnotations", "Name", "Age") { set, roundEnv, env ->
+    fun testSeveralAnnotations() = test("SeveralAnnotations", "Name", "Age") { set, roundEnv, _ ->
         val annos = set.toList()
         
         assertEquals(2, annos.size)
@@ -71,15 +71,15 @@ class ProcessorTests : AbstractProcessorTest() {
         }
     }
 
-    fun testStar() = test("Star", "*") { set, roundEnv, env ->
+    fun testStar() = test("Star", "*") { set, _, _ ->
         assertEquals(true, set.any { it.qualifiedName.toString() == "Anno" })
     }
     
-    fun testStar2() = test("Star", "Anno", "*") { set, roundEnv, env ->
+    fun testStar2() = test("Star", "Anno", "*") { set, _, _ ->
         assertEquals(true, set.any { it.qualifiedName.toString() == "Anno" })
     }
 
-    fun testStar3() = test("Star3", "Anno", "*") { set, roundEnv, env ->
+    fun testStar3() = test("Star3", "Anno", "*") { set, _, _ ->
         assertEquals(true, set.any { it.qualifiedName.toString() == "Anno2" })
     }
     
@@ -88,7 +88,7 @@ class ProcessorTests : AbstractProcessorTest() {
 
     fun testInheritedAnnotations() {
         val handledClasses = mutableListOf<String>()
-        test("InheritedAnnotations", "Anno") { set, roundEnv, env ->
+        test("InheritedAnnotations", "Anno") { set, roundEnv, _ ->
             assertEquals(1, set.size)
             val annotatedElements = roundEnv.getElementsAnnotatedWith(set.first())
             for (element in annotatedElements) {
@@ -104,7 +104,7 @@ class ProcessorTests : AbstractProcessorTest() {
         assertEquals(listOf("Base", "Impl", "Intf"), handledClasses.sorted())
     }
 
-    fun testInheritedAnnotationsOverridden() = test("InheritedAnnotationsOverridden", "Anno") { set, roundEnv, env ->
+    fun testInheritedAnnotationsOverridden() = test("InheritedAnnotationsOverridden", "Anno") { set, roundEnv, _ ->
         assertEquals(1, set.size)
         val annotatedElements = roundEnv.getElementsAnnotatedWith(set.first())
         assertEquals(2, annotatedElements.size)
@@ -113,7 +113,7 @@ class ProcessorTests : AbstractProcessorTest() {
         assertEquals("Tom", implAnnotations.first().elementValues.values.first().value)
     }
     
-    fun testNested() = test("Nested", "Anno") { set, roundEnv, env ->
+    fun testNested() = test("Nested", "Anno") { set, roundEnv, _ ->
         assertEquals(1, set.size)
         val annotatedElements = roundEnv.getElementsAnnotatedWith(set.first())
         assertEquals(1, annotatedElements.size)
@@ -128,21 +128,21 @@ class ProcessorTests : AbstractProcessorTest() {
         assertTrue((anno2.getParam("e") as JeArrayAnnotationValue).value.first() is JeTypeAnnotationValue)
     }
     
-    fun testEnumArray() = test("EnumArray", "*") { set, roundEnv, env ->
+    fun testEnumArray() = test("EnumArray", "*") { _, _, env ->
         val testClass = env.findClass("org.jetbrains.kotlin.annotation.processing.test.processor.Test")
         val enumAnno = testClass.getAnnotation(ColorsAnnotation::class.java)
         assertNotNull(enumAnno)
         assertEquals(listOf("BLUE", "RED"), enumAnno!!.colors.map { it.name })
     }
 
-    fun testStringArray() = test("StringArray", "*") { set, roundEnv, env ->
+    fun testStringArray() = test("StringArray", "*") { _, _, env ->
         val testClass = env.findClass("Test")
         val suppress = testClass.getAnnotation(Suppress::class.java)
         assertNotNull(suppress)
         assertEquals(listOf("Tom", "Mary"), suppress!!.names.toList())
     }
 
-    fun testTypeArguments() = test("TypeArguments", "*") { set, roundEnv, env ->
+    fun testTypeArguments() = test("TypeArguments", "*") { _, _, env ->
         val classA = env.findClass("A")
         val superB = classA.superclass as JeDeclaredType
         val interfaceC = classA.interfaces[0] as JeDeclaredType
@@ -151,7 +151,7 @@ class ProcessorTests : AbstractProcessorTest() {
         assertTrue(interfaceC.typeArguments.size == 1)
     }
     
-    fun testTypeArguments2() = test("TypeArguments2", "*") { set, roundEnv, env ->
+    fun testTypeArguments2() = test("TypeArguments2", "*") { _, _, env ->
         val b = env.findClass("B")
         val bSuperTypes = env.typeUtils.directSupertypes(b.asType())
         assertEquals(1, bSuperTypes.size)
@@ -183,7 +183,7 @@ class ProcessorTests : AbstractProcessorTest() {
         assertEquals("I3<java.util.List<? extends java.lang.String>>", i3.toString())
     }
     
-    fun testErasureSimple() = test("ErasureSimple", "*") { set, roundEnv, env -> 
+    fun testErasureSimple() = test("ErasureSimple", "*") { _, _, env ->
         val test = env.findClass("Test")
         val int = test.findMethod("a").returnType
         val void = test.findMethod("b").returnType
@@ -191,7 +191,7 @@ class ProcessorTests : AbstractProcessorTest() {
         assertEquals(void, env.typeUtils.erasure(void))
     }
     
-    fun testErasure2() = test("Erasure2", "*") { set, roundEnv, env ->
+    fun testErasure2() = test("Erasure2", "*") { _, _, env ->
         val erasure = fun (t: JeMethodExecutableTypeMirror) = env.typeUtils.erasure(t)
         fun JeTypeElement.check(methodName: String, toString: String, transform: (JeMethodExecutableTypeMirror) -> TypeMirror = { it }) {
             val method = enclosedElements.first { it is JeMethodExecutableElement && it.simpleName.toString() == methodName }
@@ -247,7 +247,7 @@ class ProcessorTests : AbstractProcessorTest() {
             .firstIsInstance<AnnotationProcessingExtensionForTests>()
     
     private fun incrementalDataTest(fileName: String, @Language("TEXT") expectedText: String) {
-        test(fileName, "Anno", "Anno2", "Anno3") { set, roundEnv, env -> }
+        test(fileName, "Anno", "Anno2", "Anno3") { _, _, _ -> }
         val ext = getKapt2Extension()
         val incrementalDataFile = ext.incrementalDataFile
         assertNotNull(incrementalDataFile)
@@ -256,14 +256,14 @@ class ProcessorTests : AbstractProcessorTest() {
     }
     
     fun testSourceRetention() {
-        test("SourceRetention", "*") { set, roundEnv, env -> }
+        test("SourceRetention", "*") { _, _, _ -> }
         val ext = getKapt2Extension()
         val annotationHandler = ext.sourceRetentionAnnotationHandler as SourceRetentionAnnotationHandlerImpl
         val annotations = annotationHandler.sourceRetentionAnnotations.sorted()
         assertEquals("Source1, Source2, Source3, Source4, Test5\$Source5", annotations.joinToString())
     }
     
-    fun testKotlinAnnotationDefaultValueFromBinary() = test("DefaultValueFromBinary", "*") { set, roundEnv, env ->
+    fun testKotlinAnnotationDefaultValueFromBinary() = test("DefaultValueFromBinary", "*") { _, _, env ->
         fun check(expectedValue: Boolean, className: String) {
             val clazz = env.findClass(className)
             val anno = clazz.getAnnotation(JvmSuppressWildcards::class.java)!!
@@ -275,7 +275,7 @@ class ProcessorTests : AbstractProcessorTest() {
         check(false, "TestFalse")
     }
 
-    fun testAsMemberOf() = test("AsMemberOf", "*") { set, roundEnv, env ->
+    fun testAsMemberOf() = test("AsMemberOf", "*") { _, _, env ->
         val f = env.findClass("Test").findField("f")
         val fType = f.asType() as JeDeclaredType
 
@@ -299,7 +299,7 @@ class ProcessorTests : AbstractProcessorTest() {
         check(implM, "(java.lang.String)java.lang.String")
     }
 
-    fun testAsMemberOfTypeParameters() = test("AsMemberOfTypeParameters", "*") { set, roundEnv, env ->
+    fun testAsMemberOfTypeParameters() = test("AsMemberOfTypeParameters", "*") { _, _, env ->
         val intf = env.findClass("Intf")
         val intfT = intf.typeParameters[0]
         val base = env.findClass("Base")
@@ -318,7 +318,7 @@ class ProcessorTests : AbstractProcessorTest() {
     fun testDispose() {
         var savedEnv: ProcessingEnvironment? = null
         
-        test("AsMemberOf", "*") { set, roundEnv, env ->
+        test("AsMemberOf", "*") { _, _, env ->
             savedEnv = env
         }
         
@@ -351,7 +351,7 @@ class ProcessorTests : AbstractProcessorTest() {
         }
     }
 
-    fun testMapMutableMap() = test("MapMutableMap", "*") { set, roundEnv, env ->
+    fun testMapMutableMap() = test("MapMutableMap", "*") { _, _, env ->
         val test = env.findClass("Test")
         fun test(name: String, expected: String) {
             assertEquals(expected, test.findMethods(name).single().parameters.single().asType().toString())
@@ -368,7 +368,7 @@ class ProcessorTests : AbstractProcessorTest() {
 
         var kotlinEnv: KotlinProcessingEnvironment? = null
         try {
-            test("MapMutableMap", "*") { set, roundEnv, env ->
+            test("MapMutableMap", "*") { _, _, env ->
                 kotlinEnv = env as KotlinProcessingEnvironment
                 throw HiThere()
             }

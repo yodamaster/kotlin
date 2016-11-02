@@ -34,7 +34,7 @@ class JvmCliVirtualFileFinder(
 ) : VirtualFileKotlinClassFinder() {
     override fun findVirtualFileWithHeader(classId: ClassId): VirtualFile? {
         val classFileName = classId.relativeClassName.asString().replace('.', '$') + ".class"
-        return index.findClass(classId, acceptedRootTypes = JavaRoot.OnlyBinary) { dir, rootType ->
+        return index.findClass(classId, acceptedRootTypes = JavaRoot.OnlyBinary) { dir, _ ->
             dir.findChild(classFileName)?.check(VirtualFile::isValid)
         }?.check { it in scope }
     }
@@ -46,7 +46,7 @@ class JvmCliVirtualFileFinder(
         // JvmDependenciesIndex requires the ClassId of the class which we're searching for, to cache the last request+result
         val classId = ClassId(packageFqName, Name.special("<builtins-metadata>"))
 
-        return index.findClass(classId, acceptedRootTypes = JavaRoot.OnlyBinary) { dir, rootType ->
+        return index.findClass(classId, acceptedRootTypes = JavaRoot.OnlyBinary) { dir, _ ->
             dir.findChild(fileName)?.check(VirtualFile::isValid)
         }?.check { it in scope }?.inputStream
     }

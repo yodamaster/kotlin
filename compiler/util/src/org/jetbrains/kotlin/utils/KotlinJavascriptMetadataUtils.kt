@@ -65,7 +65,7 @@ object KotlinJavascriptMetadataUtils {
     @JvmStatic fun loadMetadata(file: File): List<KotlinJavascriptMetadata> {
         assert(file.exists()) { "Library $file not found" }
         val metadataList = arrayListOf<KotlinJavascriptMetadata>()
-        JsLibraryUtils.traverseJsLibrary(file) { content, relativePath ->
+        JsLibraryUtils.traverseJsLibrary(file) { content, _ ->
             parseMetadata(content, metadataList)
         }
 

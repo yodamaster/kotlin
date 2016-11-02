@@ -52,7 +52,7 @@ object KotlinIntroduceTypeAliasHandler : RefactoringActionHandler {
                 file,
                 "Select target code block",
                 listOf(TYPE_ELEMENT, TYPE_CONSTRUCTOR),
-                { elements, parent -> parent.getExtractionContainers(strict = true, includeAll = true) },
+                { _, parent -> parent.getExtractionContainers(strict = true, includeAll = true) },
                 continuation
         )
     }

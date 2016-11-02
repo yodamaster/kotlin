@@ -434,7 +434,7 @@ private fun SuspendContextImpl.getXPositionForStepOutFromInlinedArgument(
         inlinedArgumentToSkip: KtFunctionLiteral
 ): XSourcePositionImpl? {
     return getNextPositionWithFilter(locations) {
-        offset, elementAt ->
+        offset, _ ->
         inlinedArgumentToSkip.textRange.contains(offset)
     }
 }

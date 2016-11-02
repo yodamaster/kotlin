@@ -62,7 +62,7 @@ class JavaUClass private constructor(psi: PsiClass, override val containingEleme
 
     companion object {
         fun create(psi: PsiClass, containingElement: UElement?): UClass {
-            return if (psi is PsiAnonymousClass) 
+            return if (psi is PsiAnonymousClass)
                 JavaUAnonymousClass(psi, containingElement)
             else
                 JavaUClass(psi, containingElement)

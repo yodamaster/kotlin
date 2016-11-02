@@ -49,7 +49,7 @@ abstract class AbstractMultiFileIntentionTest : KotlinMultiFileTestCase() {
             ConfigLibraryUtil.configureKotlinRuntimeAndSdk(myModule, PluginTestCaseBase.mockJdk())
         }
 
-        doTest({ rootDir, rootAfter ->
+        doTest({ rootDir, _ ->
                    val mainFile = rootDir.findFileByRelativePath(mainFilePath)!!
                    val conflictFile = rootDir.findFileByRelativePath("$mainFilePath.conflicts")
                    val document = FileDocumentManager.getInstance().getDocument(mainFile)!!

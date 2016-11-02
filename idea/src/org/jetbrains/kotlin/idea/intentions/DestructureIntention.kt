@@ -45,7 +45,7 @@ import java.util.*
 
 class DestructureInspection : IntentionBasedInspection<KtDeclaration>(
         DestructureIntention::class,
-        { element, inspection ->
+        { element, _ ->
             if (element is KtParameter) true
             else {
                 val usagesToRemove = DestructureIntention.collectUsagesToRemove(element)?.data

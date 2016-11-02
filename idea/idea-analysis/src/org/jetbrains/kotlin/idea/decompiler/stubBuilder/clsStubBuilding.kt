@@ -141,7 +141,7 @@ fun createStubForPackageName(packageDirectiveStub: KotlinPlaceHolderStubImpl<KtP
 fun createStubForTypeName(
         typeClassId: ClassId,
         parent: StubElement<out PsiElement>,
-        onUserTypeLevel: (KotlinUserTypeStub, Int) -> Unit = { x, y -> }
+        onUserTypeLevel: (KotlinUserTypeStub, Int) -> Unit = { _, _ -> }
 ): KotlinUserTypeStub {
     val fqName =
             if (typeClassId.isLocal) KotlinBuiltIns.FQ_NAMES.any

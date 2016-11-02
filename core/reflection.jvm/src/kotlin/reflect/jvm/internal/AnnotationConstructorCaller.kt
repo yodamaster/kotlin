@@ -164,7 +164,7 @@ private fun createAnnotationInstance(annotationClass: Class<*>, methods: List<Re
         }
     }
 
-    return Proxy.newProxyInstance(annotationClass.classLoader, arrayOf(annotationClass)) { proxy, method, args ->
+    return Proxy.newProxyInstance(annotationClass.classLoader, arrayOf(annotationClass)) { _, method, args ->
         val name = method.name
         when (name) {
             "annotationType" -> annotationClass

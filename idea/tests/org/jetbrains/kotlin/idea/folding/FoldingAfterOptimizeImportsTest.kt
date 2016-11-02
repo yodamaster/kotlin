@@ -47,7 +47,7 @@ class FoldingAfterOptimizeImportsTest : AbstractKotlinFoldingTest() {
         fixture.configureByFile(getTestName(true) + ".kt")
 
         doTestWithSettings(fileText) {
-            fileText ->
+            _ ->
             CodeFoldingManager.getInstance(fixture.project)!!.buildInitialFoldings(editor)
             getFoldingRegion(0).checkRegion(false, findStringWithPrefixes("// REGION BEFORE: "))
 

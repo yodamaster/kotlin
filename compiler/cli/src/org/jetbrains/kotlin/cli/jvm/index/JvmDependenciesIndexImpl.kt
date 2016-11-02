@@ -90,7 +90,7 @@ class JvmDependenciesIndexImpl(_roots: List<JavaRoot>): JvmDependenciesIndex {
     ): Set<String> {
         val result = hashSetOf<String>()
         traverseDirectoriesInPackage(packageFqName, continueSearch = {
-            dir, rootType ->
+            dir, _ ->
 
             for (child in dir.children) {
                 if (child.extension != "class" && child.extension != "java") continue

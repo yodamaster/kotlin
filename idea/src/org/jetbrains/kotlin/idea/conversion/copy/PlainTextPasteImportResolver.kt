@@ -124,11 +124,11 @@ class PlainTextPasteImportResolver(dataForConversion: DataForConversion, val tar
                     .map { it to it.resolveToDescriptor(resolutionFacade) }
                     .filter { canBeImported(it.second) }
 
-            classes.find { (psiClass, descriptor) -> JavaToKotlinClassMap.INSTANCE.mapPlatformClass(descriptor!!).isNotEmpty() }
-                    ?.let { (psiClass, descriptor) -> addImport(psiElementFactory.createImportStatement(psiClass)) }
+            classes.find { (_, descriptor) -> JavaToKotlinClassMap.INSTANCE.mapPlatformClass(descriptor!!).isNotEmpty() }
+                    ?.let { (psiClass, _) -> addImport(psiElementFactory.createImportStatement(psiClass)) }
             if (reference.resolve() != null) return true
 
-            classes.singleOrNull()?.let { (psiClass, descriptor) ->
+            classes.singleOrNull()?.let { (psiClass, _) ->
                 addImport(psiElementFactory.createImportStatement(psiClass), true)
             }
 
@@ -146,7 +146,7 @@ class PlainTextPasteImportResolver(dataForConversion: DataForConversion, val tar
                     .map { it to it.getJavaMemberDescriptor(resolutionFacade) as? DeclarationDescriptorWithVisibility }
                     .filter { canBeImported(it.second) }
 
-            members.singleOrNull()?.let { (psiMember, descriptor) ->
+            members.singleOrNull()?.let { (psiMember, _) ->
                 addImport(psiElementFactory.createImportStaticStatement(psiMember.containingClass!!, psiMember.name!!), true)
             }
 

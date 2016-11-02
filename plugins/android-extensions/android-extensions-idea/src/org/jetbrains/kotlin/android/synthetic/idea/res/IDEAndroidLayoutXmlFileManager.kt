@@ -83,7 +83,7 @@ class IDEAndroidLayoutXmlFileManager(val module: Module) : AndroidLayoutXmlFileM
             val propertyName = propertyDescriptor.name.asString()
 
             val attributes = arrayListOf<PsiElement>()
-            val visitor = AndroidXmlVisitor { retId, wClass, valueElement ->
+            val visitor = AndroidXmlVisitor { retId, _, valueElement ->
                 if (retId.name == propertyName) attributes.add(valueElement)
             }
 

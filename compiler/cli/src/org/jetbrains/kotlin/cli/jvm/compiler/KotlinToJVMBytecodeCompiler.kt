@@ -152,7 +152,7 @@ object KotlinToJVMBytecodeCompiler {
         }
 
         try {
-            for ((module, state) in outputs) {
+            for ((_, state) in outputs) {
                 ProgressIndicatorAndCompilationCanceledStatus.checkCanceled()
                 writeOutput(state.configuration, state.factory, null)
             }

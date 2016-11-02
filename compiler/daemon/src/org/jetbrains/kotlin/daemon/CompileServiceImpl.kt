@@ -442,7 +442,7 @@ class CompileServiceImpl(
 
         ifAlive {
 
-            val aliveWithOpts = walkDaemons(File(daemonOptions.runFilesPathOrDefault), compilerId, filter = { f, p -> p != port }, report = { lvl, msg -> log.info(msg) })
+            val aliveWithOpts = walkDaemons(File(daemonOptions.runFilesPathOrDefault), compilerId, filter = { _, p -> p != port }, report = { _, msg -> log.info(msg) })
                     .map { Pair(it, it.getDaemonJVMOptions()) }
                     .filter { it.second.isGood }
                     .sortedWith(compareByDescending(DaemonJVMOptionsMemoryComparator(), { it.second.get() }))
@@ -515,7 +515,7 @@ class CompileServiceImpl(
                           operationsTracer: RemoteOperationsTracer?,
                           body: (PrintStream, EventManger, Profiler) -> ExitCode): CompileService.CallResult<Int> =
             ifAlive {
-                withValidClientOrSessionProxy(sessionId) { session ->
+                withValidClientOrSessionProxy(sessionId) { _ ->
                     operationsTracer?.before("compile")
                     val rpcProfiler = if (daemonOptions.reportPerf) WallAndThreadTotalProfiler() else DummyProfiler()
                     val eventManger = EventMangerImpl()

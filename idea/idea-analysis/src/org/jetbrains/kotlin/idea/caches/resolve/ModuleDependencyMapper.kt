@@ -71,7 +71,7 @@ fun createModuleResolverProvider(
         val resolverForProject = analyzerFacade.setupResolverForProject(
                 debugName, globalContext.withProject(project), modulesToCreateResolversFor, modulesContent,
                 jvmPlatformParameters, IdeaEnvironment, builtIns,
-                delegateResolver, { m, c -> IDEPackagePartProvider(c.moduleContentScope) },
+                delegateResolver, { _, c -> IDEPackagePartProvider(c.moduleContentScope) },
                 sdk?.let { SdkInfo(project, it) }
         )
         return resolverForProject
