@@ -41,6 +41,8 @@ import org.jetbrains.kotlin.resolve.calls.results.ResolutionResultsHandler
 import org.jetbrains.kotlin.resolve.calls.results.ResolutionStatus
 import org.jetbrains.kotlin.resolve.calls.smartcasts.DataFlowValueFactory
 import org.jetbrains.kotlin.resolve.calls.tasks.*
+import org.jetbrains.kotlin.resolve.coroutine.CoroutineReceiverValue
+import org.jetbrains.kotlin.resolve.coroutine.findClosestCoroutineReceiver
 import org.jetbrains.kotlin.resolve.isHiddenInResolution
 import org.jetbrains.kotlin.resolve.scopes.LexicalScope
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
@@ -295,6 +297,8 @@ class NewResolutionOldInference(
         override val lexicalScope: LexicalScope get() = resolutionContext.scope
 
         override val isDebuggerContext: Boolean get() = resolutionContext.isDebuggerContext
+
+        override val closestCoroutineReceiver: CoroutineReceiverValue? by lazy(lexicalScope::findClosestCoroutineReceiver)
     }
 
     internal data class MyCandidate<out D: CallableDescriptor>(

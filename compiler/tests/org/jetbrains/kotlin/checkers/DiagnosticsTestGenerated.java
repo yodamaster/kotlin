@@ -4233,6 +4233,12 @@ public class DiagnosticsTestGenerated extends AbstractDiagnosticsTest {
                 KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("compiler/testData/diagnostics/tests/coroutines"), Pattern.compile("^(.+)\\.kt$"), true);
             }
 
+            @TestMetadata("callingSuspensionOutsideCoroutine.kt")
+            public void testCallingSuspensionOutsideCoroutine() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/tests/coroutines/callingSuspensionOutsideCoroutine.kt");
+                doTest(fileName);
+            }
+
             @TestMetadata("coroutineApplicability.kt")
             public void testCoroutineApplicability() throws Exception {
                 String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/tests/coroutines/coroutineApplicability.kt");
@@ -4303,6 +4309,63 @@ public class DiagnosticsTestGenerated extends AbstractDiagnosticsTest {
             public void testWrongHandleResult() throws Exception {
                 String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/tests/coroutines/wrongHandleResult.kt");
                 doTest(fileName);
+            }
+
+            @TestMetadata("compiler/testData/diagnostics/tests/coroutines/manyReceivers")
+            @TestDataPath("$PROJECT_ROOT")
+            @RunWith(JUnit3RunnerWithInners.class)
+            public static class ManyReceivers extends AbstractDiagnosticsTest {
+                public void testAllFilesPresentInManyReceivers() throws Exception {
+                    KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("compiler/testData/diagnostics/tests/coroutines/manyReceivers"), Pattern.compile("^(.+)\\.kt$"), true);
+                }
+
+                @TestMetadata("extensionToAnotherController.kt")
+                public void testExtensionToAnotherController() throws Exception {
+                    String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/tests/coroutines/manyReceivers/extensionToAnotherController.kt");
+                    doTest(fileName);
+                }
+
+                @TestMetadata("memberExtensions.kt")
+                public void testMemberExtensions() throws Exception {
+                    String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/tests/coroutines/manyReceivers/memberExtensions.kt");
+                    doTest(fileName);
+                }
+
+                @TestMetadata("memberExtensionsInsideController.kt")
+                public void testMemberExtensionsInsideController() throws Exception {
+                    String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/tests/coroutines/manyReceivers/memberExtensionsInsideController.kt");
+                    doTest(fileName);
+                }
+
+                @TestMetadata("namedArgument.kt")
+                public void testNamedArgument() throws Exception {
+                    String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/tests/coroutines/manyReceivers/namedArgument.kt");
+                    doTest(fileName);
+                }
+
+                @TestMetadata("nestedReceivers.kt")
+                public void testNestedReceivers() throws Exception {
+                    String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/tests/coroutines/manyReceivers/nestedReceivers.kt");
+                    doTest(fileName);
+                }
+
+                @TestMetadata("simple.kt")
+                public void testSimple() throws Exception {
+                    String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/tests/coroutines/manyReceivers/simple.kt");
+                    doTest(fileName);
+                }
+
+                @TestMetadata("simpleControllerTypeParameter.kt")
+                public void testSimpleControllerTypeParameter() throws Exception {
+                    String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/tests/coroutines/manyReceivers/simpleControllerTypeParameter.kt");
+                    doTest(fileName);
+                }
+
+                @TestMetadata("simpleImplicitReceiver.kt")
+                public void testSimpleImplicitReceiver() throws Exception {
+                    String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/tests/coroutines/manyReceivers/simpleImplicitReceiver.kt");
+                    doTest(fileName);
+                }
             }
         }
 

@@ -36,6 +36,7 @@ import org.jetbrains.kotlin.resolve.calls.callUtil.isSafeCall
 import org.jetbrains.kotlin.resolve.calls.context.*
 import org.jetbrains.kotlin.resolve.calls.inference.SubstitutionFilteringInternalResolveAnnotations
 import org.jetbrains.kotlin.resolve.calls.model.ArgumentMatchStatus
+import org.jetbrains.kotlin.resolve.calls.model.ImplicitAdditionalReceiverValueArgument
 import org.jetbrains.kotlin.resolve.calls.model.MutableResolvedCall
 import org.jetbrains.kotlin.resolve.calls.results.ResolutionStatus
 import org.jetbrains.kotlin.resolve.calls.results.ResolutionStatus.*
@@ -147,8 +148,8 @@ class CandidateResolver(
 
     private fun <D : CallableDescriptor> CallCandidateResolutionContext<D>.mapArguments()
             = check {
-                val argumentMappingStatus = ValueArgumentsToParametersMapper.mapValueArgumentsToParameters(
-                        call, tracing, candidateCall)
+                val argumentMappingStatus =
+                        ValueArgumentsToParametersMapper.mapValueArgumentsToParameters(call, tracing, candidateCall, scope)
                 if (!argumentMappingStatus.isSuccess) {
                     candidateCall.addStatus(ARGUMENTS_MAPPING_ERROR)
                 }
@@ -357,6 +358,22 @@ class CandidateResolver(
                     resultStatus = it
                 }
             }
+
+            if (resolvedArgument is ImplicitAdditionalReceiverValueArgument) {
+                assert(resolvedArgument.arguments.isEmpty()) {
+                    "ImplicitAdditionalReceiverValueArgument must not have any arguments, but ${resolvedArgument.arguments} are found"
+                }
+
+                // No varargs and other complicated things can be here
+                val expectedType = parameterDescriptor.type
+                val newContext = context.replaceExpectedType(expectedType)
+
+                checkTypeForValueArgument(
+                        context, newContext, candidateCall, resolvedArgument.receiver.type, argumentTypes, argument = null
+                )?.let {
+                    resultStatus = it
+                }
+            }
         }
         return ValueArgumentsCheckingResult(resultStatus, argumentTypes)
     }
@@ -367,9 +384,9 @@ class CandidateResolver(
             candidateCall: MutableResolvedCall<D>,
             expressionType: KotlinType?,
             argumentTypes: MutableList<KotlinType>,
-            argument: ValueArgument
+            argument: ValueArgument?
     ): ResolutionStatus? {
-        val expression = argument.getArgumentExpression() ?: return null
+        val expression = argument?.getArgumentExpression()
         val expectedType = newContext.expectedType
         var resultStatus: ResolutionStatus? = null
         var matchStatus = ArgumentMatchStatus.SUCCESS
@@ -379,7 +396,11 @@ class CandidateResolver(
         }
         else if (!noExpectedType(expectedType)) {
             if (!ArgumentTypeResolver.isSubtypeOfForArgumentType(expressionType, expectedType)) {
-                val smartCast = smartCastValueArgumentTypeIfPossible(expression, newContext.expectedType, expressionType, newContext)
+                val smartCast =
+                    if (expression != null)
+                        smartCastValueArgumentTypeIfPossible(expression, newContext.expectedType, expressionType, newContext)
+                    else null
+
                 if (smartCast == null) {
                     resultStatus = OTHER_ERROR
                     matchStatus = ArgumentMatchStatus.TYPE_MISMATCH
@@ -392,8 +413,8 @@ class CandidateResolver(
                 matchStatus = ArgumentMatchStatus.MATCH_MODULO_UNINFERRED_TYPES
             }
 
-            val spreadElement = argument.getSpreadElement()
-            if (spreadElement != null && !expressionType.isFlexible() && expressionType.isMarkedNullable) {
+            val spreadElement = argument?.getSpreadElement()
+            if (spreadElement != null && expression != null && !expressionType.isFlexible() && expressionType.isMarkedNullable) {
                 val dataFlowValue = DataFlowValueFactory.createDataFlowValue(expression, expressionType, context)
                 val smartCastResult = SmartCastManager.checkAndRecordPossibleCast(dataFlowValue, expectedType, expression, context,
                                                                                   call = null, recordExpressionType = false)
@@ -404,7 +425,9 @@ class CandidateResolver(
         }
 
         argumentTypes.addIfNotNull(resultingType)
-        candidateCall.recordArgumentMatchStatus(argument, matchStatus)
+        if (argument != null) {
+            candidateCall.recordArgumentMatchStatus(argument, matchStatus)
+        }
         return resultStatus
     }
 

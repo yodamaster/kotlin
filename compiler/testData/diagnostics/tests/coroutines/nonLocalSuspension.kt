@@ -62,7 +62,7 @@ fun foo() {
             suspendHere()
 
             another(1)
-            <!NON_LOCAL_SUSPENSION_POINT!>another<!>("")
+            another(<!TYPE_MISMATCH!>""<!>)
         }
     }
 }

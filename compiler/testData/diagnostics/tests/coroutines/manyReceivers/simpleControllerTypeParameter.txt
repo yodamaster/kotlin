@@ -1,0 +1,16 @@
+package
+
+public fun </*0*/ E> builder(/*0*/ coroutine c: Controller<E>.() -> kotlin.coroutines.Continuation<kotlin.Unit>): kotlin.Unit
+public fun test(): kotlin.Unit
+public suspend fun </*0*/ V, /*1*/ E> V.await(/*0*/ f: () -> V, /*1*/ machine: kotlin.coroutines.Continuation<V>, /*2*/ controller: Controller<E>): kotlin.Unit
+public suspend fun </*0*/ V, /*1*/ E> kotlin.Int.await(/*0*/ machine: kotlin.coroutines.Continuation<V>, /*1*/ controller: Controller<E>): kotlin.Unit
+public suspend fun </*0*/ V, /*1*/ E> V.inferFromReceiver(/*0*/ machine: kotlin.coroutines.Continuation<V>, /*1*/ controller: Controller<E>): kotlin.Unit
+public suspend fun </*0*/ E> kotlin.String.severalParams(/*0*/ x: kotlin.String, /*1*/ y: kotlin.Int, /*2*/ machine: kotlin.coroutines.Continuation<kotlin.Double>, /*3*/ controller: Controller<E>): kotlin.Unit
+public suspend fun </*0*/ E> kotlin.String.yieldString(/*0*/ c: kotlin.coroutines.Continuation<kotlin.Unit>, /*1*/ controller: Controller<E>): kotlin.Unit
+
+@kotlin.coroutines.AllowSuspendExtensions public final class Controller</*0*/ E> {
+    public constructor Controller</*0*/ E>()
+    public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+}

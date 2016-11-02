@@ -34,9 +34,9 @@ import org.jetbrains.kotlin.resolve.calls.context.ResolutionContext
 import org.jetbrains.kotlin.resolve.calls.context.ResolutionResultsCache
 import org.jetbrains.kotlin.resolve.calls.context.TemporaryTraceAndCache
 import org.jetbrains.kotlin.resolve.calls.inference.*
-import org.jetbrains.kotlin.resolve.calls.inference.constraintPosition.ConstraintPosition
 import org.jetbrains.kotlin.resolve.calls.inference.constraintPosition.ConstraintPositionKind.RECEIVER_POSITION
 import org.jetbrains.kotlin.resolve.calls.inference.constraintPosition.ConstraintPositionKind.VALUE_PARAMETER_POSITION
+import org.jetbrains.kotlin.resolve.calls.model.ImplicitAdditionalReceiverValueArgument
 import org.jetbrains.kotlin.resolve.calls.resolvedCallUtil.makeNullableTypeIfSafeReceiver
 import org.jetbrains.kotlin.resolve.calls.results.ResolutionStatus
 import org.jetbrains.kotlin.resolve.calls.results.ResolutionStatus.INCOMPLETE_TYPE_INFERENCE
@@ -70,6 +70,12 @@ class GenericCandidateResolver(private val argumentTypeResolver: ArgumentTypeRes
                 // We'll type check the arguments later, with the inferred types expected
                 addConstraintForValueArgument(
                         valueArgument, valueParameterDescriptor, substituteDontCare, builder, context, SHAPE_FUNCTION_ARGUMENTS
+                )
+            }
+
+            if (resolvedValueArgument is ImplicitAdditionalReceiverValueArgument) {
+                addConstraintForValueArgument(
+                        builder, valueParameterDescriptor.type, resolvedValueArgument.receiver.type, candidateParameter
                 )
             }
         }
@@ -133,21 +139,23 @@ class GenericCandidateResolver(private val argumentTypeResolver: ArgumentTypeRes
         val typeInfoForCall = argumentTypeResolver.getArgumentTypeInfo(argumentExpression, newContext, resolveFunctionArgumentBodies)
         context.candidateCall.dataFlowInfoForArguments.updateInfo(valueArgument, typeInfoForCall.dataFlowInfo)
 
-        val constraintPosition = VALUE_PARAMETER_POSITION.position(valueParameterDescriptor.index)
-
-        if (addConstraintForNestedCall(argumentExpression, constraintPosition, builder, newContext, effectiveExpectedType)) return
+        if (addConstraintForNestedCall(argumentExpression, valueParameterDescriptor, builder, newContext, effectiveExpectedType)) return
 
         val type = updateResultTypeForSmartCasts(typeInfoForCall.type, argumentExpression, context.replaceDataFlowInfo(dataFlowInfoForArgument))
+        addConstraintForValueArgument(builder, effectiveExpectedType, type, valueParameterDescriptor)
+    }
+
+    private fun addConstraintForValueArgument(builder: ConstraintSystem.Builder, effectiveExpectedType: KotlinType, type: KotlinType?, valueParameterDescriptor: ValueParameterDescriptor) {
         builder.addSubtypeConstraint(
                 type,
                 builder.compositeSubstitutor().substitute(effectiveExpectedType, Variance.INVARIANT),
-                constraintPosition
+                VALUE_PARAMETER_POSITION.position(valueParameterDescriptor.index)
         )
     }
 
     private fun addConstraintForNestedCall(
             argumentExpression: KtExpression?,
-            constraintPosition: ConstraintPosition,
+            valueParameterDescriptor: ValueParameterDescriptor,
             builder: ConstraintSystem.Builder,
             context: CallCandidateResolutionContext<*>,
             effectiveExpectedType: KotlinType
@@ -177,11 +185,7 @@ class GenericCandidateResolver(private val argumentTypeResolver: ArgumentTypeRes
         // Safe call result must be nullable if receiver is nullable
         val argumentExpressionType = nestedCall.makeNullableTypeIfSafeReceiver(candidateWithFreshVariables.returnType, context)
 
-        builder.addSubtypeConstraint(
-                argumentExpressionType,
-                builder.compositeSubstitutor().substitute(effectiveExpectedType, Variance.INVARIANT),
-                constraintPosition
-        )
+        addConstraintForValueArgument(builder, effectiveExpectedType, argumentExpressionType, valueParameterDescriptor)
 
         return true
     }

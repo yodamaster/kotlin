@@ -23,6 +23,7 @@ import org.jetbrains.kotlin.config.LanguageVersionSettings
 import org.jetbrains.kotlin.coroutines.controllerTypeIfCoroutine
 import org.jetbrains.kotlin.coroutines.resolveCoroutineHandleResultCallIfNeeded
 import org.jetbrains.kotlin.descriptors.CallableDescriptor
+import org.jetbrains.kotlin.diagnostics.Errors
 import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.resolve.*
 import org.jetbrains.kotlin.resolve.BindingContext.CONSTRAINT_SYSTEM_COMPLETER
@@ -52,6 +53,7 @@ import org.jetbrains.kotlin.types.ErrorUtils
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.TypeUtils
 import org.jetbrains.kotlin.types.Variance
+import org.jetbrains.kotlin.types.checker.KotlinTypeChecker
 import org.jetbrains.kotlin.types.expressions.DataFlowAnalyzer
 import org.jetbrains.kotlin.types.expressions.FakeCallResolver
 import java.util.*
@@ -86,13 +88,7 @@ class CallCompleter(
         }
 
         if (resolvedCall != null) {
-            val calleeExpression = if (resolvedCall is VariableAsFunctionResolvedCall)
-                resolvedCall.variableCall.call.calleeExpression
-            else
-                resolvedCall.call.calleeExpression
-            val reportOn =
-                    if (calleeExpression != null && !calleeExpression.isFakeElement) calleeExpression
-                    else resolvedCall.call.callElement
+            val reportOn = resolvedCall.elementToReportOn()
 
             if (context.trace.wantsDiagnostics()) {
                 val callCheckerContext = CallCheckerContext(context, languageVersionSettings)
@@ -108,6 +104,17 @@ class CallCompleter(
             return results.changeStatusToSuccess()
         }
         return results
+    }
+
+    private fun MutableResolvedCall<*>.elementToReportOn(): KtElement {
+        val calleeExpression = if (this is VariableAsFunctionResolvedCall)
+            this.variableCall.call.calleeExpression
+        else
+            call.calleeExpression
+        val reportOn =
+                if (calleeExpression != null && !calleeExpression.isFakeElement) calleeExpression
+                else call.callElement
+        return reportOn
     }
 
     private fun <D : CallableDescriptor> resolveHandleResultCallForCoroutineLambdaExpressions(
@@ -282,6 +289,18 @@ class CallCompleter(
             val resolvedCall = results.resultingCall
             getArgumentMapping = { argument -> resolvedCall.getArgumentMapping(argument) }
             getDataFlowInfoForArgument = { argument -> resolvedCall.dataFlowInfoForArguments.getInfo(argument) }
+
+            // Check implicit additional receivers
+            for ((parameter, argument) in resolvedCall.valueArguments.entries.filter { it.value is ImplicitAdditionalReceiverValueArgument }) {
+                val implicitReceiverType = (argument as ImplicitAdditionalReceiverValueArgument).receiver.type
+                if (!KotlinTypeChecker.DEFAULT.isSubtypeOf(implicitReceiverType, parameter.type)) {
+                    context.trace.report(
+                            Errors.CONTROLLER_PARAMETER_TYPE_MISMATCH.on(
+                                    resolvedCall.elementToReportOn(), implicitReceiverType, parameter.type
+                            )
+                    )
+                }
+            }
         }
         else {
             getArgumentMapping = { ArgumentUnmapped }

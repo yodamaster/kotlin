@@ -19,6 +19,7 @@ package org.jetbrains.kotlin.resolve.calls.tower
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.incremental.components.LookupLocation
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.resolve.coroutine.CoroutineReceiverValue
 import org.jetbrains.kotlin.resolve.scopes.LexicalScope
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
 import org.jetbrains.kotlin.resolve.scopes.SyntheticConstructorsProvider
@@ -40,6 +41,8 @@ interface ImplicitScopeTower {
     val location: LookupLocation
 
     val isDebuggerContext: Boolean
+
+    val closestCoroutineReceiver: CoroutineReceiverValue?
 }
 
 interface ScopeTowerLevel {

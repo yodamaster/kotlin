@@ -99,7 +99,3 @@ fun FakeCallResolver.resolveCoroutineHandleResultCallIfNeeded(
     }
 }
 
-
-
-fun KotlinType.isValidContinuation() =
-        (constructor.declarationDescriptor as? ClassDescriptor)?.fqNameUnsafe == DescriptorUtils.CONTINUATION_INTERFACE_FQ_NAME.toUnsafe()

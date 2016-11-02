@@ -781,6 +781,9 @@ public interface Errors {
     DiagnosticFactory3<KtExpression, String, KotlinType, KotlinType> RESULT_TYPE_MISMATCH = DiagnosticFactory3.create(ERROR);
     DiagnosticFactory0<KtWhenConditionInRange> TYPE_MISMATCH_IN_RANGE = DiagnosticFactory0.create(ERROR, WHEN_CONDITION_IN_RANGE);
 
+    DiagnosticFactory2<KtElement, KotlinType, KotlinType> CONTROLLER_PARAMETER_TYPE_MISMATCH = DiagnosticFactory2.create(ERROR);
+    DiagnosticFactory0<KtElement> EXPLICIT_CONTROLLER_ARGUMENT = DiagnosticFactory0.create(ERROR);
+
     DiagnosticFactory1<KtParameter, KotlinType> EXPECTED_PARAMETER_TYPE_MISMATCH = DiagnosticFactory1.create(ERROR);
     DiagnosticFactory2<KtFunction, Integer, List<KotlinType>> EXPECTED_PARAMETERS_NUMBER_MISMATCH =
             DiagnosticFactory2.create(ERROR, FUNCTION_PARAMETERS);

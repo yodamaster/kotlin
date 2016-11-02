@@ -50,11 +50,11 @@ fun test() {
 
         <!UNRESOLVED_REFERENCE_WRONG_RECEIVER!>wrongReceiver<!>(1)
 
+        "".wrongReceiver(2<!NO_VALUE_FOR_PARAMETER!>)<!>
         with("") {
             wrongReceiver(2<!NO_VALUE_FOR_PARAMETER!>)<!>
         }
 
-        // Though such calls are allowed declarations with not-annotated receiver should be prohibited
         anyReceiver(3)
     }
 }

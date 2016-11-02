@@ -1,0 +1,28 @@
+package
+
+public fun builder1(/*0*/ coroutine c: Controller1.() -> kotlin.coroutines.Continuation<kotlin.Unit>): kotlin.Unit
+public fun </*0*/ E> builder2(/*0*/ coroutine c: Controller2<E>.() -> kotlin.coroutines.Continuation<kotlin.Unit>): kotlin.Unit
+public fun test(): kotlin.Unit
+
+public final class A {
+    public constructor A()
+    public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    public final fun test(): kotlin.Unit
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+    public final suspend fun kotlin.String.foo(/*0*/ x: kotlin.coroutines.Continuation<kotlin.Int>, /*1*/ y: Controller1): kotlin.Unit
+}
+
+@kotlin.coroutines.AllowSuspendExtensions public final class Controller1 {
+    public constructor Controller1()
+    public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+}
+
+@kotlin.coroutines.AllowSuspendExtensions public final class Controller2</*0*/ T> {
+    public constructor Controller2</*0*/ T>()
+    public open override /*1*/ /*fake_override*/ fun equals(/*0*/ other: kotlin.Any?): kotlin.Boolean
+    public open override /*1*/ /*fake_override*/ fun hashCode(): kotlin.Int
+    public open override /*1*/ /*fake_override*/ fun toString(): kotlin.String
+}

@@ -34,6 +34,7 @@ import org.jetbrains.kotlin.resolve.calls.tasks.TracingStrategy
 import org.jetbrains.kotlin.resolve.calls.util.CallMaker
 import org.jetbrains.kotlin.resolve.coroutine.REPLACED_SUSPENSION_POINT_KEY
 import org.jetbrains.kotlin.resolve.coroutine.SUSPENSION_POINT_KEY
+import org.jetbrains.kotlin.resolve.coroutine.isSuspensionPointView
 import org.jetbrains.kotlin.types.TypeConstructorSubstitution
 import org.jetbrains.kotlin.types.TypeSubstitutor
 import org.jetbrains.kotlin.types.typeUtil.asTypeProjection
@@ -140,8 +141,7 @@ fun createResolvedCallForHandleExceptionCall(
 }
 
 fun ResolvedCall<*>.isSuspensionPoint() =
-        (candidateDescriptor as? FunctionDescriptor)?.let { it.isSuspend && it.getUserData(SUSPENSION_POINT_KEY) ?: false }
-        ?: false
+        (candidateDescriptor as? FunctionDescriptor)?.isSuspensionPointView() == true
 
 private fun FunctionDescriptor.createCustomCopy(
         copySettings: FunctionDescriptor.CopyBuilder<out FunctionDescriptor>.(FunctionDescriptor) -> FunctionDescriptor.CopyBuilder<out FunctionDescriptor>

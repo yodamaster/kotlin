@@ -466,6 +466,8 @@ public class DefaultErrorMessages {
         MAP.put(NON_EXHAUSTIVE_WHEN, "''when'' expression on enum is recommended to be exhaustive, add {0}", RENDER_WHEN_MISSING_CASES);
 
         MAP.put(TYPE_MISMATCH_IN_RANGE, "Type mismatch: incompatible types of range and element checked in it");
+        MAP.put(CONTROLLER_PARAMETER_TYPE_MISMATCH, "Expected coroutine controller type is ''{1}'', but ''{0}'' is found", RENDER_TYPE, RENDER_TYPE);
+        MAP.put(EXPLICIT_CONTROLLER_ARGUMENT, "Passing controller argument explicitly is prohibited for suspension calls");
         MAP.put(CYCLIC_INHERITANCE_HIERARCHY, "There's a cycle in the inheritance hierarchy for this type");
         MAP.put(CYCLIC_GENERIC_UPPER_BOUND, "Type parameter has cyclic upper bounds");
 

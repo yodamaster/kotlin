@@ -23,9 +23,7 @@ import kotlin.collections.CollectionsKt;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.kotlin.builtins.functions.FunctionInvokeDescriptor;
-import org.jetbrains.kotlin.descriptors.CallableDescriptor;
-import org.jetbrains.kotlin.descriptors.CallableMemberDescriptor;
-import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor;
+import org.jetbrains.kotlin.descriptors.*;
 import org.jetbrains.kotlin.diagnostics.Diagnostic;
 import org.jetbrains.kotlin.name.Name;
 import org.jetbrains.kotlin.psi.*;
@@ -33,7 +31,10 @@ import org.jetbrains.kotlin.resolve.OverrideResolver;
 import org.jetbrains.kotlin.resolve.calls.callUtil.CallUtilKt;
 import org.jetbrains.kotlin.resolve.calls.model.*;
 import org.jetbrains.kotlin.resolve.calls.tasks.TracingStrategy;
+import org.jetbrains.kotlin.resolve.coroutine.CoroutineReceiverValue;
+import org.jetbrains.kotlin.resolve.coroutine.CoroutineUtilKt;
 import org.jetbrains.kotlin.resolve.descriptorUtil.DescriptorUtilsKt;
+import org.jetbrains.kotlin.resolve.scopes.LexicalScope;
 
 import java.util.Iterator;
 import java.util.List;
@@ -72,10 +73,11 @@ public class ValueArgumentsToParametersMapper {
     public static <D extends CallableDescriptor> Status mapValueArgumentsToParameters(
             @NotNull Call call,
             @NotNull TracingStrategy tracing,
-            @NotNull MutableResolvedCall<D> candidateCall
+            @NotNull MutableResolvedCall<D> candidateCall,
+            @Nullable LexicalScope lexicalScope
     ) {
         //return new ValueArgumentsToParametersMapper().process(call, tracing, candidateCall, unmappedArguments);
-        Processor<D> processor = new Processor<D>(call, candidateCall, tracing);
+        Processor<D> processor = new Processor<D>(call, candidateCall, tracing, lexicalScope);
         processor.process();
         return processor.status;
     }
@@ -85,6 +87,7 @@ public class ValueArgumentsToParametersMapper {
         private final TracingStrategy tracing;
         private final MutableResolvedCall<D> candidateCall;
         private final List<ValueParameterDescriptor> parameters;
+        private final LexicalScope lexicalScope;
 
         private final Map<Name,ValueParameterDescriptor> parameterByName;
         private Map<Name,ValueParameterDescriptor> parameterByNameInOverriddenMethods;
@@ -93,11 +96,17 @@ public class ValueArgumentsToParametersMapper {
         private final Set<ValueParameterDescriptor> usedParameters = Sets.newHashSet();
         private Status status = OK;
 
-        private Processor(@NotNull Call call, @NotNull MutableResolvedCall<D> candidateCall, @NotNull TracingStrategy tracing) {
+        private Processor(
+                @NotNull Call call,
+                @NotNull MutableResolvedCall<D> candidateCall,
+                @NotNull TracingStrategy tracing,
+                @Nullable LexicalScope lexicalScope
+        ) {
             this.call = call;
             this.tracing = tracing;
             this.candidateCall = candidateCall;
             this.parameters = candidateCall.getCandidateDescriptor().getValueParameters();
+            this.lexicalScope = lexicalScope;
 
             this.parameterByName = Maps.newHashMap();
             for (ValueParameterDescriptor valueParameter : parameters) {
@@ -279,11 +288,17 @@ public class ValueArgumentsToParametersMapper {
             }
             else {
                 ValueParameterDescriptor lastParameter = CollectionsKt.last(parameters);
-                if (lastParameter.getVarargElementType() != null) {
+                // If actual last parameter can't be passed explicitly we should skip it to the last by one
+                // when trying to find the match for function literal
+                if (isThereImplicitlyDefinedLastParameter()) {
+                    lastParameter = CollectionsKt.getOrNull(parameters, parameters.size() - 2);
+                }
+
+                if (lastParameter != null && lastParameter.getVarargElementType() != null) {
                     report(VARARG_OUTSIDE_PARENTHESES.on(possiblyLabeledFunctionLiteral));
                     setStatus(ERROR);
                 }
-                else if (!usedParameters.add(lastParameter)) {
+                else if (lastParameter == null || !usedParameters.add(lastParameter)) {
                     report(TOO_MANY_ARGUMENTS.on(possiblyLabeledFunctionLiteral, candidateCall.getCandidateDescriptor()));
                     setStatus(WEAK_ERROR);
                 }
@@ -299,7 +314,36 @@ public class ValueArgumentsToParametersMapper {
             }
         }
 
+        /**
+         * Checks if the considered function is suspension point view and it's last parameter is implicit controller
+         * That means that it must not be passed explicitly, but obtained from the lexical scope.
+         */
+        private boolean isThereImplicitlyDefinedLastParameter() {
+            D descriptor = candidateCall.getCandidateDescriptor();
+            if (!CoroutineUtilKt.isSuspensionPointView(descriptor)) return false;
+            if (!(descriptor instanceof SimpleFunctionDescriptor)) return false;
+            FunctionDescriptor initialSignatureDescriptor = ((SimpleFunctionDescriptor) descriptor).getInitialSignatureDescriptor();
+
+            assert initialSignatureDescriptor != null : "initialSignatureDescriptor can't be null for suspension point " + descriptor;
+
+            return CoroutineUtilKt.isImplicitControllerParameter(CollectionsKt.last(initialSignatureDescriptor.getValueParameters()));
+        }
+
         private void reportUnmappedParameters() {
+            if (isThereImplicitlyDefinedLastParameter() && usedParameters.contains(CollectionsKt.last(parameters))) {
+                ResolvedValueArgument argument = candidateCall.getValueArguments().get(CollectionsKt.last(parameters));
+                KtElement reportOn;
+                if (argument != null && argument instanceof ExpressionValueArgument && ((ExpressionValueArgument) argument).getValueArgument() != null) {
+                    //noinspection ConstantConditions
+                    reportOn = ((ExpressionValueArgument) argument).getValueArgument().asElement();
+                }
+                else {
+                    reportOn = candidateCall.getCall().getCallElement();
+                }
+
+                candidateCall.getTrace().report(EXPLICIT_CONTROLLER_ARGUMENT.on(reportOn));
+            }
+
             for (ValueParameterDescriptor valueParameter : parameters) {
                 if (!usedParameters.contains(valueParameter)) {
                     if (DescriptorUtilsKt.hasDefaultValue(valueParameter)) {
@@ -309,6 +353,15 @@ public class ValueArgumentsToParametersMapper {
                         candidateCall.recordValueArgument(valueParameter, new VarargValueArgument());
                     }
                     else {
+                        if (valueParameter == CollectionsKt.last(parameters) && isThereImplicitlyDefinedLastParameter()) {
+                            CoroutineReceiverValue receiver = CoroutineUtilKt.findClosestCoroutineReceiver(lexicalScope);
+                            if (receiver != null) {
+                                candidateCall.recordValueArgument(
+                                        valueParameter,
+                                        new ImplicitAdditionalReceiverValueArgument(receiver));
+                                continue;
+                            }
+                        }
                         tracing.noValueForParameter(candidateCall.getTrace(), valueParameter);
                         setStatus(ERROR);
                     }

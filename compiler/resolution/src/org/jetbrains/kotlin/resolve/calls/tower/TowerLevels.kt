@@ -24,17 +24,14 @@ import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.calls.smartcasts.getReceiverValueWithSmartCast
 import org.jetbrains.kotlin.resolve.calls.util.FakeCallableDescriptorForObject
 import org.jetbrains.kotlin.resolve.calls.util.FakeCallableDescriptorForTypeAliasObject
-import org.jetbrains.kotlin.resolve.coroutine.CoroutineReceiverValue
 import org.jetbrains.kotlin.resolve.coroutine.createCoroutineSuspensionFunctionView
+import org.jetbrains.kotlin.resolve.coroutine.isValidContinuation
 import org.jetbrains.kotlin.resolve.descriptorUtil.HIDES_MEMBERS_NAME_LIST
 import org.jetbrains.kotlin.resolve.descriptorUtil.hasClassValueDescriptor
 import org.jetbrains.kotlin.resolve.descriptorUtil.hasHidesMembersAnnotation
 import org.jetbrains.kotlin.resolve.descriptorUtil.hasLowPriorityInOverloadResolution
 import org.jetbrains.kotlin.resolve.scopes.*
-import org.jetbrains.kotlin.resolve.scopes.receivers.CastImplicitClassReceiver
-import org.jetbrains.kotlin.resolve.scopes.receivers.ImplicitClassReceiver
-import org.jetbrains.kotlin.resolve.scopes.receivers.QualifierReceiver
-import org.jetbrains.kotlin.resolve.scopes.receivers.ReceiverValueWithSmartCastInfo
+import org.jetbrains.kotlin.resolve.scopes.receivers.*
 import org.jetbrains.kotlin.resolve.scopes.utils.collectFunctions
 import org.jetbrains.kotlin.resolve.scopes.utils.collectVariables
 import org.jetbrains.kotlin.resolve.selectMostSpecificInEachOverridableGroup
@@ -120,11 +117,12 @@ internal class ReceiverScopeTowerLevel(
             }
         }
 
-        if (receiverValue is CoroutineReceiverValue) {
-            result.addAll(result.mapNotNull {
-                val suspensionFunctionView = it.descriptor.createCoroutineSuspensionFunctionView() ?: return@mapNotNull null
+        if (scopeTower.closestCoroutineReceiver != null) {
+            createSuspensionViews(
+                    result.map { it.descriptor }, receiverValue, scopeTower
+            ).mapTo(result) { suspensionFunctionView ->
                 createCandidateDescriptor(suspensionFunctionView, dispatchReceiver)
-            })
+            }
         }
 
         return result
@@ -272,15 +270,31 @@ private fun ResolutionScope.getContributedFunctionsAndConstructors(
     val classifier = getContributedClassifier(name, location)
     val functions = ArrayList<FunctionDescriptor>(getContributedFunctions(name, location))
 
-    if (extensionReceiver?.receiverValue is CoroutineReceiverValue) {
-        functions.mapNotNullTo(functions) { it.createCoroutineSuspensionFunctionView() }
-    }
+    functions.addAll(createSuspensionViews(functions, extensionReceiver?.receiverValue, scopeTower))
 
     return functions +
            (getClassWithConstructors(classifier)?.constructors?.filter { it.dispatchReceiverParameter == null } ?: emptyList()) +
            (classifier?.getTypeAliasConstructors()?.filter { it.dispatchReceiverParameter == null } ?: emptyList()) +
            (classifier?.let { scopeTower.syntheticConstructorsProvider.getSyntheticConstructors(it, location) }
                     ?.filter { it.dispatchReceiverParameter == null } ?: emptyList())
+}
+
+private fun <D : CallableDescriptor> createSuspensionViews(
+        original: Collection<D>,
+        knownReceiver: ReceiverValue?,
+        scopeTower: ImplicitScopeTower
+): Collection<D> {
+    val closestCoroutineReceiver = scopeTower.closestCoroutineReceiver ?: return emptyList()
+
+    val suspendViews = original.mapNotNull { it.createCoroutineSuspensionFunctionView() }
+
+    return if (closestCoroutineReceiver == knownReceiver)
+        suspendViews
+    else
+        // For non-coroutine receiver leave only such functions that receive controller by last parameter
+        suspendViews.filter {
+            (it as? FunctionDescriptor)?.initialSignatureDescriptor?.valueParameters?.lastOrNull()?.type?.isValidContinuation() == false
+        }
 }
 
 private fun ResolutionScope.getContributedObjectVariables(name: Name, location: LookupLocation): Collection<VariableDescriptor> {
