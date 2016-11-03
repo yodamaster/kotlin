@@ -268,4 +268,10 @@ public class KtFile extends PsiFileBase implements KtDeclarationContainer, KtAnn
                     }
                 });
     }
+
+    @NotNull
+    @Override
+    public KtElement getPsiOrParent() {
+        return this;
+    }
 }

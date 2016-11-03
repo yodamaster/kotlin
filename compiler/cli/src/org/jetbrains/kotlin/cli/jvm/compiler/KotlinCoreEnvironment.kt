@@ -93,6 +93,7 @@ import org.jetbrains.kotlin.name.isValidJavaFqName
 import org.jetbrains.kotlin.parsing.KotlinParserDefinition
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.resolve.CodeAnalyzerInitializer
+import org.jetbrains.kotlin.resolve.extensions.SyntheticResolveExtension
 import org.jetbrains.kotlin.resolve.jvm.KotlinJavaPsiFacade
 import org.jetbrains.kotlin.resolve.jvm.extensions.AnalysisCompletedHandlerExtension
 import org.jetbrains.kotlin.resolve.jvm.extensions.PackageFragmentProviderExtension
@@ -166,6 +167,7 @@ class KotlinCoreEnvironment private constructor(
         project.registerService(JvmVirtualFileFinderFactory::class.java, finderFactory)
 
         ExpressionCodegenExtension.registerExtensionPoint(project)
+        SyntheticResolveExtension.registerExtensionPoint(project)
         ClassBuilderInterceptorExtension.registerExtensionPoint(project)
         AnalysisCompletedHandlerExtension.registerExtensionPoint(project)
         PackageFragmentProviderExtension.registerExtensionPoint(project)
