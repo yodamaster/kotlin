@@ -19,9 +19,13 @@ package org.jetbrains.kotlin.resolve.jvm
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.psi.search.GlobalSearchScope
 import org.jetbrains.kotlin.analyzer.*
+import org.jetbrains.kotlin.builtins.JvmBuiltInsPackageFragmentProvider
+import org.jetbrains.kotlin.config.LanguageVersionSettings
 import org.jetbrains.kotlin.config.LanguageVersionSettingsImpl
+import org.jetbrains.kotlin.container.ComponentProvider
 import org.jetbrains.kotlin.container.get
 import org.jetbrains.kotlin.context.ModuleContext
+import org.jetbrains.kotlin.descriptors.PackageFragmentProvider
 import org.jetbrains.kotlin.descriptors.PackagePartProvider
 import org.jetbrains.kotlin.descriptors.impl.CompositePackageFragmentProvider
 import org.jetbrains.kotlin.descriptors.impl.ModuleDescriptorImpl
@@ -29,17 +33,35 @@ import org.jetbrains.kotlin.frontend.java.di.createContainerForLazyResolveWithJa
 import org.jetbrains.kotlin.incremental.components.LookupTracker
 import org.jetbrains.kotlin.load.java.lazy.ModuleClassResolverImpl
 import org.jetbrains.kotlin.load.java.structure.JavaClass
+import org.jetbrains.kotlin.resolve.BindingTrace
 import org.jetbrains.kotlin.resolve.CodeAnalyzerInitializer
 import org.jetbrains.kotlin.resolve.TargetEnvironment
 import org.jetbrains.kotlin.resolve.TargetPlatform
 import org.jetbrains.kotlin.resolve.jvm.extensions.PackageFragmentProviderExtension
 import org.jetbrains.kotlin.resolve.jvm.platform.JvmPlatform
 import org.jetbrains.kotlin.resolve.lazy.ResolveSession
+import org.jetbrains.kotlin.resolve.lazy.declarations.DeclarationProviderFactory
 import org.jetbrains.kotlin.resolve.lazy.declarations.DeclarationProviderFactoryService
 
 class JvmPlatformParameters(
-        val moduleByJavaClass: (JavaClass) -> ModuleInfo?
-) : PlatformAnalysisParameters
+        val trace: BindingTrace?,
+        val languageVersionSettings: LanguageVersionSettings,
+        val lookupTracker: LookupTracker,
+        val useBuiltInsProvider: Boolean, // TODO: load built-ins from module dependencies in IDE
+        val useLazyResolve: Boolean,
+        val moduleByJavaClass: (JavaClass) -> ModuleInfo?,
+        val moduleParameters: (ModuleInfo) -> JvmModuleParameters
+) : PlatformAnalysisParameters {
+    constructor(moduleByJavaClass: (JavaClass) -> ModuleInfo?) : this(
+            null, LanguageVersionSettingsImpl.DEFAULT /* TODO: see KT-12410 */, LookupTracker.DO_NOTHING, false, true, moduleByJavaClass,
+            { _ -> JvmModuleParameters(null, { emptyList() }) }
+    )
+}
+
+class JvmModuleParameters(
+        val customDeclarationProviderFactory: DeclarationProviderFactory?,
+        val getAdditionalProviders: (ComponentProvider) -> List<PackageFragmentProvider>
+)
 
 
 object JvmAnalyzerFacade : AnalyzerFacade<JvmPlatformParameters>() {
@@ -55,10 +77,14 @@ object JvmAnalyzerFacade : AnalyzerFacade<JvmPlatformParameters>() {
     ): ResolverForModule {
         val (syntheticFiles, moduleContentScope) = moduleContent
         val project = moduleContext.project
-        val declarationProviderFactory = DeclarationProviderFactoryService.createDeclarationProviderFactory(
-                project, moduleContext.storageManager, syntheticFiles,
-                if (moduleInfo.isLibrary) GlobalSearchScope.EMPTY_SCOPE else moduleContentScope
-        )
+        val moduleParameters = platformParameters.moduleParameters(moduleInfo)
+
+        val declarationProviderFactory =
+                moduleParameters.customDeclarationProviderFactory
+                ?: DeclarationProviderFactoryService.createDeclarationProviderFactory(
+                        project, moduleContext.storageManager, syntheticFiles,
+                        if (moduleInfo.isLibrary) GlobalSearchScope.EMPTY_SCOPE else moduleContentScope
+                )
 
         val moduleClassResolver = ModuleClassResolverImpl { javaClass ->
             val referencedClassModule = platformParameters.moduleByJavaClass(javaClass)
@@ -78,7 +104,7 @@ object JvmAnalyzerFacade : AnalyzerFacade<JvmPlatformParameters>() {
             resolverForModule.componentProvider.get<JavaDescriptorResolver>()
         }
 
-        val trace = CodeAnalyzerInitializer.getInstance(project).createTrace()
+        val trace = platformParameters.trace ?: CodeAnalyzerInitializer.getInstance(project).createTrace()
         val container = createContainerForLazyResolveWithJava(
                 moduleContext,
                 trace,
@@ -86,18 +112,16 @@ object JvmAnalyzerFacade : AnalyzerFacade<JvmPlatformParameters>() {
                 moduleContentScope,
                 moduleClassResolver,
                 targetEnvironment,
-                LookupTracker.DO_NOTHING,
+                platformParameters.lookupTracker,
                 packagePartProvider,
-                LanguageVersionSettingsImpl.DEFAULT, // TODO: see KT-12410
-                useBuiltInsProvider = false, // TODO: load built-ins from module dependencies in IDE
-                useLazyResolve = true
+                platformParameters.languageVersionSettings,
+                platformParameters.useBuiltInsProvider,
+                platformParameters.useLazyResolve
         )
-        val resolveSession = container.get<ResolveSession>()
-        val javaDescriptorResolver = container.get<JavaDescriptorResolver>()
 
-        val providersForModule = arrayListOf(
-                resolveSession.packageFragmentProvider,
-                javaDescriptorResolver.packageFragmentProvider)
+        val providersForModule = arrayListOf(container.get<ResolveSession>().packageFragmentProvider)
+        providersForModule += moduleParameters.getAdditionalProviders(container)
+        providersForModule += container.get<JavaDescriptorResolver>().packageFragmentProvider
 
         providersForModule += PackageFragmentProviderExtension.getInstances(project)
                 .mapNotNull { it.getPackageFragmentProvider(project, moduleDescriptor, moduleContext.storageManager, trace, moduleInfo) }
