@@ -14,4 +14,4 @@ fun test() {
     D().f<caret>oo
 }
 
-//INFO: <b>public</b> <b>open</b> <b>val</b> foo: Int <i>defined in</i> D<p>This property returns zero.</p>
+//INFO: <b>public</b> <b>open</b> <b>val</b> foo: <a href="psi_element://kotlin.Int">Int</a> <i>defined in</i> D<p>This property returns zero.</p>

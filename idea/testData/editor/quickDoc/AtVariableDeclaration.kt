@@ -5,4 +5,4 @@ fun test() {
 }
 
 
-//INFO: <b>val</b> test: String? <i>defined in</i> test
+//INFO: <b>val</b> test: <a href="psi_element://kotlin.String">String</a>? <i>defined in</i> test
