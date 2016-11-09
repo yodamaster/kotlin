@@ -32,6 +32,7 @@ import org.jetbrains.kotlin.idea.codeInsight.DescriptorToSourceUtilsIde
 import org.jetbrains.kotlin.idea.core.completion.DeclarationLookupObject
 import org.jetbrains.kotlin.idea.kdoc.KDocRenderer
 import org.jetbrains.kotlin.idea.kdoc.findKDoc
+import org.jetbrains.kotlin.idea.kdoc.isBoringBuiltinClass
 import org.jetbrains.kotlin.idea.kdoc.resolveKDocLink
 import org.jetbrains.kotlin.idea.references.mainReference
 import org.jetbrains.kotlin.psi.*
@@ -47,6 +48,8 @@ import org.jetbrains.kotlin.utils.addToStdlib.constant
 class HtmlClassifierNamePolicy(val base: ClassifierNamePolicy) : ClassifierNamePolicy {
     override fun renderClassifier(classifier: ClassifierDescriptor, renderer: DescriptorRenderer): String {
         val name = base.renderClassifier(classifier, renderer)
+        if (classifier.isBoringBuiltinClass())
+            return name
         return buildString {
             val ref = classifier.fqNameUnsafe.toString()
             DocumentationManagerUtil.createHyperlink(this, ref, name, true)

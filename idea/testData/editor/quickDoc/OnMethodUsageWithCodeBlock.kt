@@ -24,7 +24,7 @@ fun test() {
     <caret>testMethod(1, "value")
 }
 
-//INFO: <b>public</b> <b>fun</b> testMethod(): <a href="psi_element://kotlin.Unit">Unit</a> <i>defined in</i> root package<p>Some documentation.</p>
+//INFO: <b>public</b> <b>fun</b> testMethod(): Unit <i>defined in</i> root package<p>Some documentation.</p>
 //INFO: <pre><code>
 //INFO: Code block
 //INFO:     Second line
