@@ -16,12 +16,24 @@
 
 package org.jetbrains.kotlin.idea.kdoc
 
+import org.jetbrains.kotlin.builtins.KotlinBuiltIns.FQ_NAMES
 import org.jetbrains.kotlin.descriptors.ClassifierDescriptor
 import org.jetbrains.kotlin.resolve.DescriptorUtils
 
 private val boringBuiltinClasses = setOf(
-        "kotlin.Unit", "kotlin.Byte", "kotlin.Short", "kotlin.Int", "kotlin.Long", "kotlin.Char", "kotlin.Boolean",
-        "kotlin.Float", "kotlin.Double", "kotlin.String", "kotlin.Array", "kotlin.Any")
+        FQ_NAMES.unit,
+        FQ_NAMES._byte,
+        FQ_NAMES._short,
+        FQ_NAMES._int,
+        FQ_NAMES._long,
+        FQ_NAMES._char,
+        FQ_NAMES._boolean,
+        FQ_NAMES._float,
+        FQ_NAMES._double,
+        FQ_NAMES.string,
+        FQ_NAMES.array,
+        FQ_NAMES.any
+)
 
 fun ClassifierDescriptor.isBoringBuiltinClass(): Boolean =
-        DescriptorUtils.getFqName(this).asString() in boringBuiltinClasses
+        DescriptorUtils.getFqName(this) in boringBuiltinClasses
