@@ -252,7 +252,7 @@ public final class Translation {
     ) {
         StaticContext staticContext = StaticContext.generateStaticContext(bindingTrace, config, moduleDescriptor);
         JsProgram program = staticContext.getProgram();
-        program.getRootScope().declareName("_");
+        JsName rootPackageName = program.getRootScope().declareName(Namer.getRootPackageName());
 
         JsFunction rootFunction = staticContext.getRootFunction();
         JsBlock rootBlock = rootFunction.getBody();
@@ -269,8 +269,6 @@ public final class Translation {
         }
 
         mayBeGenerateTests(files, config, rootBlock, context);
-
-        JsName rootPackageName = program.getRootScope().declareName(Namer.getRootPackageName());
         rootFunction.getParameters().add(new JsParameter((rootPackageName)));
 
         // Invoke function passing modules as arguments
