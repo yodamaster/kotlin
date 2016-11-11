@@ -36,6 +36,18 @@ public class KDocCompletionTestGenerated extends AbstractJvmBasicCompletionTest 
         KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("idea/idea-completion/testData/kdoc"), Pattern.compile("^(.+)\\.kt$"), TargetBackend.ANY, true);
     }
 
+    @TestMetadata("ExtensionsFQLink.kt")
+    public void testExtensionsFQLink() throws Exception {
+        String fileName = KotlinTestUtils.navigationMetadata("idea/idea-completion/testData/kdoc/ExtensionsFQLink.kt");
+        doTest(fileName);
+    }
+
+    @TestMetadata("ExtensionsForSubClassFQLink.kt")
+    public void testExtensionsForSubClassFQLink() throws Exception {
+        String fileName = KotlinTestUtils.navigationMetadata("idea/idea-completion/testData/kdoc/ExtensionsForSubClassFQLink.kt");
+        doTest(fileName);
+    }
+
     @TestMetadata("FQLink.kt")
     public void testFQLink() throws Exception {
         String fileName = KotlinTestUtils.navigationMetadata("idea/idea-completion/testData/kdoc/FQLink.kt");

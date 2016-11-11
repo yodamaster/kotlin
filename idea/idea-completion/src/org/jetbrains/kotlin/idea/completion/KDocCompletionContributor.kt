@@ -47,6 +47,8 @@ import org.jetbrains.kotlin.psi.psiUtil.getParentOfType
 import org.jetbrains.kotlin.psi.psiUtil.getStrictParentOfType
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.calls.smartcasts.DataFlowInfo
+import org.jetbrains.kotlin.resolve.descriptorUtil.isExtension
+import org.jetbrains.kotlin.resolve.descriptorUtil.isExtensionProperty
 import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
 import org.jetbrains.kotlin.resolve.scopes.LexicalScope
 import org.jetbrains.kotlin.resolve.scopes.utils.collectDescriptorsFiltered
@@ -122,7 +124,7 @@ class KDocNameCompletionSession(
                 if (extensionReceiver != null) {
                     val substituted = descriptor.substituteExtensionIfCallable(implicitReceivers, bindingContext, DataFlowInfo.EMPTY,
                                                                                CallType.DEFAULT, moduleDescriptor)
-                    return !substituted.isEmpty()
+                    return substituted.isNotEmpty()
                 }
             }
             return true
@@ -131,12 +133,14 @@ class KDocNameCompletionSession(
         @Suppress("IfThenToElvis")
         return (
                 if (collectFormParentScopes)
-                    scope.collectDescriptorsFiltered(nameFilter = nameFilter)
+                    scope.collectDescriptorsFiltered(nameFilter = nameFilter).asSequence()
                 else if (scope is LexicalScope.Empty)
-                    scope.parent.getContributedDescriptors(nameFilter = nameFilter)
+                    scope.parent.getContributedDescriptors(nameFilter = nameFilter).asSequence()
                 else
-                    scope.getContributedDescriptors(nameFilter = nameFilter)
-               ).asSequence().filter(::isApplicable)
+                    (scope.getContributedDescriptors(nameFilter = nameFilter).asSequence()
+                     + scope.parent.collectDescriptorsFiltered(nameFilter = nameFilter).asSequence()
+                             .filter { it.isExtension || it.isExtensionProperty })
+               ).filter(::isApplicable)
     }
 
 
