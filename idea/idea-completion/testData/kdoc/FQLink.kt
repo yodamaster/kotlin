@@ -11,6 +11,9 @@ fun bar() {
 
 }
 
+class Z
+
+// EXIST: Z
 // EXIST: f
 // EXIST: bar
-
+// ABSENT: z
