@@ -224,7 +224,7 @@ public final class ExpressionVisitor extends TranslatorVisitor<JsNode> {
                 : "::class expression should be type checked to a KClass: " + expressionType;
 
         KotlinType type = CollectionsKt.single(expressionType.getArguments()).getType();
-        JsNameRef referenceToJsClass = UtilsKt.getReferenceToJsClass(type, context);
+        JsExpression referenceToJsClass = UtilsKt.getReferenceToJsClass(type, context);
 
         ClassifierDescriptor typeClassifier = type.getConstructor().getDeclarationDescriptor();
         if (typeClassifier != null && DescriptorUtils.isEnumEntry(typeClassifier)) {

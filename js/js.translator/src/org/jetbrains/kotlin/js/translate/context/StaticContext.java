@@ -431,7 +431,7 @@ public final class StaticContext {
                     }
                     if (descriptor instanceof ConstructorDescriptor) {
                         if (((ConstructorDescriptor) descriptor).isPrimary()) {
-                            return getInnerNameForDescriptor(((ConstructorDescriptor) descriptor).getConstructedClass());
+                            return getInnerNameForDescriptor(((ConstructorDescriptor) descriptor).getContainingDeclaration());
                         }
                     }
                     return localOrImportedName(descriptor, getSuggestedName(descriptor));

@@ -204,7 +204,7 @@ class ClassTranslator private constructor(
                 .innerWithUsageTracker(constructorScope, constructorDescriptor)
                 .innerContextWithAliased(receiverDescriptor, thisNameRef)
 
-        val outerClassName = context.getOuterClassReference(classDescriptor);
+        val outerClassName = context.getOuterClassReference(classDescriptor)
         val outerClass = DescriptorUtils.getContainingClass(classDescriptor)
         if (outerClassName != null) {
             val outerClassReceiver = outerClass!!.thisAsReceiverParameter

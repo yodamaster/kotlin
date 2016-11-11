@@ -81,7 +81,7 @@ object DefaultVariableAccessCase : VariableAccessCase() {
         }
 
         if (descriptor is FakeCallableDescriptorForObject) {
-            return ReferenceTranslator.translateAsValueReference(descriptor.getReferencedObject(), context)
+            return ReferenceTranslator.translateAsValueReference(descriptor.getReferencedDescriptor(), context)
         }
 
         val functionRef = ReferenceTranslator.translateAsValueReference(callableDescriptor, context)

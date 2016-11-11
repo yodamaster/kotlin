@@ -86,8 +86,6 @@ abstract class AbstractDeclarationVisitor : TranslatorVisitor<Unit>()  {
         addFunction(descriptor, translateFunction(descriptor, expression, context))
     }
 
-    override fun visitTypeAlias(typeAlias: KtTypeAlias, data: TranslationContext?) {}
-
     private fun translateFunction(
             descriptor: FunctionDescriptor,
             expression: KtDeclarationWithBody,

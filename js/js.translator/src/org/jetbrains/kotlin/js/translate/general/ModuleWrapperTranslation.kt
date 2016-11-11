@@ -107,7 +107,6 @@ object ModuleWrapperTranslation {
             importedModules: List<String>, program: JsProgram
     ): List<JsStatement> {
         val invocation = makePlainInvocation(moduleId, function, importedModules, program)
-        val invocation = makePlainInvocation(function, importedModules, program)
         val statements = mutableListOf<JsStatement>()
 
         for (importedModule in importedModules) {

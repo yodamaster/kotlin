@@ -17,7 +17,6 @@
 package org.jetbrains.kotlin.js.translate.reference
 
 import com.google.dart.compiler.backend.js.ast.*
-import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.js.resolve.diagnostics.ErrorsJs
 import org.jetbrains.kotlin.js.translate.context.TranslationContext

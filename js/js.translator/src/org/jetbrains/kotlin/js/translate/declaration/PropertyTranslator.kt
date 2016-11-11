@@ -62,7 +62,7 @@ fun translateAccessors(
 }
 
 fun MutableList<JsPropertyInitializer>.addGetterAndSetter(
-        descriptor: VariableDescriptorWithAccessors,
+        descriptor: PropertyDescriptor,
         generateGetter: () -> JsPropertyInitializer,
         generateSetter: () -> JsPropertyInitializer
 ) {
@@ -73,11 +73,11 @@ fun MutableList<JsPropertyInitializer>.addGetterAndSetter(
 }
 
 class DefaultPropertyTranslator(
-        val descriptor: VariableDescriptorWithAccessors,
+        val descriptor: PropertyDescriptor,
         context: TranslationContext,
         val delegateReference: JsExpression
 ) : AbstractTranslator(context) {
-    fun generateDefaultGetterFunction(getterDescriptor: VariableAccessorDescriptor, function: JsFunction) {
+    fun generateDefaultGetterFunction(getterDescriptor: PropertyAccessorDescriptor, function: JsFunction) {
         val delegatedCall = bindingContext()[BindingContext.DELEGATED_PROPERTY_RESOLVED_CALL, getterDescriptor]
 
         if (delegatedCall != null) {
@@ -86,12 +86,12 @@ class DefaultPropertyTranslator(
 
         assert(!descriptor.isExtension) { "Unexpected extension property $descriptor}" }
         assert(descriptor is PropertyDescriptor) { "Property descriptor expected: $descriptor" }
-        val result = backingFieldReference(context(), descriptor as PropertyDescriptor)
+        val result = backingFieldReference(context(), descriptor)
         function.body.statements += JsReturn(result)
     }
 
     private fun generateDelegatedGetterFunction(
-            getterDescriptor: VariableAccessorDescriptor,
+            getterDescriptor: PropertyAccessorDescriptor,
             delegatedCall: ResolvedCall<FunctionDescriptor>,
             function: JsFunction
     ) {
@@ -108,9 +108,9 @@ class DefaultPropertyTranslator(
         function.addStatement(returnResult)
     }
 
-    fun generateDefaultSetterFunction(setterDescriptor: VariableAccessorDescriptor, function: JsFunction) {
+    fun generateDefaultSetterFunction(setterDescriptor: PropertyAccessorDescriptor, function: JsFunction) {
         assert(setterDescriptor.valueParameters.size == 1) { "Setter must have 1 parameter" }
-        val correspondingPropertyName = setterDescriptor.correspondingVariable.name.asString()
+        val correspondingPropertyName = setterDescriptor.correspondingProperty.name.asString()
         val valueParameter = function.addParameter(correspondingPropertyName).name
         val withAliased = context().innerContextWithAliased(setterDescriptor.valueParameters[0], valueParameter.makeRef())
         val delegatedCall = bindingContext()[BindingContext.DELEGATED_PROPERTY_RESOLVED_CALL, setterDescriptor]
@@ -128,15 +128,15 @@ class DefaultPropertyTranslator(
         else {
             assert(!descriptor.isExtension) { "Unexpected extension property $descriptor}" }
             assert(descriptor is PropertyDescriptor) { "Property descriptor expected: $descriptor" }
-            val assignment = assignmentToBackingField(withAliased, descriptor as PropertyDescriptor, valueParameter.makeRef())
+            val assignment = assignmentToBackingField(withAliased, descriptor, valueParameter.makeRef())
             function.addStatement(assignment.makeStmt())
         }
     }
 
     private fun contextWithPropertyMetadataCreationIntrinsified(
-            context: TranslationContext, delegatedCall: ResolvedCall<FunctionDescriptor>, accessor: VariableAccessorDescriptor
+            context: TranslationContext, delegatedCall: ResolvedCall<FunctionDescriptor>, accessor: PropertyAccessorDescriptor
     ): TranslationContext {
-        val propertyNameLiteral = context.program().getStringLiteral(accessor.correspondingVariable.name.asString())
+        val propertyNameLiteral = context.program().getStringLiteral(accessor.correspondingProperty.name.asString())
         // 0th argument is instance, 1st is KProperty, 2nd (for setter) is value
         val fakeArgumentExpression =
                 (delegatedCall.valueArgumentsByIndex!![1] as ExpressionValueArgument).valueArgument!!.getArgumentExpression()
@@ -152,7 +152,7 @@ fun KtProperty.hasCustomGetter() = getter?.hasBody() ?: false
 fun KtProperty.hasCustomSetter() = setter?.hasBody() ?: false
 
 private class PropertyTranslator(
-        val descriptor: VariableDescriptorWithAccessors,
+        val descriptor: PropertyDescriptor,
         val declaration: KtProperty?,
         context: TranslationContext
 ) : AbstractTranslator(context) {
@@ -193,7 +193,7 @@ private class PropertyTranslator(
         return generateDefaultAccessor(setterDescriptor, defaultFunction)
     }
 
-    private fun generateDefaultAccessor(accessorDescriptor: VariableAccessorDescriptor, function: JsFunction): JsPropertyInitializer =
+    private fun generateDefaultAccessor(accessorDescriptor: PropertyAccessorDescriptor, function: JsFunction): JsPropertyInitializer =
             translateFunctionAsEcma5PropertyDescriptor(function, accessorDescriptor, context())
 
     private fun translateCustomAccessor(expression: KtPropertyAccessor): JsPropertyInitializer {
@@ -202,15 +202,15 @@ private class PropertyTranslator(
         return Translation.functionTranslator(expression, context(), function).translateAsEcma5PropertyDescriptor()
     }
 
-    private fun createFunction(descriptor: VariableAccessorDescriptor) =
+    private fun createFunction(descriptor: PropertyAccessorDescriptor) =
             JsFunction(context().getScopeForDescriptor(descriptor), JsBlock(), accessorDescription(descriptor))
 
-    private fun accessorDescription(accessorDescriptor: VariableAccessorDescriptor): String {
+    private fun accessorDescription(accessorDescriptor: PropertyAccessorDescriptor): String {
         val accessorType =
                 when (accessorDescriptor) {
-                    is PropertyGetterDescriptor, is LocalVariableAccessorDescriptor.Getter ->
+                    is PropertyGetterDescriptor ->
                         "getter"
-                    is PropertySetterDescriptor, is LocalVariableAccessorDescriptor.Setter ->
+                    is PropertySetterDescriptor ->
                         "setter"
                     else ->
                         throw IllegalArgumentException("Unknown accessor type ${accessorDescriptor.javaClass}")

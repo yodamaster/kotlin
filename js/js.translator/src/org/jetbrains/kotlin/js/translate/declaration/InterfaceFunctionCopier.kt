@@ -115,11 +115,11 @@ class InterfaceFunctionCopier(val context: StaticContext) {
 
     private fun generateBridges(member: CallableMemberDescriptor): Sequence<CallableMemberDescriptor> = when (member) {
         is FunctionDescriptor -> {
-            generateBridgesForFunctionDescriptor(member, identity()) { false }
+            generateBridgesForFunctionDescriptor(member, identity())
                     .map { it.from }
                     .asSequence()
         }
-        is PropertyDescriptor -> generateBridgesForFunctionDescriptor(member.getter!!, identity()) { false }
+        is PropertyDescriptor -> generateBridgesForFunctionDescriptor(member.getter!!, identity())
                 .map { it.from }
                 .map { (it as PropertyAccessorDescriptor).correspondingProperty }
                 .asSequence()
