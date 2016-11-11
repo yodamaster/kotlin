@@ -25,7 +25,6 @@ import org.jetbrains.kotlin.js.config.JsConfig;
 import org.jetbrains.kotlin.js.translate.intrinsic.Intrinsics;
 import org.jetbrains.kotlin.js.translate.utils.JsAstUtils;
 import org.jetbrains.kotlin.js.translate.utils.TranslationUtils;
-import org.jetbrains.kotlin.name.FqName;
 import org.jetbrains.kotlin.psi.KtExpression;
 import org.jetbrains.kotlin.resolve.BindingContext;
 import org.jetbrains.kotlin.resolve.BindingTrace;
@@ -174,11 +173,6 @@ public class TranslationContext {
         return this.innerWithAliasingContext(aliasingContext.withDescriptorsAliased(aliases));
     }
 
-    @NotNull
-    public JsName importDeclaration(@NotNull String suggestedName, @NotNull JsExpression declaration) {
-        return staticContext.importDeclaration(suggestedName, declaration);
-    }
-
     @Nullable
     private JsBlock getBlockForDescriptor(@NotNull DeclarationDescriptor descriptor) {
         if (descriptor instanceof CallableDescriptor) {
@@ -231,11 +225,6 @@ public class TranslationContext {
             staticContext.export((MemberDescriptor) descriptor, true);
         }
         return staticContext.getQualifiedReference(descriptor);
-    }
-
-    @NotNull
-    public JsNameRef getQualifiedReference(@NotNull FqName fqName) {
-        return staticContext.getQualifiedReference(fqName);
     }
 
     @NotNull
