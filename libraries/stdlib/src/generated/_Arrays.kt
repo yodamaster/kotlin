@@ -7236,7 +7236,7 @@ public inline fun <R, C : MutableCollection<in R>> CharArray.flatMapTo(destinati
  * 
  * The returned map preserves the entry iteration order of the keys produced from the original array.
  * 
- * @sample test.collections.CollectionTest.groupBy
+ * @sample samples.collections.Collections.Transformations.groupBy
  */
 public inline fun <T, K> Array<out T>.groupBy(keySelector: (T) -> K): Map<K, List<T>> {
     return groupByTo(LinkedHashMap<K, MutableList<T>>(), keySelector)
@@ -7248,7 +7248,7 @@ public inline fun <T, K> Array<out T>.groupBy(keySelector: (T) -> K): Map<K, Lis
  * 
  * The returned map preserves the entry iteration order of the keys produced from the original array.
  * 
- * @sample test.collections.CollectionTest.groupBy
+ * @sample samples.collections.Collections.Transformations.groupBy
  */
 public inline fun <K> ByteArray.groupBy(keySelector: (Byte) -> K): Map<K, List<Byte>> {
     return groupByTo(LinkedHashMap<K, MutableList<Byte>>(), keySelector)
@@ -7260,7 +7260,7 @@ public inline fun <K> ByteArray.groupBy(keySelector: (Byte) -> K): Map<K, List<B
  * 
  * The returned map preserves the entry iteration order of the keys produced from the original array.
  * 
- * @sample test.collections.CollectionTest.groupBy
+ * @sample samples.collections.Collections.Transformations.groupBy
  */
 public inline fun <K> ShortArray.groupBy(keySelector: (Short) -> K): Map<K, List<Short>> {
     return groupByTo(LinkedHashMap<K, MutableList<Short>>(), keySelector)
@@ -7272,7 +7272,7 @@ public inline fun <K> ShortArray.groupBy(keySelector: (Short) -> K): Map<K, List
  * 
  * The returned map preserves the entry iteration order of the keys produced from the original array.
  * 
- * @sample test.collections.CollectionTest.groupBy
+ * @sample samples.collections.Collections.Transformations.groupBy
  */
 public inline fun <K> IntArray.groupBy(keySelector: (Int) -> K): Map<K, List<Int>> {
     return groupByTo(LinkedHashMap<K, MutableList<Int>>(), keySelector)
@@ -7284,7 +7284,7 @@ public inline fun <K> IntArray.groupBy(keySelector: (Int) -> K): Map<K, List<Int
  * 
  * The returned map preserves the entry iteration order of the keys produced from the original array.
  * 
- * @sample test.collections.CollectionTest.groupBy
+ * @sample samples.collections.Collections.Transformations.groupBy
  */
 public inline fun <K> LongArray.groupBy(keySelector: (Long) -> K): Map<K, List<Long>> {
     return groupByTo(LinkedHashMap<K, MutableList<Long>>(), keySelector)
@@ -7296,7 +7296,7 @@ public inline fun <K> LongArray.groupBy(keySelector: (Long) -> K): Map<K, List<L
  * 
  * The returned map preserves the entry iteration order of the keys produced from the original array.
  * 
- * @sample test.collections.CollectionTest.groupBy
+ * @sample samples.collections.Collections.Transformations.groupBy
  */
 public inline fun <K> FloatArray.groupBy(keySelector: (Float) -> K): Map<K, List<Float>> {
     return groupByTo(LinkedHashMap<K, MutableList<Float>>(), keySelector)
@@ -7308,7 +7308,7 @@ public inline fun <K> FloatArray.groupBy(keySelector: (Float) -> K): Map<K, List
  * 
  * The returned map preserves the entry iteration order of the keys produced from the original array.
  * 
- * @sample test.collections.CollectionTest.groupBy
+ * @sample samples.collections.Collections.Transformations.groupBy
  */
 public inline fun <K> DoubleArray.groupBy(keySelector: (Double) -> K): Map<K, List<Double>> {
     return groupByTo(LinkedHashMap<K, MutableList<Double>>(), keySelector)
@@ -7320,7 +7320,7 @@ public inline fun <K> DoubleArray.groupBy(keySelector: (Double) -> K): Map<K, Li
  * 
  * The returned map preserves the entry iteration order of the keys produced from the original array.
  * 
- * @sample test.collections.CollectionTest.groupBy
+ * @sample samples.collections.Collections.Transformations.groupBy
  */
 public inline fun <K> BooleanArray.groupBy(keySelector: (Boolean) -> K): Map<K, List<Boolean>> {
     return groupByTo(LinkedHashMap<K, MutableList<Boolean>>(), keySelector)
@@ -7332,7 +7332,7 @@ public inline fun <K> BooleanArray.groupBy(keySelector: (Boolean) -> K): Map<K, 
  * 
  * The returned map preserves the entry iteration order of the keys produced from the original array.
  * 
- * @sample test.collections.CollectionTest.groupBy
+ * @sample samples.collections.Collections.Transformations.groupBy
  */
 public inline fun <K> CharArray.groupBy(keySelector: (Char) -> K): Map<K, List<Char>> {
     return groupByTo(LinkedHashMap<K, MutableList<Char>>(), keySelector)
@@ -7345,7 +7345,7 @@ public inline fun <K> CharArray.groupBy(keySelector: (Char) -> K): Map<K, List<C
  * 
  * The returned map preserves the entry iteration order of the keys produced from the original array.
  * 
- * @sample test.collections.CollectionTest.groupByKeysAndValues
+ * @sample samples.collections.Collections.Transformations.groupByKeysAndValues
  */
 public inline fun <T, K, V> Array<out T>.groupBy(keySelector: (T) -> K, valueTransform: (T) -> V): Map<K, List<V>> {
     return groupByTo(LinkedHashMap<K, MutableList<V>>(), keySelector, valueTransform)
@@ -7358,7 +7358,7 @@ public inline fun <T, K, V> Array<out T>.groupBy(keySelector: (T) -> K, valueTra
  * 
  * The returned map preserves the entry iteration order of the keys produced from the original array.
  * 
- * @sample test.collections.CollectionTest.groupByKeysAndValues
+ * @sample samples.collections.Collections.Transformations.groupByKeysAndValues
  */
 public inline fun <K, V> ByteArray.groupBy(keySelector: (Byte) -> K, valueTransform: (Byte) -> V): Map<K, List<V>> {
     return groupByTo(LinkedHashMap<K, MutableList<V>>(), keySelector, valueTransform)
@@ -7371,7 +7371,7 @@ public inline fun <K, V> ByteArray.groupBy(keySelector: (Byte) -> K, valueTransf
  * 
  * The returned map preserves the entry iteration order of the keys produced from the original array.
  * 
- * @sample test.collections.CollectionTest.groupByKeysAndValues
+ * @sample samples.collections.Collections.Transformations.groupByKeysAndValues
  */
 public inline fun <K, V> ShortArray.groupBy(keySelector: (Short) -> K, valueTransform: (Short) -> V): Map<K, List<V>> {
     return groupByTo(LinkedHashMap<K, MutableList<V>>(), keySelector, valueTransform)
@@ -7384,7 +7384,7 @@ public inline fun <K, V> ShortArray.groupBy(keySelector: (Short) -> K, valueTran
  * 
  * The returned map preserves the entry iteration order of the keys produced from the original array.
  * 
- * @sample test.collections.CollectionTest.groupByKeysAndValues
+ * @sample samples.collections.Collections.Transformations.groupByKeysAndValues
  */
 public inline fun <K, V> IntArray.groupBy(keySelector: (Int) -> K, valueTransform: (Int) -> V): Map<K, List<V>> {
     return groupByTo(LinkedHashMap<K, MutableList<V>>(), keySelector, valueTransform)
@@ -7397,7 +7397,7 @@ public inline fun <K, V> IntArray.groupBy(keySelector: (Int) -> K, valueTransfor
  * 
  * The returned map preserves the entry iteration order of the keys produced from the original array.
  * 
- * @sample test.collections.CollectionTest.groupByKeysAndValues
+ * @sample samples.collections.Collections.Transformations.groupByKeysAndValues
  */
 public inline fun <K, V> LongArray.groupBy(keySelector: (Long) -> K, valueTransform: (Long) -> V): Map<K, List<V>> {
     return groupByTo(LinkedHashMap<K, MutableList<V>>(), keySelector, valueTransform)
@@ -7410,7 +7410,7 @@ public inline fun <K, V> LongArray.groupBy(keySelector: (Long) -> K, valueTransf
  * 
  * The returned map preserves the entry iteration order of the keys produced from the original array.
  * 
- * @sample test.collections.CollectionTest.groupByKeysAndValues
+ * @sample samples.collections.Collections.Transformations.groupByKeysAndValues
  */
 public inline fun <K, V> FloatArray.groupBy(keySelector: (Float) -> K, valueTransform: (Float) -> V): Map<K, List<V>> {
     return groupByTo(LinkedHashMap<K, MutableList<V>>(), keySelector, valueTransform)
@@ -7423,7 +7423,7 @@ public inline fun <K, V> FloatArray.groupBy(keySelector: (Float) -> K, valueTran
  * 
  * The returned map preserves the entry iteration order of the keys produced from the original array.
  * 
- * @sample test.collections.CollectionTest.groupByKeysAndValues
+ * @sample samples.collections.Collections.Transformations.groupByKeysAndValues
  */
 public inline fun <K, V> DoubleArray.groupBy(keySelector: (Double) -> K, valueTransform: (Double) -> V): Map<K, List<V>> {
     return groupByTo(LinkedHashMap<K, MutableList<V>>(), keySelector, valueTransform)
@@ -7436,7 +7436,7 @@ public inline fun <K, V> DoubleArray.groupBy(keySelector: (Double) -> K, valueTr
  * 
  * The returned map preserves the entry iteration order of the keys produced from the original array.
  * 
- * @sample test.collections.CollectionTest.groupByKeysAndValues
+ * @sample samples.collections.Collections.Transformations.groupByKeysAndValues
  */
 public inline fun <K, V> BooleanArray.groupBy(keySelector: (Boolean) -> K, valueTransform: (Boolean) -> V): Map<K, List<V>> {
     return groupByTo(LinkedHashMap<K, MutableList<V>>(), keySelector, valueTransform)
@@ -7449,7 +7449,7 @@ public inline fun <K, V> BooleanArray.groupBy(keySelector: (Boolean) -> K, value
  * 
  * The returned map preserves the entry iteration order of the keys produced from the original array.
  * 
- * @sample test.collections.CollectionTest.groupByKeysAndValues
+ * @sample samples.collections.Collections.Transformations.groupByKeysAndValues
  */
 public inline fun <K, V> CharArray.groupBy(keySelector: (Char) -> K, valueTransform: (Char) -> V): Map<K, List<V>> {
     return groupByTo(LinkedHashMap<K, MutableList<V>>(), keySelector, valueTransform)
@@ -7461,7 +7461,7 @@ public inline fun <K, V> CharArray.groupBy(keySelector: (Char) -> K, valueTransf
  * 
  * @return The [destination] map.
  * 
- * @sample test.collections.CollectionTest.groupBy
+ * @sample samples.collections.Collections.Transformations.groupBy
  */
 public inline fun <T, K, M : MutableMap<in K, MutableList<T>>> Array<out T>.groupByTo(destination: M, keySelector: (T) -> K): M {
     for (element in this) {
@@ -7478,7 +7478,7 @@ public inline fun <T, K, M : MutableMap<in K, MutableList<T>>> Array<out T>.grou
  * 
  * @return The [destination] map.
  * 
- * @sample test.collections.CollectionTest.groupBy
+ * @sample samples.collections.Collections.Transformations.groupBy
  */
 public inline fun <K, M : MutableMap<in K, MutableList<Byte>>> ByteArray.groupByTo(destination: M, keySelector: (Byte) -> K): M {
     for (element in this) {
@@ -7495,7 +7495,7 @@ public inline fun <K, M : MutableMap<in K, MutableList<Byte>>> ByteArray.groupBy
  * 
  * @return The [destination] map.
  * 
- * @sample test.collections.CollectionTest.groupBy
+ * @sample samples.collections.Collections.Transformations.groupBy
  */
 public inline fun <K, M : MutableMap<in K, MutableList<Short>>> ShortArray.groupByTo(destination: M, keySelector: (Short) -> K): M {
     for (element in this) {
@@ -7512,7 +7512,7 @@ public inline fun <K, M : MutableMap<in K, MutableList<Short>>> ShortArray.group
  * 
  * @return The [destination] map.
  * 
- * @sample test.collections.CollectionTest.groupBy
+ * @sample samples.collections.Collections.Transformations.groupBy
  */
 public inline fun <K, M : MutableMap<in K, MutableList<Int>>> IntArray.groupByTo(destination: M, keySelector: (Int) -> K): M {
     for (element in this) {
@@ -7529,7 +7529,7 @@ public inline fun <K, M : MutableMap<in K, MutableList<Int>>> IntArray.groupByTo
  * 
  * @return The [destination] map.
  * 
- * @sample test.collections.CollectionTest.groupBy
+ * @sample samples.collections.Collections.Transformations.groupBy
  */
 public inline fun <K, M : MutableMap<in K, MutableList<Long>>> LongArray.groupByTo(destination: M, keySelector: (Long) -> K): M {
     for (element in this) {
@@ -7546,7 +7546,7 @@ public inline fun <K, M : MutableMap<in K, MutableList<Long>>> LongArray.groupBy
  * 
  * @return The [destination] map.
  * 
- * @sample test.collections.CollectionTest.groupBy
+ * @sample samples.collections.Collections.Transformations.groupBy
  */
 public inline fun <K, M : MutableMap<in K, MutableList<Float>>> FloatArray.groupByTo(destination: M, keySelector: (Float) -> K): M {
     for (element in this) {
@@ -7563,7 +7563,7 @@ public inline fun <K, M : MutableMap<in K, MutableList<Float>>> FloatArray.group
  * 
  * @return The [destination] map.
  * 
- * @sample test.collections.CollectionTest.groupBy
+ * @sample samples.collections.Collections.Transformations.groupBy
  */
 public inline fun <K, M : MutableMap<in K, MutableList<Double>>> DoubleArray.groupByTo(destination: M, keySelector: (Double) -> K): M {
     for (element in this) {
@@ -7580,7 +7580,7 @@ public inline fun <K, M : MutableMap<in K, MutableList<Double>>> DoubleArray.gro
  * 
  * @return The [destination] map.
  * 
- * @sample test.collections.CollectionTest.groupBy
+ * @sample samples.collections.Collections.Transformations.groupBy
  */
 public inline fun <K, M : MutableMap<in K, MutableList<Boolean>>> BooleanArray.groupByTo(destination: M, keySelector: (Boolean) -> K): M {
     for (element in this) {
@@ -7597,7 +7597,7 @@ public inline fun <K, M : MutableMap<in K, MutableList<Boolean>>> BooleanArray.g
  * 
  * @return The [destination] map.
  * 
- * @sample test.collections.CollectionTest.groupBy
+ * @sample samples.collections.Collections.Transformations.groupBy
  */
 public inline fun <K, M : MutableMap<in K, MutableList<Char>>> CharArray.groupByTo(destination: M, keySelector: (Char) -> K): M {
     for (element in this) {
@@ -7615,7 +7615,7 @@ public inline fun <K, M : MutableMap<in K, MutableList<Char>>> CharArray.groupBy
  * 
  * @return The [destination] map.
  * 
- * @sample test.collections.CollectionTest.groupByKeysAndValues
+ * @sample samples.collections.Collections.Transformations.groupByKeysAndValues
  */
 public inline fun <T, K, V, M : MutableMap<in K, MutableList<V>>> Array<out T>.groupByTo(destination: M, keySelector: (T) -> K, valueTransform: (T) -> V): M {
     for (element in this) {
@@ -7633,7 +7633,7 @@ public inline fun <T, K, V, M : MutableMap<in K, MutableList<V>>> Array<out T>.g
  * 
  * @return The [destination] map.
  * 
- * @sample test.collections.CollectionTest.groupByKeysAndValues
+ * @sample samples.collections.Collections.Transformations.groupByKeysAndValues
  */
 public inline fun <K, V, M : MutableMap<in K, MutableList<V>>> ByteArray.groupByTo(destination: M, keySelector: (Byte) -> K, valueTransform: (Byte) -> V): M {
     for (element in this) {
@@ -7651,7 +7651,7 @@ public inline fun <K, V, M : MutableMap<in K, MutableList<V>>> ByteArray.groupBy
  * 
  * @return The [destination] map.
  * 
- * @sample test.collections.CollectionTest.groupByKeysAndValues
+ * @sample samples.collections.Collections.Transformations.groupByKeysAndValues
  */
 public inline fun <K, V, M : MutableMap<in K, MutableList<V>>> ShortArray.groupByTo(destination: M, keySelector: (Short) -> K, valueTransform: (Short) -> V): M {
     for (element in this) {
@@ -7669,7 +7669,7 @@ public inline fun <K, V, M : MutableMap<in K, MutableList<V>>> ShortArray.groupB
  * 
  * @return The [destination] map.
  * 
- * @sample test.collections.CollectionTest.groupByKeysAndValues
+ * @sample samples.collections.Collections.Transformations.groupByKeysAndValues
  */
 public inline fun <K, V, M : MutableMap<in K, MutableList<V>>> IntArray.groupByTo(destination: M, keySelector: (Int) -> K, valueTransform: (Int) -> V): M {
     for (element in this) {
@@ -7687,7 +7687,7 @@ public inline fun <K, V, M : MutableMap<in K, MutableList<V>>> IntArray.groupByT
  * 
  * @return The [destination] map.
  * 
- * @sample test.collections.CollectionTest.groupByKeysAndValues
+ * @sample samples.collections.Collections.Transformations.groupByKeysAndValues
  */
 public inline fun <K, V, M : MutableMap<in K, MutableList<V>>> LongArray.groupByTo(destination: M, keySelector: (Long) -> K, valueTransform: (Long) -> V): M {
     for (element in this) {
@@ -7705,7 +7705,7 @@ public inline fun <K, V, M : MutableMap<in K, MutableList<V>>> LongArray.groupBy
  * 
  * @return The [destination] map.
  * 
- * @sample test.collections.CollectionTest.groupByKeysAndValues
+ * @sample samples.collections.Collections.Transformations.groupByKeysAndValues
  */
 public inline fun <K, V, M : MutableMap<in K, MutableList<V>>> FloatArray.groupByTo(destination: M, keySelector: (Float) -> K, valueTransform: (Float) -> V): M {
     for (element in this) {
@@ -7723,7 +7723,7 @@ public inline fun <K, V, M : MutableMap<in K, MutableList<V>>> FloatArray.groupB
  * 
  * @return The [destination] map.
  * 
- * @sample test.collections.CollectionTest.groupByKeysAndValues
+ * @sample samples.collections.Collections.Transformations.groupByKeysAndValues
  */
 public inline fun <K, V, M : MutableMap<in K, MutableList<V>>> DoubleArray.groupByTo(destination: M, keySelector: (Double) -> K, valueTransform: (Double) -> V): M {
     for (element in this) {
@@ -7741,7 +7741,7 @@ public inline fun <K, V, M : MutableMap<in K, MutableList<V>>> DoubleArray.group
  * 
  * @return The [destination] map.
  * 
- * @sample test.collections.CollectionTest.groupByKeysAndValues
+ * @sample samples.collections.Collections.Transformations.groupByKeysAndValues
  */
 public inline fun <K, V, M : MutableMap<in K, MutableList<V>>> BooleanArray.groupByTo(destination: M, keySelector: (Boolean) -> K, valueTransform: (Boolean) -> V): M {
     for (element in this) {
@@ -7759,7 +7759,7 @@ public inline fun <K, V, M : MutableMap<in K, MutableList<V>>> BooleanArray.grou
  * 
  * @return The [destination] map.
  * 
- * @sample test.collections.CollectionTest.groupByKeysAndValues
+ * @sample samples.collections.Collections.Transformations.groupByKeysAndValues
  */
 public inline fun <K, V, M : MutableMap<in K, MutableList<V>>> CharArray.groupByTo(destination: M, keySelector: (Char) -> K, valueTransform: (Char) -> V): M {
     for (element in this) {

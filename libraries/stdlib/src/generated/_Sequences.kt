@@ -609,7 +609,7 @@ public inline fun <T, R, C : MutableCollection<in R>> Sequence<T>.flatMapTo(dest
  * 
  * The returned map preserves the entry iteration order of the keys produced from the original sequence.
  * 
- * @sample test.collections.CollectionTest.groupBy
+ * @sample samples.collections.Collections.Transformations.groupBy
  */
 public inline fun <T, K> Sequence<T>.groupBy(keySelector: (T) -> K): Map<K, List<T>> {
     return groupByTo(LinkedHashMap<K, MutableList<T>>(), keySelector)
@@ -622,7 +622,7 @@ public inline fun <T, K> Sequence<T>.groupBy(keySelector: (T) -> K): Map<K, List
  * 
  * The returned map preserves the entry iteration order of the keys produced from the original sequence.
  * 
- * @sample test.collections.CollectionTest.groupByKeysAndValues
+ * @sample samples.collections.Collections.Transformations.groupByKeysAndValues
  */
 public inline fun <T, K, V> Sequence<T>.groupBy(keySelector: (T) -> K, valueTransform: (T) -> V): Map<K, List<V>> {
     return groupByTo(LinkedHashMap<K, MutableList<V>>(), keySelector, valueTransform)
@@ -634,7 +634,7 @@ public inline fun <T, K, V> Sequence<T>.groupBy(keySelector: (T) -> K, valueTran
  * 
  * @return The [destination] map.
  * 
- * @sample test.collections.CollectionTest.groupBy
+ * @sample samples.collections.Collections.Transformations.groupBy
  */
 public inline fun <T, K, M : MutableMap<in K, MutableList<T>>> Sequence<T>.groupByTo(destination: M, keySelector: (T) -> K): M {
     for (element in this) {
@@ -652,7 +652,7 @@ public inline fun <T, K, M : MutableMap<in K, MutableList<T>>> Sequence<T>.group
  * 
  * @return The [destination] map.
  * 
- * @sample test.collections.CollectionTest.groupByKeysAndValues
+ * @sample samples.collections.Collections.Transformations.groupByKeysAndValues
  */
 public inline fun <T, K, V, M : MutableMap<in K, MutableList<V>>> Sequence<T>.groupByTo(destination: M, keySelector: (T) -> K, valueTransform: (T) -> V): M {
     for (element in this) {
