@@ -132,7 +132,7 @@ CODE_FENCE_END=("```" | "~~~")
 
 <LINE_BEGINNING, CONTENTS_BEGINNING, CONTENTS> {
 
-    [\ ]{4}[\ ]* {
+    ([\ ]{4}[\ ]*)|([\t]+) {
         if(yystate() == CONTENTS_BEGINNING) {
             yybegin(INDENTED_CODE_BLOCK);
             return KDocTokens.CODE_BLOCK_TEXT;
@@ -144,7 +144,7 @@ CODE_FENCE_END=("```" | "~~~")
             yybegin(LINE_BEGINNING);
             return TokenType.WHITE_SPACE;
         }  else {
-            yybegin(yystate() == CONTENTS_BEGINNING? CONTENTS_BEGINNING:CONTENTS);
+            yybegin(yystate() == CONTENTS_BEGINNING ? CONTENTS_BEGINNING : CONTENTS);
             return KDocTokens.TEXT;  // internal white space
         }
     }
@@ -198,14 +198,14 @@ CODE_FENCE_END=("```" | "~~~")
 <INDENTED_CODE_BLOCK, CODE_BLOCK_LINE_BEGINNING, CODE_BLOCK_CONTENTS_BEGINNING, CODE_BLOCK> {
     {WHITE_SPACE_CHAR}+ {
         if (yytextContainLineBreaks()) {
-            yybegin(yystate() == INDENTED_CODE_BLOCK? LINE_BEGINNING:CODE_BLOCK_LINE_BEGINNING);
+            yybegin(yystate() == INDENTED_CODE_BLOCK ? LINE_BEGINNING : CODE_BLOCK_LINE_BEGINNING);
             return TokenType.WHITE_SPACE;
         }
         return KDocTokens.CODE_BLOCK_TEXT;
     }
 
     . {
-        yybegin(yystate() == INDENTED_CODE_BLOCK? INDENTED_CODE_BLOCK:CODE_BLOCK);
+        yybegin(yystate() == INDENTED_CODE_BLOCK ? INDENTED_CODE_BLOCK : CODE_BLOCK);
         return KDocTokens.CODE_BLOCK_TEXT;
     }
 }

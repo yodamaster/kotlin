@@ -85,7 +85,7 @@ public class QuickDocProviderTestGenerated extends AbstractQuickDocProviderTest 
     }
 
     @TestMetadata("IndentedCodeBlock.kt")
-    public void testIdentedCodeBlock() throws Exception {
+    public void testIndentedCodeBlock() throws Exception {
         String fileName = KotlinTestUtils.navigationMetadata("idea/testData/editor/quickDoc/IndentedCodeBlock.kt");
         doTest(fileName);
     }

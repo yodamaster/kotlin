@@ -105,8 +105,9 @@ open class KDocTag(node: ASTNode) : KDocElementImpl(node) {
         for (node in children) {
             val type = node.elementType
             if (type == KDocTokens.CODE_BLOCK_TEXT) {
+                //If first line of code block
                 if (!isCodeBlock())
-                    indentedCodeBlock = indentedCodeBlock || node.text.startsWith(indentionWhiteSpaces) || node.text.startsWith("\t")
+                    indentedCodeBlock = indentedCodeBlock || node.text.startsWith(indentationWhiteSpaces) || node.text.startsWith("\t")
                 startCodeBlock()
             }
             else if (KDocTokens.CONTENT_TOKENS.contains(type)) {
@@ -115,10 +116,12 @@ open class KDocTag(node: ASTNode) : KDocElementImpl(node) {
             }
 
             if (KDocTokens.CONTENT_TOKENS.contains(type)) {
-                targetBuilder.append(if ((!contentStarted && !indentedCodeBlock) || (afterAsterisk && targetBuilder == builder))
-                                         node.text.trimStart()
-                                     else
-                                         node.text)
+                val isPlainContent = afterAsterisk && !isCodeBlock()
+                // If content not yet started and not part of indented code block
+                // and not inside fenced code block we should trim leading spaces
+                val trimLeadingSpaces = !(contentStarted || indentedCodeBlock) || isPlainContent
+
+                targetBuilder.append(if (trimLeadingSpaces) node.text.trimStart() else node.text)
                 contentStarted = true
                 afterAsterisk = false
             }
@@ -143,11 +146,13 @@ open class KDocTag(node: ASTNode) : KDocElementImpl(node) {
         val minIndent = lines.filter { it.trim().isNotEmpty() }.map { it.calcIndent() }.min() ?: 0
         var processedLines = lines.map { it.drop(minIndent) }
         if (prepend4WhiteSpaces)
-            processedLines = processedLines.map { if (it.isNotBlank()) it.prependIndent(indentionWhiteSpaces) else it }
+            processedLines = processedLines.map { if (it.isNotBlank()) it.prependIndent(indentationWhiteSpaces) else it }
         return processedLines.joinToString("\n")
     }
 
-    private val indentionWhiteSpaces = "    "
-
     fun String.calcIndent() = indexOfFirst { !it.isWhitespace() }
+
+    companion object {
+        val indentationWhiteSpaces = " ".repeat(4)
+    }
 }

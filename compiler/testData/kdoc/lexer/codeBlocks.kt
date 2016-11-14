@@ -3,6 +3,9 @@
  *    This is indented code block
  *    Second line of code block
  * @foo This is text.
+ *	Tabulated code block
+ *	Tabulated second line
+ * @foo This is text.
  * ``` kotlin
  * @foo This is code block.
  * ```
