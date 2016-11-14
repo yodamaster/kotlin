@@ -67,9 +67,9 @@ open class KDocTag(node: ASTNode) : KDocElementImpl(node) {
     }
 
     private fun childrenAfterTagName(): List<ASTNode> =
-        node.getChildren(null)
-                .dropWhile { it.elementType == KDocTokens.TAG_NAME }
-                .dropWhile { it.elementType == TokenType.WHITE_SPACE }
+            node.getChildren(null)
+                    .dropWhile { it.elementType == KDocTokens.TAG_NAME }
+                    .dropWhile { it.elementType == TokenType.WHITE_SPACE }
 
     /**
      * Returns the content of this tag (all text following the tag name and the subject if present,
@@ -82,14 +82,17 @@ open class KDocTag(node: ASTNode) : KDocElementImpl(node) {
 
         var contentStarted = false
         var afterAsterisk = false
+        var indentedCodeBlock = false
+
+        fun isCodeBlock() = targetBuilder == codeBlockBuilder
 
         fun startCodeBlock() {
             targetBuilder = codeBlockBuilder
         }
 
         fun flushCodeBlock() {
-            if (targetBuilder == codeBlockBuilder) {
-                builder.append(trimCommonIndent(codeBlockBuilder))
+            if (isCodeBlock()) {
+                builder.append(trimCommonIndent(codeBlockBuilder, indentedCodeBlock))
                 codeBlockBuilder.setLength(0)
                 targetBuilder = builder
             }
@@ -102,14 +105,17 @@ open class KDocTag(node: ASTNode) : KDocElementImpl(node) {
         for (node in children) {
             val type = node.elementType
             if (type == KDocTokens.CODE_BLOCK_TEXT) {
+                if (!isCodeBlock())
+                    indentedCodeBlock = indentedCodeBlock || node.text.startsWith(indentionWhiteSpaces) || node.text.startsWith("\t")
                 startCodeBlock()
             }
             else if (KDocTokens.CONTENT_TOKENS.contains(type)) {
                 flushCodeBlock()
+                indentedCodeBlock = false
             }
 
             if (KDocTokens.CONTENT_TOKENS.contains(type)) {
-                targetBuilder.append(if (!contentStarted || (afterAsterisk && targetBuilder == builder))
+                targetBuilder.append(if ((!contentStarted && !indentedCodeBlock) || (afterAsterisk && targetBuilder == builder))
                                          node.text.trimStart()
                                      else
                                          node.text)
@@ -132,11 +138,16 @@ open class KDocTag(node: ASTNode) : KDocElementImpl(node) {
         return builder.toString().trimEnd(' ', '\t')
     }
 
-    private fun trimCommonIndent(builder: StringBuilder): String {
+    private fun trimCommonIndent(builder: StringBuilder, prepend4WhiteSpaces: Boolean = false): String {
         val lines = builder.toString().split('\n')
         val minIndent = lines.filter { it.trim().isNotEmpty() }.map { it.calcIndent() }.min() ?: 0
-        return lines.map { it.drop(minIndent) }.joinToString("\n")
+        var processedLines = lines.map { it.drop(minIndent) }
+        if (prepend4WhiteSpaces)
+            processedLines = processedLines.map { if (it.isNotBlank()) it.prependIndent(indentionWhiteSpaces) else it }
+        return processedLines.joinToString("\n")
     }
+
+    private val indentionWhiteSpaces = "    "
 
     fun String.calcIndent() = indexOfFirst { !it.isWhitespace() }
 }
