@@ -16,6 +16,8 @@
 
 package kotlin
 
+import kotlin.js.internal.JsError
+
 /**
  * The base class for all errors and exceptions. Only instances of this class can be thrown or caught.
  *
