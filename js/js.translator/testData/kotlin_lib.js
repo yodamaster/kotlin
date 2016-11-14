@@ -199,8 +199,6 @@ Kotlin.intDownto = function (from, to) {
     return new Kotlin.kotlin.ranges.IntProgression(from, to, -1);
 };
 
-Kotlin.Throwable = Error;
-
 /** @const */
 var POW_2_32 = 4294967296;
 // TODO: consider switching to Symbol type once we are on ES6.
