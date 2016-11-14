@@ -42,7 +42,7 @@ import org.jetbrains.kotlin.psi.psiUtil.getNonStrictParentOfType
 import org.jetbrains.kotlin.renderer.ClassifierNamePolicy
 import org.jetbrains.kotlin.renderer.DescriptorRenderer
 import org.jetbrains.kotlin.resolve.BindingContext
-import org.jetbrains.kotlin.resolve.deprecatedByAnnotationReplaceWithInfo
+import org.jetbrains.kotlin.resolve.deprecatedByAnnotationReplaceWithExpression
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameUnsafe
 import org.jetbrains.kotlin.resolve.getDeprecation
 import org.jetbrains.kotlin.resolve.lazy.BodyResolveMode
@@ -179,15 +179,15 @@ class KotlinQuickDocumentationProvider : AbstractDocumentationProvider() {
             return buildString {
                 wrapTag("DL") {
                     deprecation.message?.let { message ->
-                        wrapTag("DT") { wrapTag("b") { append("Deprecation reason:") } }
+                        wrapTag("DT") { wrapTag("b") { append("Deprecated:") } }
                         wrapTag("DD") {
                             append(message.htmlEscape())
                         }
                     }
-                    deprecation.deprecatedByAnnotationReplaceWithInfo()?.let { replaceWith ->
+                    deprecation.deprecatedByAnnotationReplaceWithExpression()?.let { replaceWith ->
                         wrapTag("DT") { wrapTag("b") { append("Replace with:") } }
                         wrapTag("DD") {
-                            wrapTag("code") { append(replaceWith.expression.htmlEscape()) }
+                            wrapTag("code") { append(replaceWith.htmlEscape()) }
                         }
                     }
                 }

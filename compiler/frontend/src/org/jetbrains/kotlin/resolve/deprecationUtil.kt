@@ -42,19 +42,13 @@ interface Deprecation {
 
 fun Deprecation.deprecatedByOverriddenMessage(): String? = (this as? DeprecatedByOverridden)?.additionalMessage()
 
-fun Deprecation.deprecatedByAnnotationReplaceWithInfo(): DeprecationReplaceWith? {
+fun Deprecation.deprecatedByAnnotationReplaceWithExpression(): String? {
     val annotation = (this as? DeprecatedByAnnotation)?.annotation ?: return null
     val replaceWithAnnotation = annotation.argumentValue(kotlin.Deprecated::replaceWith.name)
                                         as? AnnotationDescriptor ?: return null
 
-    @Suppress("UNCHECKED_CAST")
-    return DeprecationReplaceWith(
-            replaceWithAnnotation.argumentValue(kotlin.ReplaceWith::expression.name) as String,
-            replaceWithAnnotation.argumentValue(kotlin.ReplaceWith::imports.name) as? List<String>
-    )
+    return replaceWithAnnotation.argumentValue(kotlin.ReplaceWith::expression.name) as String
 }
-
-data class DeprecationReplaceWith(val expression: String, var imports: List<String>?)
 
 private data class DeprecatedByAnnotation(val annotation: AnnotationDescriptor, override val target: DeclarationDescriptor) : Deprecation {
     override val deprecationLevel: DeprecationLevelValue
