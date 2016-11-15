@@ -23,6 +23,7 @@ import org.intellij.markdown.MarkdownTokenTypes
 import org.intellij.markdown.ast.ASTNode
 import org.intellij.markdown.flavours.commonmark.CommonMarkFlavourDescriptor
 import org.intellij.markdown.parser.MarkdownParser
+import org.jetbrains.kotlin.kdoc.psi.impl.KDocLink
 import org.jetbrains.kotlin.kdoc.psi.impl.KDocSection
 import org.jetbrains.kotlin.kdoc.psi.impl.KDocTag
 
@@ -47,8 +48,27 @@ object KDocRenderer {
             renderTag(docComment.findTagByName("since"), "Since", result)
 
             renderSeeAlso(docComment, result)
+
+            val sampleTags = docComment.findTagsByName("sample").filter { it.getSubjectLink() != null }
+            renderSamplesList(sampleTags, result)
         }
         return result.toString()
+    }
+
+    private fun KDocLink.createHyperlink(to: StringBuilder) {
+        DocumentationManagerUtil.createHyperlink(to, getLinkText(), getLinkText(), false)
+    }
+
+    private fun renderSamplesList(sampleTags: List<KDocTag>, to: StringBuilder) {
+        if (sampleTags.isNotEmpty()) {
+            to.append("<dl><dt><b>Samples:</b></dt>")
+            sampleTags.forEach {
+                to.append("<dd>")
+                it.getSubjectLink()!!.createHyperlink(to)
+                to.append("</dd>")
+            }
+            to.append("</dl>\n")
+        }
     }
 
     private fun renderSeeAlso(docComment: KDocSection, to: StringBuilder) {
@@ -99,7 +119,8 @@ object KDocRenderer {
         val maybeSingleParagraph = markdownNode.children.filter { it.type != MarkdownTokenTypes.EOL }.singleOrNull()
         if (maybeSingleParagraph != null && !allowSingleParagraph) {
             return maybeSingleParagraph.children.joinToString("") { it.toHtml() }
-        } else {
+        }
+        else {
             return markdownNode.toHtml()
         }
     }
