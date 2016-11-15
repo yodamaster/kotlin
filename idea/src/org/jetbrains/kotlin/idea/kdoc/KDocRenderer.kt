@@ -17,15 +17,22 @@
 package org.jetbrains.kotlin.idea.kdoc
 
 import com.intellij.codeInsight.documentation.DocumentationManagerUtil
+import com.intellij.psi.PsiElement
 import org.intellij.markdown.IElementType
 import org.intellij.markdown.MarkdownElementTypes
 import org.intellij.markdown.MarkdownTokenTypes
 import org.intellij.markdown.ast.ASTNode
 import org.intellij.markdown.flavours.commonmark.CommonMarkFlavourDescriptor
 import org.intellij.markdown.parser.MarkdownParser
+import org.jetbrains.kotlin.idea.references.mainReference
+import org.jetbrains.kotlin.idea.util.wrapTag
 import org.jetbrains.kotlin.kdoc.psi.impl.KDocLink
+import org.jetbrains.kotlin.kdoc.psi.impl.KDocName
 import org.jetbrains.kotlin.kdoc.psi.impl.KDocSection
 import org.jetbrains.kotlin.kdoc.psi.impl.KDocTag
+import org.jetbrains.kotlin.psi.KtBlockExpression
+import org.jetbrains.kotlin.psi.KtDeclarationWithBody
+import org.jetbrains.kotlin.psi.psiUtil.getChildrenOfType
 
 object KDocRenderer {
     fun renderKDoc(docComment: KDocTag): String {
@@ -59,15 +66,53 @@ object KDocRenderer {
         DocumentationManagerUtil.createHyperlink(to, getLinkText(), getLinkText(), false)
     }
 
-    private fun renderSamplesList(sampleTags: List<KDocTag>, to: StringBuilder) {
-        if (sampleTags.isNotEmpty()) {
-            to.append("<dl><dt><b>Samples:</b></dt>")
-            sampleTags.forEach {
-                to.append("<dd>")
-                it.getSubjectLink()!!.createHyperlink(to)
-                to.append("</dd>")
+    private fun KDocLink.getTargetElement(): PsiElement? {
+        return this.getChildrenOfType<KDocName>().last().mainReference.resolve()
+    }
+
+    private fun PsiElement.extractExampleText() = when (this) {
+        is KtDeclarationWithBody -> {
+            val bodyExpression = bodyExpression
+            when (bodyExpression) {
+                is KtBlockExpression -> bodyExpression.text.removeSurrounding("{", "}")
+                else -> bodyExpression!!.text
             }
-            to.append("</dl>\n")
+        }
+        else -> text
+    }
+
+    private fun trimCommonIndent(text: String): String {
+        fun String.leadingIndent() = indexOfFirst { !it.isWhitespace() }
+
+        val lines = text.split('\n')
+        val minIndent = lines.filter { it.trim().isNotEmpty() }.map(String::leadingIndent).min() ?: 0
+        return lines.map { it.drop(minIndent) }.joinToString("\n")
+    }
+
+
+    private fun renderSamplesList(sampleTags: List<KDocTag>, to: StringBuilder) {
+        if (sampleTags.isEmpty()) return
+        to.apply {
+            wrapTag("dl") {
+                append("<dt><b>Samples:</b></dt>")
+                sampleTags.forEach {
+                    wrapTag("dd") {
+                        it.getSubjectLink()?.let { subjectLink ->
+                            subjectLink.createHyperlink(to)
+                            val target = subjectLink.getTargetElement()
+                            wrapTag("pre") {
+                                wrapTag("code") {
+                                    if (target == null)
+                                        to.append("// Unresolved")
+                                    else {
+                                        to.append(trimCommonIndent(target.extractExampleText()))
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
