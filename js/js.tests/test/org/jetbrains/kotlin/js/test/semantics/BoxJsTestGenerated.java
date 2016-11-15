@@ -5681,12 +5681,6 @@ public class BoxJsTestGenerated extends AbstractBoxJsTest {
             doTest(fileName);
         }
 
-        @TestMetadata("nestedNative.kt")
-        public void testNestedNative() throws Exception {
-            String fileName = KotlinTestUtils.navigationMetadata("js/js.translator/testData/box/nestedTypes/nestedNative.kt");
-            doTest(fileName);
-        }
-
         @TestMetadata("nestedObjectLazyInitialized.kt")
         public void testNestedObjectLazyInitialized() throws Exception {
             String fileName = KotlinTestUtils.navigationMetadata("js/js.translator/testData/box/nestedTypes/nestedObjectLazyInitialized.kt");
