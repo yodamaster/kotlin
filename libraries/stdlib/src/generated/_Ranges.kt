@@ -838,3 +838,79 @@ public fun Long.coerceIn(range: ClosedRange<Long>): Long {
     return if (this < range.start) range.start else if (this > range.endInclusive) range.endInclusive else this
 }
 
+public fun <T: Comparable<T>> minOf(a: T, b: T): T {
+    return if (a <= b) a else b
+}
+
+@kotlin.internal.InlineOnly
+public inline fun minOf(a: Byte, b: Byte): Byte {
+    return Math.min(a.toInt(), b.toInt()).toByte()
+}
+
+@kotlin.internal.InlineOnly
+public inline fun minOf(a: Short, b: Short): Short {
+    return Math.min(a.toInt(), b.toInt()).toShort()
+}
+
+@kotlin.internal.InlineOnly
+public inline fun minOf(a: Int, b: Int): Int {
+    return Math.min(a, b)
+}
+
+@kotlin.internal.InlineOnly
+public inline fun minOf(a: Long, b: Long): Long {
+    return Math.min(a, b)
+}
+
+@kotlin.internal.InlineOnly
+public inline fun minOf(a: Float, b: Float): Float {
+    return Math.min(a, b)
+}
+
+@kotlin.internal.InlineOnly
+public inline fun minOf(a: Double, b: Double): Double {
+    return Math.min(a, b)
+}
+
+public fun <T: Comparable<T>> minOf(a: T, b: T, c: T): T {
+    return minOf(a, minOf(b, c))
+}
+
+@kotlin.internal.InlineOnly
+public inline fun minOf(a: Byte, b: Byte, c: Byte): Byte {
+    return Math.min(a.toInt(), Math.min(b.toInt(), c.toInt())).toByte()
+}
+
+@kotlin.internal.InlineOnly
+public inline fun minOf(a: Short, b: Short, c: Short): Short {
+    return Math.min(a.toInt(), Math.min(b.toInt(), c.toInt())).toShort()
+}
+
+@kotlin.internal.InlineOnly
+public inline fun minOf(a: Int, b: Int, c: Int): Int {
+    return minOf(a, minOf(b, c))
+}
+
+@kotlin.internal.InlineOnly
+public inline fun minOf(a: Long, b: Long, c: Long): Long {
+    return minOf(a, minOf(b, c))
+}
+
+@kotlin.internal.InlineOnly
+public inline fun minOf(a: Float, b: Float, c: Float): Float {
+    return minOf(a, minOf(b, c))
+}
+
+@kotlin.internal.InlineOnly
+public inline fun minOf(a: Double, b: Double, c: Double): Double {
+    return minOf(a, minOf(b, c))
+}
+
+public fun <T> minOf(a: T, b: T, c: T, comparator: Comparator<in T>): T {
+    return minOf(a, minOf(b, c, comparator), comparator)
+}
+
+public fun <T> minOf(a: T, b: T, comparator: Comparator<in T>): T {
+    return if (comparator.compare(a, b) <= 0) a else b
+}
+
