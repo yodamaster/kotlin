@@ -34,23 +34,28 @@ class ModuleMapping private constructor(val packageFqName2Parts: Map<String, Pac
         @JvmField
         val EMPTY: ModuleMapping = ModuleMapping(emptyMap(), "EMPTY")
 
-        fun create(proto: ByteArray?, debugName: String?): ModuleMapping {
-            if (proto == null) {
+        fun create(bytes: ByteArray?, debugName: String?): ModuleMapping {
+            if (bytes == null) {
                 return EMPTY
             }
 
-            val stream = DataInputStream(ByteArrayInputStream(proto))
+            val stream = DataInputStream(ByteArrayInputStream(bytes))
             val version = JvmMetadataVersion(*IntArray(stream.readInt()) { stream.readInt() })
 
             if (version.isCompatible()) {
                 val parseFrom = JvmPackageTable.PackageTable.parseFrom(stream)
                 if (parseFrom != null) {
                     val packageFqNameParts = hashMapOf<String, PackageParts>()
-                    parseFrom.packagePartsList.forEach {
-                        val packageParts = PackageParts(it.packageFqName)
-                        packageFqNameParts.put(it.packageFqName, packageParts)
-                        it.classNameList.forEach {
-                            packageParts.parts.add(it)
+                    for (proto in parseFrom.packagePartsList) {
+                        PackageParts(proto.packageFqName).apply {
+                            packageFqNameParts.put(proto.packageFqName, this)
+                            parts.addAll(proto.classNameList)
+                        }
+                    }
+                    for (proto in parseFrom.metadataPartsList) {
+                        PackageParts(proto.packageFqName).apply {
+                            packageFqNameParts.put(proto.packageFqName, this)
+                            metadataParts.addAll(proto.classNameList)
                         }
                     }
                     return ModuleMapping(packageFqNameParts, debugName ?: "<unknown>")
