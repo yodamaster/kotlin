@@ -1879,7 +1879,7 @@ public infix fun <T, R> Iterable<T>.zip(other: Array<out R>): List<Pair<T, R>> {
 public inline fun <T, R, V> Iterable<T>.zip(other: Array<out R>, transform: (T, R) -> V): List<V> {
     val arraySize = other.size
     @Suppress("NON_PUBLIC_CALL_FROM_PUBLIC_INLINE")
-    val list = ArrayList<V>(Math.min(collectionSizeOrDefault(10), arraySize))
+    val list = ArrayList<V>(minOf(collectionSizeOrDefault(10), arraySize))
     var i = 0
     for (element in this) {
         if (i >= arraySize) break
@@ -1902,7 +1902,7 @@ public inline fun <T, R, V> Iterable<T>.zip(other: Iterable<R>, transform: (T, R
     val first = iterator()
     val second = other.iterator()
     @Suppress("NON_PUBLIC_CALL_FROM_PUBLIC_INLINE")
-    val list = ArrayList<V>(Math.min(collectionSizeOrDefault(10), other.collectionSizeOrDefault(10)))
+    val list = ArrayList<V>(minOf(collectionSizeOrDefault(10), other.collectionSizeOrDefault(10)))
     while (first.hasNext() && second.hasNext()) {
         list.add(transform(first.next(), second.next()))
     }
