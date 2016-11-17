@@ -48,7 +48,6 @@ import org.jetbrains.kotlin.gradle.plugin.kotlinDebug
 import org.jetbrains.kotlin.gradle.plugin.kotlinInfo
 import org.jetbrains.kotlin.gradle.utils.ParsedGradleVersion
 import org.jetbrains.kotlin.incremental.*
-import org.jetbrains.kotlin.incremental.components.SourceRetentionAnnotationHandler
 import org.jetbrains.kotlin.incremental.multiproject.ArtifactDifferenceRegistryProvider
 import org.jetbrains.kotlin.utils.LibraryUtils
 import java.io.File
@@ -75,6 +74,7 @@ abstract class AbstractKotlinCompile<T : CommonCompilerArguments>() : AbstractCo
             System.setProperty("kotlin.incremental.compilation.experimental", value.toString())
         }
 
+    var compilerJarFile: File? = null
     internal var compilerCalled: Boolean = false
     // TODO: consider more reliable approach (see usage)
     internal var anyClassesCompiled: Boolean = false
@@ -187,10 +187,15 @@ open class KotlinCompile : AbstractKotlinCompile<K2JVMCompilerArguments>(), Kotl
         args.classpathAsList = compileClasspath.toList()
         args.destinationAsFile = destinationDir
         val outputItemCollector = OutputItemsCollectorImpl()
+        val compilerJar = compilerJarFile
+                ?: findKotlinJvmCompilerJar(project)
+                ?: throw IllegalStateException("Could not find Kotlin Compiler jar. Please specify $name.compilerJarFile")
 
         if (!incremental) {
             anyClassesCompiled = true
-            val exitCode = GradleCompilerRunner(project).runJvmCompiler(allKotlinSources, getJavaSourceRoots(), args, messageCollector, outputItemCollector)
+            val compilerRunner = GradleCompilerRunner(project)
+            val exitCode = compilerRunner.runJvmCompiler(allKotlinSources, getJavaSourceRoots(), args, messageCollector,
+                    outputItemCollector, compilerJar)
             processCompilerExitCode(exitCode)
             return
         }
@@ -236,45 +241,6 @@ open class KotlinCompile : AbstractKotlinCompile<K2JVMCompilerArguments>(), Kotl
             ExitCode.OK -> {
                 logger.kotlinInfo("Compilation succeeded")
             }
-        }
-    }
-
-    private fun compileNotIncremental(
-            sourcesToCompile: List<File>,
-            outputDir: File,
-            args: K2JVMCompilerArguments
-    ): ExitCode {
-        logger.kotlinDebug("Removing all kotlin classes in $outputDir")
-        // we're free to delete all classes since only we know about that directory
-        // todo: can be optimized -- compile and remove only files that were not generated
-        listClassFiles(outputDir.canonicalPath).forEach { it.delete() }
-
-        val moduleFile = makeModuleFile(
-                args.moduleName,
-                isTest = false,
-                outputDir = outputDir,
-                sourcesToCompile = sourcesToCompile,
-                javaSourceRoots = getJavaSourceRoots(),
-                classpath = compileClasspath,
-                friendDirs = listOf())
-        args.module = moduleFile.absolutePath
-        val messageCollector = GradleMessageCollector(logger)
-
-        sourceAnnotationsRegistry?.clear()
-        val services = with (Services.Builder()) {
-            sourceAnnotationsRegistry?.let { handler ->
-                register(SourceRetentionAnnotationHandler::class.java, handler)
-            }
-            build()
-        }
-
-        try {
-            logger.kotlinDebug("compiling with args: ${ArgumentUtils.convertArgumentsToStringList(args)}")
-            logger.kotlinDebug("compiling with classpath: ${compileClasspath.toList().sorted().joinToString()}")
-            return compiler.exec(messageCollector, services, args)
-        }
-        finally {
-            moduleFile.delete()
         }
     }
 
@@ -359,8 +325,6 @@ open class Kotlin2JsCompile() : AbstractKotlinCompile<K2JSCompilerArguments>(), 
     private val kotlinOptionsImpl = KotlinJsOptionsImpl()
     override val kotlinOptions: KotlinJsOptions
             get() = kotlinOptionsImpl
-
-    var compilerJarFile: File? = null
 
     @Suppress("unused")
     val outputFile: String?
