@@ -40,6 +40,8 @@ import org.jetbrains.kotlin.cli.js.K2JSCompiler
 import org.jetbrains.kotlin.cli.jvm.K2JVMCompiler
 import org.jetbrains.kotlin.com.intellij.openapi.util.io.FileUtil
 import org.jetbrains.kotlin.compilerRunner.ArgumentUtils
+import org.jetbrains.kotlin.compilerRunner.GradleCompilerRunner
+import org.jetbrains.kotlin.compilerRunner.OutputItemsCollectorImpl
 import org.jetbrains.kotlin.config.Services
 import org.jetbrains.kotlin.gradle.dsl.*
 import org.jetbrains.kotlin.gradle.plugin.kotlinDebug
@@ -181,17 +183,20 @@ open class KotlinCompile : AbstractKotlinCompile<K2JVMCompilerArguments>(), Kotl
     }
 
     override fun callCompiler(args: K2JVMCompilerArguments, allKotlinSources: List<File>, changedFiles: ChangedFiles) {
-        val outputDir = destinationDir
+        val messageCollector = GradleMessageCollector(logger)
+        args.classpathAsList = compileClasspath.toList()
+        args.destinationAsFile = destinationDir
+        val outputItemCollector = OutputItemsCollectorImpl()
 
         if (!incremental) {
             anyClassesCompiled = true
-            processCompilerExitCode(compileNotIncremental(allKotlinSources, outputDir, args))
+            val exitCode = GradleCompilerRunner(project).runJvmCompiler(allKotlinSources, getJavaSourceRoots(), args, messageCollector, outputItemCollector)
+            processCompilerExitCode(exitCode)
             return
         }
 
         logger.warn(USING_EXPERIMENTAL_INCREMENTAL_MESSAGE)
         val reporter = GradleIncReporter(project.rootProject.projectDir)
-        val messageCollector = GradleMessageCollector(logger)
         val compiler = IncrementalJvmCompilerRunner(
                 taskBuildDirectory,
                 getJavaSourceRoots(),
@@ -203,8 +208,6 @@ open class KotlinCompile : AbstractKotlinCompile<K2JVMCompilerArguments>(), Kotl
                 artifactDifferenceRegistryProvider,
                 artifactFile
         )
-        args.classpathAsList = classpath.toList()
-        args.destinationAsFile = destinationDir
         try {
             val exitCode = compiler.compile(allKotlinSources, args, messageCollector, { changedFiles })
             processCompilerExitCode(exitCode)
