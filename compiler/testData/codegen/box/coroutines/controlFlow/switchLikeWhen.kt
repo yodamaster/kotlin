@@ -1,8 +1,5 @@
 // WITH_RUNTIME
 
-// TODO: fix bug in JVM backend and remove this directive
-// TARGET_BACKEND: JS
-
 class Controller {
     var result = ""
 
@@ -28,7 +25,7 @@ fun box(): String {
             }
         }
     }
-    if (value != "A;[B][C]!") return "fail: suspend as if condition: $value"
+    if (value != "A;B]C]!") return "fail: suspend as if condition: $value"
 
     return "OK"
 }
