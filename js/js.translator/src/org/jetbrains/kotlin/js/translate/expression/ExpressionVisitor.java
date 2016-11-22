@@ -53,9 +53,7 @@ import org.jetbrains.kotlin.types.KotlinType;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.jetbrains.kotlin.js.translate.context.Namer.GET_KCLASS;
-import static org.jetbrains.kotlin.js.translate.context.Namer.GET_KCLASS_FROM_EXPRESSION;
-import static org.jetbrains.kotlin.js.translate.context.Namer.getCapturedVarAccessor;
+import static org.jetbrains.kotlin.js.translate.context.Namer.*;
 import static org.jetbrains.kotlin.js.translate.general.Translation.translateAsExpression;
 import static org.jetbrains.kotlin.js.translate.utils.BindingUtils.*;
 import static org.jetbrains.kotlin.js.translate.utils.ErrorReportingUtils.message;
@@ -224,13 +222,14 @@ public final class ExpressionVisitor extends TranslatorVisitor<JsNode> {
                 : "::class expression should be type checked to a KClass: " + expressionType;
 
         KotlinType type = CollectionsKt.single(expressionType.getArguments()).getType();
-        JsExpression referenceToJsClass = UtilsKt.getReferenceToJsClass(type, context);
 
         ClassifierDescriptor typeClassifier = type.getConstructor().getDeclarationDescriptor();
         if (typeClassifier != null && DescriptorUtils.isEnumEntry(typeClassifier)) {
-            return new JsInvocation(context.namer().kotlin(GET_KCLASS_FROM_EXPRESSION), referenceToJsClass);
+            JsExpression referenceToEntry = ReferenceTranslator.translateAsValueReference(typeClassifier, context);
+            return new JsInvocation(context.namer().kotlin(GET_KCLASS_FROM_EXPRESSION), referenceToEntry);
         }
 
+        JsExpression referenceToJsClass = UtilsKt.getReferenceToJsClass(type, context);
         return new JsInvocation(context.namer().kotlin(GET_KCLASS), referenceToJsClass);
     }
 

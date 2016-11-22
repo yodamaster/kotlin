@@ -304,7 +304,7 @@ internal class ExpressionDecomposer private constructor(
             else {
                 if (receiver != null && applyBindIfNecessary) {
                     val receiverTmp = receiver.extractToTemporary()
-                    qualifier = JsAstUtils.invokeBind(receiverTmp, pureFqn(callee.ident, receiverTmp))
+                    qualifier = JsAstUtils.invokeBind(receiverTmp, pureFqn(callee!!.ident, receiverTmp))
                 }
                 qualifier = qualifier.extractToTemporary()
             }
