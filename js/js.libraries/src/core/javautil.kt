@@ -30,7 +30,6 @@ public inline fun <T> Comparator(crossinline comparison: (T, T) -> Int): Compara
     override fun compare(obj1: T, obj2: T): Int = comparison(obj1, obj2)
 }
 
-@library
 public interface RandomAccess
 
 @library
@@ -121,7 +120,6 @@ public open class LinkedHashMap<K, V>(
         initialCapacity: Int = DEFAULT_INITIAL_CAPACITY, loadFactor: Float = DEFAULT_LOAD_FACTOR, accessOrder: Boolean = false
 ) : HashMap<K, V>(initialCapacity, loadFactor)
 
-@library
 public open class NoSuchElementException(message: String? = null) : Exception() {}
 
 @native

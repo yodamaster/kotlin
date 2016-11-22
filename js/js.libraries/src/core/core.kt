@@ -4,7 +4,7 @@ import java.util.*
 
 @native
 public val noImpl: Nothing
-    get() = throw Exception()
+    get() = throw java.lang.Exception()
 
 @native
 public fun eval(expr: String): dynamic = noImpl

@@ -1,9 +1,7 @@
 package java.io
 
-@library
-public class IOException(message: String = "") : Exception() {}
+public class IOException(message: String = "") : Exception(message)
 
-@library
 public interface Closeable {
     public open fun close(): Unit
 }
