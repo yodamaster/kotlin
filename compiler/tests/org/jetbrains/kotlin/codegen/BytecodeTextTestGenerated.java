@@ -1050,6 +1050,51 @@ public class BytecodeTextTestGenerated extends AbstractBytecodeTextTest {
         }
     }
 
+    @TestMetadata("compiler/testData/codegen/bytecodeText/ieee754")
+    @TestDataPath("$PROJECT_ROOT")
+    @RunWith(JUnit3RunnerWithInners.class)
+    public static class Ieee754 extends AbstractBytecodeTextTest {
+        public void testAllFilesPresentInIeee754() throws Exception {
+            KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("compiler/testData/codegen/bytecodeText/ieee754"), Pattern.compile("^(.+)\\.kt$"), TargetBackend.ANY, true);
+        }
+
+        @TestMetadata("byteSmartCast.kt")
+        public void testByteSmartCast() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/bytecodeText/ieee754/byteSmartCast.kt");
+            doTest(fileName);
+        }
+
+        @TestMetadata("charSmartCast.kt")
+        public void testCharSmartCast() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/bytecodeText/ieee754/charSmartCast.kt");
+            doTest(fileName);
+        }
+
+        @TestMetadata("diffeterntTypes.kt")
+        public void testDiffeterntTypes() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/bytecodeText/ieee754/diffeterntTypes.kt");
+            doTest(fileName);
+        }
+
+        @TestMetadata("intSmartCast.kt")
+        public void testIntSmartCast() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/bytecodeText/ieee754/intSmartCast.kt");
+            doTest(fileName);
+        }
+
+        @TestMetadata("longSmartCast.kt")
+        public void testLongSmartCast() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/bytecodeText/ieee754/longSmartCast.kt");
+            doTest(fileName);
+        }
+
+        @TestMetadata("shortSmartCast.kt")
+        public void testShortSmartCast() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/bytecodeText/ieee754/shortSmartCast.kt");
+            doTest(fileName);
+        }
+    }
+
     @TestMetadata("compiler/testData/codegen/bytecodeText/inline")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)
