@@ -23,6 +23,7 @@ import org.jetbrains.kotlin.analyzer.AnalysisResult
 import org.jetbrains.kotlin.codegen.*
 import org.jetbrains.kotlin.codegen.state.GenerationState
 import org.jetbrains.kotlin.codegen.state.KotlinTypeMapper
+import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.kapt3.diagnostic.ErrorsKapt3
 import org.jetbrains.kotlin.kapt3.diagnostic.KaptError
@@ -169,8 +170,7 @@ abstract class AbstractKapt3Extension(
                 module,
                 bindingContext,
                 files,
-                disableCallAssertions = false,
-                disableParamAssertions = false)
+                CompilerConfiguration.EMPTY)
 
         val (classFilesCompilationTime) = measureTimeMillis {
             KotlinCodegenFacade.compileCorrectFiles(generationState, CompilationErrorHandler.THROW_EXCEPTION)
