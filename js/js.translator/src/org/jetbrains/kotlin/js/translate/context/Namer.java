@@ -43,7 +43,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import static com.google.dart.compiler.backend.js.ast.JsScopesKt.JsObjectScope;
 import static org.jetbrains.kotlin.js.translate.utils.JsAstUtils.pureFqn;
 import static org.jetbrains.kotlin.js.translate.utils.JsDescriptorUtils.getModuleName;
 
@@ -122,7 +121,9 @@ public final class Namer {
             qualifier = fqNameParent.asString();
         }
 
-        String mangledName = new NameSuggestion().suggest(functionDescriptor).getNames().get(0);
+        SuggestedName suggestedName = new NameSuggestion().suggest(functionDescriptor);
+        assert suggestedName != null : "Suggested name can be null only for module descriptors: " + functionDescriptor;
+        String mangledName = suggestedName.getNames().get(0);
         return StringUtil.join(Arrays.asList(moduleName, qualifier, mangledName), ".");
     }
 
@@ -211,7 +212,7 @@ public final class Namer {
     private final JsName isTypeName;
 
     private Namer(@NotNull JsScope rootScope) {
-        kotlinScope = JsObjectScope(rootScope, "Kotlin standard object");
+        kotlinScope = new JsObjectScope(rootScope, "Kotlin standard object");
 
         callGetProperty = kotlin("callGetter");
         callSetProperty = kotlin("callSetter");

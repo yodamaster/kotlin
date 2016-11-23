@@ -26,7 +26,6 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.kotlin.descriptors.*;
 import org.jetbrains.kotlin.descriptors.annotations.AnnotationDescriptor;
 import org.jetbrains.kotlin.descriptors.annotations.KotlinRetention;
-import org.jetbrains.kotlin.js.translate.callTranslator.CallTranslator;
 import org.jetbrains.kotlin.js.translate.context.Namer;
 import org.jetbrains.kotlin.js.translate.context.TranslationContext;
 import org.jetbrains.kotlin.js.translate.declaration.ClassTranslator;
@@ -46,7 +45,6 @@ import org.jetbrains.kotlin.resolve.BindingContext;
 import org.jetbrains.kotlin.resolve.BindingContextUtils;
 import org.jetbrains.kotlin.resolve.bindingContextUtil.BindingContextUtilsKt;
 import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall;
-import org.jetbrains.kotlin.resolve.calls.model.ResolvedValueArgument;
 import org.jetbrains.kotlin.resolve.constants.CompileTimeConstant;
 import org.jetbrains.kotlin.resolve.constants.evaluate.ConstantExpressionEvaluator;
 import org.jetbrains.kotlin.resolve.descriptorUtil.DescriptorUtilsKt;
@@ -54,13 +52,9 @@ import org.jetbrains.kotlin.resolve.inline.InlineUtil;
 import org.jetbrains.kotlin.types.expressions.DoubleColonLHS;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import static org.jetbrains.kotlin.js.translate.context.Namer.GET_KCLASS;
-import static org.jetbrains.kotlin.js.translate.context.Namer.GET_KCLASS_FROM_EXPRESSION;
-import static org.jetbrains.kotlin.js.translate.context.Namer.getCapturedVarAccessor;
+import static org.jetbrains.kotlin.js.translate.context.Namer.*;
 import static org.jetbrains.kotlin.js.translate.general.Translation.translateAsExpression;
 import static org.jetbrains.kotlin.js.translate.utils.BindingUtils.*;
 import static org.jetbrains.kotlin.js.translate.utils.ErrorReportingUtils.message;
@@ -466,13 +460,14 @@ public final class ExpressionVisitor extends TranslatorVisitor<JsNode> {
         JsExpression alias = new LiteralFunctionTranslator(context).translate(expression, null, null);
 
         FunctionDescriptor descriptor = getFunctionDescriptor(context.bindingContext(), expression);
-        JsName name = context.getNameForDescriptor(descriptor);
+        JsNameRef nameRef = (JsNameRef) ReferenceTranslator.translateAsValueReference(descriptor, context);
+        assert nameRef.getName() != null;
         if (InlineUtil.isInline(descriptor)) {
-            MetadataProperties.setStaticRef(name, alias);
+            MetadataProperties.setStaticRef(nameRef.getName(), alias);
         }
 
         boolean isExpression = BindingContextUtilsKt.isUsedAsExpression(expression, context.bindingContext());
-        JsNode result = isExpression ? alias : JsAstUtils.newVar(name, alias);
+        JsNode result = isExpression ? alias : JsAstUtils.newVar(nameRef.getName(), alias);
 
         return result.source(expression);
     }
@@ -558,10 +553,7 @@ public final class ExpressionVisitor extends TranslatorVisitor<JsNode> {
         ResolvedCall<FunctionDescriptor> superCall = BindingUtils.getSuperCall(context.bindingContext(),
                                                                                expression.getObjectDeclaration());
         if (superCall != null) {
-            assert context.getDeclarationDescriptor() != null : "This expression should be inside declaration: " +
-                    PsiUtilsKt.getTextWithLocation(expression);
-            TranslationContext superCallContext = context.newDeclaration(context.getDeclarationDescriptor());
-            closureArgs.addAll(CallArgumentTranslator.translate(superCall, null, superCallContext).getTranslateArguments());
+            closureArgs.addAll(CallArgumentTranslator.translate(superCall, null, context).getTranslateArguments());
         }
 
         return new JsNew(constructor, closureArgs);

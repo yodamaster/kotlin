@@ -58,7 +58,7 @@ fun renameLocalNames(
         function: JsFunction
 ) {
     for (name in collectDefinedNames(function.body)) {
-        val freshName = context.getFreshName(name).apply { staticRef = name.staticRef }
+        val freshName = context.getTemporaryName(name.ident).apply { staticRef = name.staticRef }
         context.replaceName(name, freshName.makeRef())
     }
 }

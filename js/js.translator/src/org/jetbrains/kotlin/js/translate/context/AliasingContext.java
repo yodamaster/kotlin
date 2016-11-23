@@ -17,7 +17,6 @@
 package org.jetbrains.kotlin.js.translate.context;
 
 import com.google.dart.compiler.backend.js.ast.JsExpression;
-import gnu.trove.THashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor;
@@ -32,10 +31,10 @@ public class AliasingContext {
         return new AliasingContext(null, null, null);
     }
 
-    @NotNull
+    @Nullable
     private final Map<DeclarationDescriptor, JsExpression> aliasesForDescriptors;
 
-    @NotNull
+    @Nullable
     private final Map<KtExpression, JsExpression> aliasesForExpressions;
 
     @Nullable
@@ -47,8 +46,8 @@ public class AliasingContext {
             @Nullable Map<KtExpression, JsExpression> aliasesForExpressions
     ) {
         this.parent = parent;
-        this.aliasesForDescriptors = aliasesForDescriptors == null ? Collections.<DeclarationDescriptor, JsExpression>emptyMap() : aliasesForDescriptors;
-        this.aliasesForExpressions = aliasesForExpressions == null ? Collections.<KtExpression, JsExpression>emptyMap() : aliasesForExpressions;
+        this.aliasesForDescriptors = aliasesForDescriptors;
+        this.aliasesForExpressions = aliasesForExpressions;
     }
 
     @NotNull
@@ -73,6 +72,9 @@ public class AliasingContext {
 
     @Nullable
     public JsExpression getAliasForDescriptor(@NotNull DeclarationDescriptor descriptor) {
+        if (aliasesForDescriptors == null) {
+            return parent != null ? parent.getAliasForDescriptor(descriptor) : null;
+        }
         // these aliases cannot be shared and applicable only in current context
         JsExpression alias = aliasesForDescriptors.get(descriptor.getOriginal());
         return alias != null || parent == null ? alias : parent.getAliasForDescriptor(descriptor);
@@ -80,6 +82,9 @@ public class AliasingContext {
 
     @Nullable
     public JsExpression getAliasForExpression(@NotNull KtExpression element) {
+        if (aliasesForExpressions == null) {
+            return parent != null ? parent.getAliasForExpression(element) : null;
+        }
         JsExpression alias = aliasesForExpressions.get(element);
         return alias != null || parent == null ? alias : parent.getAliasForExpression(element);
     }

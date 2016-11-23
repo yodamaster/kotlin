@@ -13,15 +13,15 @@ fun <T> assertEquals(expected: T, actual: T, message: String? = null) {
 
 fun <T> assertNotEquals(illegal: T, actual: T, message: String? = null) {
     if (illegal == actual) {
-        val msg = if (message == null) "" else (" message = '" + message + "',")
+        val msg = if (message == null) "" else " message = '$message',"
         fail("Illegal value:$msg illegal = '$illegal', actual = '$actual'")
     }
 }
 
 fun <T> assertSame(expected: T, actual: T, message: String? = null) {
     if (expected !== actual) {
-        val msg = if (message == null) "" else (" message = '" + message + "',")
-        fail("Expected same instances, got expected = '$expected', actual = '$actual'")
+        val msg = if (message == null) "" else ", message = '$message'"
+        fail("Expected same instances, got expected = '$expected', actual = '$actual'$msg")
     }
 }
 

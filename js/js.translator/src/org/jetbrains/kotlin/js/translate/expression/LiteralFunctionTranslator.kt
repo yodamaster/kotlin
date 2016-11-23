@@ -243,7 +243,7 @@ private fun getFreshNamesInScope(scope: JsScope, suggested: List<JsExpression>):
         }
 
         val ident = suggestion.ident
-        val name = scope.declareFreshName(ident)
+        val name = scope.declareTemporaryName(ident)
         freshNames.add(name)
     }
 
