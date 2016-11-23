@@ -6872,6 +6872,12 @@ public class BoxJsTestGenerated extends AbstractBoxJsTest {
             KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("js/js.translator/testData/box/standardClasses"), Pattern.compile("^([^_](.+))\\.kt$"), TargetBackend.ANY, true);
         }
 
+        @TestMetadata("any.kt")
+        public void testAny() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("js/js.translator/testData/box/standardClasses/any.kt");
+            doTest(fileName);
+        }
+
         @TestMetadata("array.kt")
         public void testArray() throws Exception {
             String fileName = KotlinTestUtils.navigationMetadata("js/js.translator/testData/box/standardClasses/array.kt");
