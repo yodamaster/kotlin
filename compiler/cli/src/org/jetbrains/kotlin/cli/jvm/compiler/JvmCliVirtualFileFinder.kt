@@ -26,6 +26,7 @@ import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.serialization.deserialization.MetadataPackageFragment
+import org.jetbrains.kotlin.serialization.deserialization.MetadataPackageFragmentProvider
 import org.jetbrains.kotlin.utils.addToStdlib.check
 import java.io.InputStream
 
@@ -40,6 +41,15 @@ class JvmCliVirtualFileFinder(
         assert(!classId.isNestedClass) { "Nested classes are not supported here: $classId" }
 
         return findBinaryClass(classId, classId.shortClassName.asString() + MetadataPackageFragment.METADATA_FILE_EXTENSION)?.inputStream
+    }
+
+    override fun hasMetadataPackage(fqName: FqName): Boolean {
+        var found = false
+        index.traverseDirectoriesInPackage(fqName, continueSearch = { dir, _ ->
+            found = found or dir.children.any { it.extension == MetadataPackageFragment.METADATA_FILE_EXTENSION.substring(1) }
+            !found
+        })
+        return found
     }
 
     override fun findBuiltInsData(packageFqName: FqName): InputStream? {
