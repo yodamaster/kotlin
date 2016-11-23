@@ -17,7 +17,7 @@
 package org.jetbrains.kotlin.js.translate.intrinsic.objects
 
 import com.google.dart.compiler.backend.js.ast.JsExpression
-import com.google.dart.compiler.backend.js.ast.JsName
+import com.google.dart.compiler.backend.js.ast.JsInvocation
 import org.jetbrains.kotlin.builtins.CompanionObjectMapping
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
@@ -25,17 +25,25 @@ import org.jetbrains.kotlin.js.translate.context.Namer
 import org.jetbrains.kotlin.js.translate.context.StaticContext
 import org.jetbrains.kotlin.js.translate.context.TranslationContext
 import org.jetbrains.kotlin.js.translate.utils.JsAstUtils
+import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameUnsafe
+import org.jetbrains.kotlin.serialization.deserialization.findClassAcrossModuleDependencies
 
 class DefaultClassObjectIntrinsic(val staticContext: StaticContext, val fqName: FqName): ObjectIntrinsic {
-    private val innerName: JsName by lazy {
-        val declaration = JsAstUtils.replaceRootReference(staticContext.getQualifiedReference(fqName), Namer.kotlinObject())
-        staticContext.importDeclaration(fqName.shortName().asString(), declaration)
+    private val reference: JsExpression by lazy {
+        val existingClass = staticContext.currentModule.findClassAcrossModuleDependencies(ClassId.topLevel(fqName))
+        if (existingClass != null) {
+            JsInvocation(JsAstUtils.pureFqn(staticContext.getNameForObjectInstance(existingClass), null))
+        }
+        else {
+            val declaration = JsAstUtils.replaceRootReference(staticContext.getQualifiedReference(fqName), Namer.kotlinObject())
+            JsAstUtils.pureFqn(staticContext.importDeclaration(fqName.shortName().asString(), declaration), null)
+        }
     }
 
-    override fun apply(context: TranslationContext) = JsAstUtils.pureFqn(innerName, null)
+    override fun apply(context: TranslationContext) = reference
 }
 
 class ObjectIntrinsics(private val staticContext: StaticContext) {

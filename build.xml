@@ -367,7 +367,6 @@
             </sources>
 
             <sources dir="${js.stdlib.output.dir}">
-                <file name="builtins.js"/>
                 <file name="${compiled.stdlib.js}"/>
             </sources>
 
@@ -385,12 +384,12 @@
            3. We can omit return _, since it's already exported by the code in UMD wrapper.
         -->
         <replaceregexp file="${js.stdlib.output.dir}/kotlin.js"
-                       match="module.exports,\s*require\([^)]+\)"
+                       match="\}\)\s*\(module.exports,\s*require\([^)]+\)\)"
                        replace=""
                        byline="true" encoding="UTF-8" />
         <replaceregexp file="${js.stdlib.output.dir}/kotlin.js"
-                       match="function\s*\(_,\s*Kotlin\)"
-                       replace="function()"
+                       match="\(function\s*\(_,\s*Kotlin\)\s*\{"
+                       replace=""
                        byline="true" encoding="UTF-8" />
         <replaceregexp file="${js.stdlib.output.dir}/kotlin.js"
                        match="return\s+_;"
@@ -402,24 +401,15 @@
         <property environment="env"/>
         <kotlin-pp src="libraries/stdlib/src" output="${intermediate-sources}/stdlib/js" profile="JS" />
 
-        <!-- We don't want descriptors for built-ins to be serialized, so we compile these files separately. -->
-        <new-kotlin2js output="${js.stdlib.output.dir}/tmp-builtins/kotlin.js">
-            <src>
-                <union>
-                    <resources refid="kotlin.builtin.native.files"/>
-                </union>
-            </src>
-        </new-kotlin2js>
-
         <new-kotlin2js output="${js.stdlib.output.dir}/tmp/kotlin.js">
             <src>
                 <union>
+                    <resources refid="kotlin.builtin.native.files"/>
                     <fileset refid="kotlin.builtin.files"/>
                     <resources refid="js.lib.files"/>
                 </union>
             </src>
         </new-kotlin2js>
-        <move file="${js.stdlib.output.dir}/tmp-builtins/kotlin.js" tofile="${js.stdlib.output.dir}/builtins.js" />
         <move file="${js.stdlib.output.dir}/tmp/kotlin.js" tofile="${js.stdlib.output.dir}/${compiled.stdlib.js}" />
         <move file="${js.stdlib.output.dir}/tmp/kotlin" todir="${js.stdlib.output.dir}" />
         <move file="${js.stdlib.output.dir}/tmp/${compiled.stdlib.meta.js}" tofile="${js.stdlib.output.dir}/${compiled.stdlib.meta.js}" />

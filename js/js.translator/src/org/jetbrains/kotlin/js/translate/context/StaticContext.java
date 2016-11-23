@@ -24,6 +24,7 @@ import com.google.dart.compiler.backend.js.ast.metadata.SideEffectKind;
 import com.intellij.openapi.util.Factory;
 import com.intellij.util.containers.ContainerUtil;
 import com.intellij.util.containers.hash.LinkedHashMap;
+import kotlin.jvm.functions.Function1;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns;
@@ -39,16 +40,17 @@ import org.jetbrains.kotlin.js.translate.intrinsic.Intrinsics;
 import org.jetbrains.kotlin.js.translate.utils.JsAstUtils;
 import org.jetbrains.kotlin.name.FqName;
 import org.jetbrains.kotlin.name.FqNameUnsafe;
+import org.jetbrains.kotlin.name.Name;
 import org.jetbrains.kotlin.resolve.BindingContext;
 import org.jetbrains.kotlin.resolve.BindingTrace;
 import org.jetbrains.kotlin.resolve.DescriptorUtils;
 import org.jetbrains.kotlin.resolve.calls.tasks.DynamicCallsKt;
 import org.jetbrains.kotlin.resolve.descriptorUtil.DescriptorUtilsKt;
+import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter;
 
 import java.util.*;
 
 import static org.jetbrains.kotlin.js.config.LibrarySourcesConfig.UNKNOWN_EXTERNAL_MODULE_NAME;
-import static org.jetbrains.kotlin.js.translate.utils.AnnotationsUtils.getNameForAnnotatedObject;
 import static org.jetbrains.kotlin.js.translate.utils.AnnotationsUtils.isLibraryObject;
 import static org.jetbrains.kotlin.js.translate.utils.AnnotationsUtils.isNativeObject;
 import static org.jetbrains.kotlin.js.translate.utils.JsAstUtils.pureFqn;
@@ -415,12 +417,40 @@ public final class StaticContext {
                 rootFunction.getScope().declareFreshName(suggestedName);
     }
 
+    @Nullable
+    private DeclarationDescriptor getOverridingBuiltin(@NotNull DeclarationDescriptor descriptor) {
+        if (!KotlinBuiltIns.isBuiltIn(descriptor) || !(descriptor instanceof ClassDescriptor)) return null;
+        final ClassDescriptor cls = (ClassDescriptor) descriptor;
+        if (!(cls.getContainingDeclaration() instanceof PackageFragmentDescriptor)) return null;
+        PackageFragmentDescriptor pkg = (PackageFragmentDescriptor) cls.getContainingDeclaration();
+
+        PackageViewDescriptor currentPkg = currentModule.getPackage(pkg.getFqName());
+        Collection<DeclarationDescriptor> currentCandidates = currentPkg.getMemberScope().getContributedDescriptors(
+                DescriptorKindFilter.CLASSIFIERS, new Function1<Name, Boolean>() {
+            @Override
+            public Boolean invoke(Name name) {
+                return name.equals(cls.getName());
+            }
+        });
+
+        for (DeclarationDescriptor candidate : currentCandidates) {
+            if (DescriptorUtils.getContainingModule(candidate) == currentModule) return candidate;
+        }
+
+        return null;
+    }
+
     private final class InnerNameGenerator extends Generator<JsName> {
         public InnerNameGenerator() {
             addRule(new Rule<JsName>() {
                 @Nullable
                 @Override
                 public JsName apply(@NotNull DeclarationDescriptor descriptor) {
+                    DeclarationDescriptor overridingBuiltin = getOverridingBuiltin(descriptor);
+                    if (overridingBuiltin != null) {
+                        return getInnerNameForDescriptor(overridingBuiltin);
+                    }
+
                     if (descriptor instanceof FunctionDescriptor) {
                         FunctionDescriptor initialDescriptor = ((FunctionDescriptor) descriptor).getInitialSignatureDescriptor();
                         if (initialDescriptor != null) {
@@ -438,6 +468,7 @@ public final class StaticContext {
                             return getInnerNameForDescriptor(((ConstructorDescriptor) descriptor).getConstructedClass());
                         }
                     }
+
                     return localOrImportedName(descriptor, getSuggestedName(descriptor));
                 }
             });
