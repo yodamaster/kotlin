@@ -77,42 +77,48 @@ class CatchTranslator(
         val parameterRef = jsCatch.parameter.name.makeRef()
         val catchContext = context().innerContextWithAliased(parameterDescriptor, parameterRef)
 
-        jsCatch.body = JsBlock(translateCatches(catchContext, parameterDescriptor, parameterRef, catches.iterator()))
+        jsCatch.body = JsBlock(translateCatches(catchContext, parameterRef, catches.iterator()))
 
         return jsCatch
     }
 
     private fun translateCatches(
             context: TranslationContext,
-            parameterDescriptor: DeclarationDescriptor,
-            parameterRef: JsNameRef,
+            prevParameterRef: JsNameRef,
             catches: Iterator<KtCatchClause>
     ): JsStatement {
-        if (!catches.hasNext()) return JsThrow(parameterRef)
+        if (!catches.hasNext()) return JsThrow(prevParameterRef)
 
         var nextContext = context
 
         val catch = catches.next()
         val param = catch.catchParameter!!
-        val paramName = context.getNameForElement(param)
+        val parameterDescriptor = BindingUtils.getDescriptorForElement(bindingContext(), catch.catchParameter!!)
+        val parameterName = context().getNameForDescriptor(parameterDescriptor)
         val paramType = param.typeReference!!
 
         val additionalStatements = mutableListOf<JsStatement>()
-        if (paramName.ident != parameterRef.ident) {
-            additionalStatements += JsAstUtils.newVar(paramName, parameterRef)
-            nextContext = nextContext.innerContextWithAliased(parameterDescriptor, paramName.makeRef())
+        val parameterRef = if (parameterName.ident != prevParameterRef.ident) {
+            val parameterAlias = context.scope().declareTemporaryName(parameterName.ident)
+            additionalStatements += JsAstUtils.newVar(parameterAlias, prevParameterRef)
+            val ref = JsAstUtils.pureFqn(parameterAlias, null)
+            ref
         }
-        val thenBlock = translateCatchBody(context, catch)
+        else {
+            prevParameterRef
+        }
+        nextContext = nextContext.innerContextWithAliased(parameterDescriptor, parameterRef)
+        val thenBlock = translateCatchBody(nextContext, catch)
         thenBlock.statements.addAll(0, additionalStatements)
 
         if (paramType.isThrowable) return thenBlock
 
         // translateIsCheck won't ever return `null` if its second argument is `null`
         val typeCheck = with (patternTranslator(nextContext)) {
-            translateIsCheck(parameterRef, null, paramType)
+            translateIsCheck(prevParameterRef, null, paramType)
         }!!
 
-        val elseBlock = translateCatches(nextContext, parameterDescriptor, parameterRef, catches)
+        val elseBlock = translateCatches(context, prevParameterRef, catches)
         return JsIf(typeCheck, thenBlock, elseBlock)
     }
 
