@@ -285,7 +285,7 @@ class PlatformImplDeclarationChecker : DeclarationChecker {
         val b = when (other) {
             is ClassDescriptor -> other
             is TypeAliasDescriptor -> {
-                val classDescriptor = other.classDescriptor ?: return Incompatible.Unknown
+                val classDescriptor = other.classDescriptor ?: return Compatible // do not report extra error on erroneous typealias
                 // If a platform class test.C is implemented by a typealias test.C = test.CImpl, we must now state that any occurrence
                 // of the type "test.C" in the platform class scope should be replaced with "test.CImpl".
                 // Otherwise the types would not be equal and e.g. test.C's constructor is not going to be found in test.CImpl's scope.
