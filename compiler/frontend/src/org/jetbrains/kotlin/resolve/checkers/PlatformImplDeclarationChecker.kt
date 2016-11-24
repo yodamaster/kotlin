@@ -360,7 +360,7 @@ class PlatformImplDeclarationChecker : DeclarationChecker {
             selector(first) == selector(second)
 
     private inline fun <T, K> equalsBy(first: List<T>, second: List<T>, selector: (T) -> K): Boolean {
-        for (i in 0..first.size - 1) {
+        for (i in first.indices) {
             if (selector(first[i]) != selector(second[i])) return false
         }
 
