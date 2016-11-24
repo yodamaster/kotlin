@@ -137,12 +137,15 @@ public final class AnnotationsUtils {
     }
 
     public static boolean isPredefinedObject(@NotNull DeclarationDescriptor descriptor) {
+        if (descriptor instanceof MemberDescriptor && ((MemberDescriptor) descriptor).isPlatform()) return true;
+
         for (PredefinedAnnotation annotation : PredefinedAnnotation.values()) {
             if (hasAnnotationOrInsideAnnotatedClass(descriptor, annotation)) {
                 return true;
             }
         }
-        return descriptor instanceof MemberDescriptor && ((MemberDescriptor) descriptor).isPlatform();
+
+        return false;
     }
 
     private static boolean hasAnnotationOrInsideAnnotatedClass(
