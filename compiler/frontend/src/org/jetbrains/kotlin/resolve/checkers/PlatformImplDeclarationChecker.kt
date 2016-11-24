@@ -40,6 +40,7 @@ import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.TypeConstructorSubstitution
 import org.jetbrains.kotlin.types.TypeSubstitutor
 import org.jetbrains.kotlin.types.typeUtil.asTypeProjection
+import org.jetbrains.kotlin.utils.SmartList
 import org.jetbrains.kotlin.utils.keysToMap
 
 class PlatformImplDeclarationChecker : DeclarationChecker {
@@ -336,7 +337,7 @@ class PlatformImplDeclarationChecker : DeclarationChecker {
             for ((descriptor, compatibility) in mapping) {
                 when (compatibility) {
                     Compatible -> continue@outer
-                    is Incompatible -> incompatibilityMap.getOrPut(compatibility) { ArrayList(1) }.add(descriptor)
+                    is Incompatible -> incompatibilityMap.getOrPut(compatibility) { SmartList() }.add(descriptor)
                 }
             }
 
