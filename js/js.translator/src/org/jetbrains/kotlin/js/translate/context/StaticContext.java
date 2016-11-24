@@ -36,6 +36,7 @@ import org.jetbrains.kotlin.js.translate.context.generator.Generator;
 import org.jetbrains.kotlin.js.translate.context.generator.Rule;
 import org.jetbrains.kotlin.js.translate.declaration.InterfaceFunctionCopier;
 import org.jetbrains.kotlin.js.translate.intrinsic.Intrinsics;
+import org.jetbrains.kotlin.js.translate.utils.AnnotationsUtils;
 import org.jetbrains.kotlin.js.translate.utils.JsAstUtils;
 import org.jetbrains.kotlin.name.FqName;
 import org.jetbrains.kotlin.name.FqNameUnsafe;
@@ -327,6 +328,10 @@ public final class StaticContext {
 
         if (DynamicCallsKt.isDynamic(suggested.getDescriptor())) {
             scope = JsDynamicScope.INSTANCE;
+        }
+        else if (AnnotationsUtils.isPredefinedObject(suggested.getDescriptor()) &&
+                 DescriptorUtils.isTopLevelDeclaration(suggested.getDescriptor())) {
+            scope = rootScope;
         }
 
         List<JsName> names = new ArrayList<JsName>();

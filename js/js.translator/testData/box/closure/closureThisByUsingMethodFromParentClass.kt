@@ -1,20 +1,5 @@
 package foo
 
-// HACKS
-
-@native
-const val PATH_TO_F_CREATOR = "B\$far\$lambda"
-@native
-const val PATH_TO_G_CREATOR = "B\$gar\$lambda"
-
-@native("$PATH_TO_F_CREATOR")
-val F_CREATOR: Any = noImpl
-@native("$PATH_TO_G_CREATOR")
-val G_CREATOR: Any = noImpl
-
-
-// Test
-
 open class A {
     fun foo() = "A::foo"
 }
@@ -35,8 +20,8 @@ fun box(): String {
     assertEquals("A::foo", f())
     assertEquals("B::boo", g())
 
-    val fs = F_CREATOR.toString()
-    val gs = G_CREATOR.toString().replaceAll("boo", "foo").replaceAll("gar", "far")
+    val fs: String = js("B\$far\$lambda").toString()
+    val gs = (js("B\$gar\$lambda").toString() as String).replaceAll("boo", "foo").replaceAll("gar", "far")
 
     assertEquals(gs, fs)
 
