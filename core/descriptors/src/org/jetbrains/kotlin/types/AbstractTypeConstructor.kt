@@ -20,7 +20,25 @@ import org.jetbrains.kotlin.descriptors.SupertypeLoopChecker
 import org.jetbrains.kotlin.storage.StorageManager
 
 abstract class AbstractTypeConstructor(storageManager: StorageManager) : TypeConstructor {
-    override fun getSupertypes() = supertypes().supertypesWithoutCycles
+    override fun getSupertypes(): List<KotlinType> {
+        val superTypesWithoutCycles = supertypes().supertypesWithoutCycles
+        var errorMessage = ""
+        for (type in superTypesWithoutCycles) {
+            if (type.isError) {
+                errorMessage += """Type constructor ($this) has error super type.
+Declaration descriptor: $declarationDescriptor
+Super types without cycles: ${superTypesWithoutCycles.joinToString(",")}
+
+"""
+            }
+        }
+
+        if (errorMessage.isNotBlank()) {
+            throw IllegalStateException(errorMessage)
+        }
+
+        return superTypesWithoutCycles
+    }
 
     // In current version diagnostic about loops in supertypes is reported on each vertex (supertype reference) that lies on the cycle.
     // To achieve that we store both versions of supertypes --- before and after loops disconnection.
@@ -28,7 +46,7 @@ abstract class AbstractTypeConstructor(storageManager: StorageManager) : TypeCon
     private class Supertypes(
             val allSupertypes: Collection<KotlinType>) {
             // initializer is only needed as a stub for case when 'getSupertypes' is called while 'supertypes' are being calculated
-            var supertypesWithoutCycles: List<KotlinType> = listOf(ErrorUtils.ERROR_TYPE_FOR_LOOP_IN_SUPERTYPES)
+            var supertypesWithoutCycles: List<KotlinType> = listOf(ErrorUtils.ERROR_TYPE_FOR_LOOP_IN_SUPERTYPES_WITHOUT_CYCLE)
     }
 
     private val supertypes = storageManager.createLazyValueWithPostCompute(
