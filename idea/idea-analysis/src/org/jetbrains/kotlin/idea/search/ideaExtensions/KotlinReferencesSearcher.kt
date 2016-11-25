@@ -32,6 +32,7 @@ import org.jetbrains.kotlin.asJava.toLightClass
 import org.jetbrains.kotlin.asJava.toLightElements
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.idea.references.KtSimpleNameReference
+import org.jetbrains.kotlin.idea.references.mainReference
 import org.jetbrains.kotlin.idea.search.KOTLIN_NAMED_ARGUMENT_SEARCH_CONTEXT
 import org.jetbrains.kotlin.idea.search.allScope
 import org.jetbrains.kotlin.idea.search.effectiveSearchScope
@@ -39,6 +40,7 @@ import org.jetbrains.kotlin.idea.search.unionSafe
 import org.jetbrains.kotlin.idea.search.usagesSearch.OperatorReferenceSearcher
 import org.jetbrains.kotlin.idea.search.usagesSearch.dataClassComponentFunction
 import org.jetbrains.kotlin.idea.search.usagesSearch.getClassNameForCompanionObject
+import org.jetbrains.kotlin.idea.search.usagesSearch.processDelegationCallConstructorUsages
 import org.jetbrains.kotlin.idea.stubindex.KotlinSourceFilterScope
 import org.jetbrains.kotlin.idea.util.application.runReadAction
 import org.jetbrains.kotlin.psi.*
@@ -133,7 +135,13 @@ class KotlinReferencesSearcher : QueryExecutorBase<PsiReference, ReferencesSearc
                 if (referenceSearcher != null) {
                     longTasks.add { referenceSearcher.run() }
                 }
+            }
 
+            if (element is KtSecondaryConstructor) {
+                val intersectionScope = element.useScope.intersectWith(queryParameters.effectiveSearchScope)
+                element.processDelegationCallConstructorUsages(intersectionScope) {
+                    it.calleeExpression?.mainReference?.let { consumer.process(it) } ?: true
+                }
             }
 
             if (kotlinOptions.searchForComponentConventions) {

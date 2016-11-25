@@ -346,7 +346,7 @@ class UnusedSymbolInspection : AbstractKotlinInspection() {
 }
 
 class SafeDeleteFix(declaration: KtDeclaration) : LocalQuickFix {
-    private val name =
+    private val name: String =
             if (declaration is KtConstructor<*>) "Safe delete constructor"
             else QuickFixBundle.message("safe.delete.text", declaration.name)
 
