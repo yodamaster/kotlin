@@ -45,18 +45,9 @@ class ModuleMapping private constructor(val packageFqName2Parts: Map<String, Pac
             if (version.isCompatible()) {
                 val parseFrom = JvmPackageTable.PackageTable.parseFrom(stream)
                 if (parseFrom != null) {
-                    val packageFqNameParts = hashMapOf<String, PackageParts>()
-                    for (proto in parseFrom.packagePartsList) {
-                        PackageParts(proto.packageFqName).apply {
-                            packageFqNameParts.put(proto.packageFqName, this)
-                            parts.addAll(proto.classNameList)
-                        }
-                    }
-                    for (proto in parseFrom.metadataPartsList) {
-                        PackageParts(proto.packageFqName).apply {
-                            packageFqNameParts.put(proto.packageFqName, this)
-                            metadataParts.addAll(proto.classNameList)
-                        }
+                    val packageFqNameParts = hashMapOf<String, PackageParts>().apply {
+                        addParts(this, parseFrom.packagePartsList, PackageParts::parts)
+                        addParts(this, parseFrom.metadataPartsList, PackageParts::metadataParts)
                     }
                     return ModuleMapping(packageFqNameParts, debugName ?: "<unknown>")
                 }
@@ -66,6 +57,19 @@ class ModuleMapping private constructor(val packageFqName2Parts: Map<String, Pac
             }
 
             return EMPTY
+        }
+
+        private inline fun addParts(
+                result: MutableMap<String, PackageParts>,
+                partsList: List<JvmPackageTable.PackageParts>,
+                whichParts: (PackageParts) -> MutableSet<String>
+        ) {
+            for (proto in partsList) {
+                PackageParts(proto.packageFqName).apply {
+                    result.put(proto.packageFqName, this)
+                    whichParts(this).addAll(proto.classNameList)
+                }
+            }
         }
     }
 }
