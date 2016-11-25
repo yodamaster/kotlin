@@ -26,7 +26,7 @@ import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
 import org.jetbrains.kotlin.cli.jvm.compiler.JvmPackagePartProvider
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.jetbrains.kotlin.codegen.JvmCodegenUtil
-import org.jetbrains.kotlin.codegen.serializeJvmPackageTable
+import org.jetbrains.kotlin.codegen.serializeToByteArray
 import org.jetbrains.kotlin.config.CommonConfigurationKeys
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ClassKind
@@ -120,11 +120,11 @@ open class MetadataSerializer(private val dependOnOldBuiltIns: Boolean) {
         }
 
         val kotlinModuleFile = File(destDir, JvmCodegenUtil.getMappingFileName(JvmCodegenUtil.getModuleName(module)))
-        val packageTableBytes = serializeJvmPackageTable(JvmPackageTable.PackageTable.newBuilder().apply {
+        val packageTableBytes = JvmPackageTable.PackageTable.newBuilder().apply {
             for (table in packageTable.values) {
                 table.addTo(this)
             }
-        })
+        }.serializeToByteArray()
 
         kotlinModuleFile.parentFile.mkdirs()
         kotlinModuleFile.writeBytes(packageTableBytes)

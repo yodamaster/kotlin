@@ -104,7 +104,7 @@ public class ClassFileFactory implements OutputFileCollection {
         generators.put(outputFilePath, new OutAndSourceFileList(CollectionsKt.toList(packagePartSourceFiles)) {
             @Override
             public byte[] asBytes(ClassBuilderFactory factory) {
-                return ClassFileUtilsKt.serializeJvmPackageTable(builder);
+                return ClassFileUtilsKt.serializeToByteArray(builder);
             }
 
             @Override

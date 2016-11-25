@@ -59,7 +59,7 @@ private fun Iterable<PackageParts>.addCompiledParts(state: GenerationState): Lis
             }
 }
 
-fun serializeJvmPackageTable(builder: JvmPackageTable.PackageTable.Builder): ByteArray {
+fun JvmPackageTable.PackageTable.Builder.serializeToByteArray(): ByteArray {
     val moduleMapping = ByteArrayOutputStream(4096)
     val out = DataOutputStream(moduleMapping)
     val version = JvmMetadataVersion.INSTANCE.toArray()
@@ -67,7 +67,7 @@ fun serializeJvmPackageTable(builder: JvmPackageTable.PackageTable.Builder): Byt
     for (number in version) {
         out.writeInt(number)
     }
-    builder.build().writeTo(out)
+    build().writeTo(out)
     out.flush()
     return moduleMapping.toByteArray()
 }
