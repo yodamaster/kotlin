@@ -16,22 +16,33 @@
 
 package org.jetbrains.kotlin.js.resolve.diagnostics
 
-import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
+import org.jetbrains.kotlin.descriptors.PropertyAccessorDescriptor
 import org.jetbrains.kotlin.diagnostics.DiagnosticSink
+import org.jetbrains.kotlin.diagnostics.Errors
 import org.jetbrains.kotlin.js.translate.utils.AnnotationsUtils
+import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.KtDeclaration
 import org.jetbrains.kotlin.resolve.BindingContext
-import org.jetbrains.kotlin.resolve.checkers.SimpleDeclarationChecker
 import org.jetbrains.kotlin.resolve.DescriptorUtils
+import org.jetbrains.kotlin.resolve.checkers.SimpleDeclarationChecker
 
-class NativeInnerClassChecker : SimpleDeclarationChecker {
+class JsExternalChecker : SimpleDeclarationChecker {
     override fun check(declaration: KtDeclaration, descriptor: DeclarationDescriptor, diagnosticHolder: DiagnosticSink,
                        bindingContext: BindingContext) {
-        if (descriptor !is ClassDescriptor || !AnnotationsUtils.isNativeObject(descriptor)) return
+        if (!AnnotationsUtils.isNativeObject(descriptor)) return
 
-        if (descriptor.isInner && !AnnotationsUtils.isNativeObject(DescriptorUtils.getContainingClass(descriptor)!!)) {
-            diagnosticHolder.report(ErrorsJs.NATIVE_INNER_CLASS_PROHIBITED.on(declaration))
+        if (!DescriptorUtils.isTopLevelDeclaration(descriptor)) {
+            if (declaration.hasModifier(KtTokens.EXTERNAL_KEYWORD) && descriptor !is PropertyAccessorDescriptor) {
+                diagnosticHolder.report(ErrorsJs.NESTED_EXTERNAL_DECLARATION.on(declaration))
+            }
+        }
+
+        if (DescriptorUtils.isAnnotationClass(descriptor)) {
+            diagnosticHolder.report(Errors.WRONG_MODIFIER_TARGET.on(declaration, KtTokens.EXTERNAL_KEYWORD, "annotation class"))
+        }
+        else if (descriptor is PropertyAccessorDescriptor && !AnnotationsUtils.isNativeObject(descriptor.correspondingProperty)) {
+            diagnosticHolder.report(Errors.WRONG_MODIFIER_TARGET.on(declaration, KtTokens.EXTERNAL_KEYWORD, "property accessor"))
         }
     }
 }
