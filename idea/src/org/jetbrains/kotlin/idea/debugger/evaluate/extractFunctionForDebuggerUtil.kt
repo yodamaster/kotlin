@@ -150,7 +150,7 @@ private fun KtCodeFragment.clearContextElement() {
 }
 
 private fun KtFile.findContextElement(): KtElement? {
-    return this.findDescendantOfType { it.IS_CONTEXT_ELEMENT == true }
+    return this.findDescendantOfType { it.IS_CONTEXT_ELEMENT }
 }
 
 private var PsiElement.DEBUG_SMART_CAST: PsiElement? by CopyableUserDataProperty(Key.create("DEBUG_SMART_CAST"))

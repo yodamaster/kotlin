@@ -176,7 +176,7 @@ fun getInterfaceContainmentVerifier(getMemberInfos: () -> List<KotlinMemberInfo>
     return result@ { member ->
         val psiMethodToCheck = lightElementForMemberInfo(member) as? PsiMethod ?: return@result false
         getMemberInfos().any {
-            if (!it.isSuperClass || it.overrides != false) return@any false
+            if (!it.isSuperClass || it.overrides) return@any false
 
             val psiSuperInterface = (it.member as? KtClass)?.toLightClass()
             psiSuperInterface?.findMethodBySignature(psiMethodToCheck, true) != null

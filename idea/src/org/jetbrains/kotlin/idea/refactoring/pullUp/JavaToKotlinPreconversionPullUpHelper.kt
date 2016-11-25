@@ -83,7 +83,7 @@ class JavaToKotlinPreconversionPullUpHelper(
 
     override fun move(info: MemberInfo, substitutor: PsiSubstitutor) {
         val member = info.member
-        val movingSuperInterface = member is PsiClass && info.overrides == false
+        val movingSuperInterface = member is PsiClass && !info.overrides
 
         if (!movingSuperInterface) {
             member.originalMember = member
