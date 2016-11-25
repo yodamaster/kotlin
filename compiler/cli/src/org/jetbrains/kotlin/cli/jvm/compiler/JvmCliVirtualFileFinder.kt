@@ -26,7 +26,6 @@ import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.serialization.deserialization.MetadataPackageFragment
-import org.jetbrains.kotlin.serialization.deserialization.MetadataPackageFragmentProvider
 import org.jetbrains.kotlin.utils.addToStdlib.check
 import java.io.InputStream
 
