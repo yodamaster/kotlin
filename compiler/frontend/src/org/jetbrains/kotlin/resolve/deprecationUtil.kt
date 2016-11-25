@@ -67,7 +67,7 @@ private data class DeprecatedByOverridden(private val deprecations: Collection<D
         })
     }
 
-    override val deprecationLevel: DeprecationLevelValue = deprecations.map(Deprecation::deprecationLevel).min()!!
+    override val deprecationLevel: DeprecationLevelValue = deprecations.map { it.deprecationLevel }.min()!!
 
     override val target: DeclarationDescriptor
         get() = deprecations.first().target
@@ -115,7 +115,7 @@ private fun deprecationByOverridden(root: CallableMemberDescriptor): Deprecation
                 return
             }
             else -> {
-                overriddenDescriptors.forEach(::traverse)
+                overriddenDescriptors.forEach { traverse(it) }
             }
         }
     }
