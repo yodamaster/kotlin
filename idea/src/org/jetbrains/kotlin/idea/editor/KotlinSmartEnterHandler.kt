@@ -71,7 +71,7 @@ class KotlinSmartEnterHandler: SmartEnterProcessorWithFixers() {
 
         while (atCaret != null) {
             when {
-                atCaret.isKotlinStatement() == true -> return atCaret
+                atCaret.isKotlinStatement() -> return atCaret
                 atCaret.parent is KtFunctionLiteral -> return atCaret
                 atCaret is KtDeclaration -> {
                     val declaration = atCaret
