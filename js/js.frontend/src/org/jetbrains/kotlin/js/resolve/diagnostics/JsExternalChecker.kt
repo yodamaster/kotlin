@@ -16,10 +16,7 @@
 
 package org.jetbrains.kotlin.js.resolve.diagnostics
 
-import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
-import org.jetbrains.kotlin.descriptors.FunctionDescriptor
-import org.jetbrains.kotlin.descriptors.PropertyAccessorDescriptor
-import org.jetbrains.kotlin.descriptors.PropertyDescriptor
+import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.diagnostics.DiagnosticSink
 import org.jetbrains.kotlin.diagnostics.Errors
 import org.jetbrains.kotlin.js.translate.utils.AnnotationsUtils
@@ -47,6 +44,9 @@ class JsExternalChecker : SimpleDeclarationChecker {
         else if (descriptor is PropertyAccessorDescriptor && !AnnotationsUtils.isNativeObject(descriptor.correspondingProperty)) {
             diagnosticHolder.report(Errors.WRONG_MODIFIER_TARGET.on(declaration, KtTokens.EXTERNAL_KEYWORD, "property accessor"))
         }
+        else if (isPrivateNonInlineMemberOfExternalClass(descriptor)) {
+            diagnosticHolder.report(ErrorsJs.EXTERNAL_CLASS_PRIVATE_MEMBER.on(declaration))
+        }
 
         if (descriptor !is PropertyAccessorDescriptor && descriptor.isExtension) {
             val target = when (descriptor) {
@@ -56,5 +56,15 @@ class JsExternalChecker : SimpleDeclarationChecker {
             }
             diagnosticHolder.report(Errors.WRONG_MODIFIER_TARGET.on(declaration, KtTokens.EXTERNAL_KEYWORD, target))
         }
+    }
+
+    private fun isPrivateNonInlineMemberOfExternalClass(descriptor: DeclarationDescriptor): Boolean {
+        if (descriptor is PropertyAccessorDescriptor) return false
+        if (descriptor !is MemberDescriptor || descriptor.visibility != Visibilities.PRIVATE) return false
+        if (descriptor is FunctionDescriptor && descriptor.isInline) return false
+        if (descriptor is PropertyDescriptor && descriptor.accessors.all { it.isInline }) return false
+
+        val containingDeclaration = descriptor.containingDeclaration as? ClassDescriptor ?: return false
+        return AnnotationsUtils.isNativeObject(containingDeclaration)
     }
 }
