@@ -27,7 +27,9 @@ class PredefinedFunctionEnhancementInfo(
         val parametersInfo: List<TypeEnhancementInfo?> = emptyList()
 )
 
+private val NULLABLE = JavaTypeQualifiers(NullabilityQualifier.NULLABLE, null, isNotNullTypeParameter = false)
 private val NOT_NULLABLE = JavaTypeQualifiers(NullabilityQualifier.NOT_NULL, null, isNotNullTypeParameter = false)
+private val NOT_NULLABLE_T = JavaTypeQualifiers(NullabilityQualifier.NOT_NULL, null, isNotNullTypeParameter = true)
 
 val PREDEFINED_FUNCTION_ENHANCEMENT_INFO_BY_SIGNATURE = signatures {
     mapOf(
@@ -40,7 +42,62 @@ val PREDEFINED_FUNCTION_ENHANCEMENT_INFO_BY_SIGNATURE = signatures {
                                     )
                             )
                     ),
+            signature(javaUtil("Collection"), "removeIf(Ljava/util/function/Predicate;)Z") to
+                    PredefinedFunctionEnhancementInfo(
+                            parametersInfo = listOf(TypeEnhancementInfo(0 to NOT_NULLABLE, 1 to NOT_NULLABLE))
+                    ),
+            signature(javaUtil("Map"), "merge(Ljava/lang/Object;Ljava/lang/Object;Ljava/util/function/BiFunction;)Ljava/lang/Object;") to
+                    PredefinedFunctionEnhancementInfo(
+                            parametersInfo = listOf(
+                                    TypeEnhancementInfo(0 to NOT_NULLABLE),
+                                    TypeEnhancementInfo(0 to NOT_NULLABLE_T),
+                                    TypeEnhancementInfo(0 to NOT_NULLABLE, 1 to NOT_NULLABLE_T, 2 to NOT_NULLABLE_T, 3 to NULLABLE)
+                            ),
+                            returnTypeInfo = TypeEnhancementInfo(0 to NULLABLE)
+                    ),
             signature("java/util/function/Consumer", "accept(Ljava/lang/Object;)V") to
-                    PredefinedFunctionEnhancementInfo(parametersInfo = listOf(TypeEnhancementInfo(0 to NOT_NULLABLE)))
+                    PredefinedFunctionEnhancementInfo(
+                            parametersInfo = listOf(TypeEnhancementInfo(0 to NOT_NULLABLE))
+                    ),
+            signature("java/util/function/Predicate", "test(Ljava/lang/Object;)Z") to
+                    PredefinedFunctionEnhancementInfo(
+                            parametersInfo = listOf(TypeEnhancementInfo(0 to NOT_NULLABLE))
+                    ),
+            signature("java/util/function/Function", "apply(Ljava/lang/Object;)Ljava/lang/Object;") to
+                    PredefinedFunctionEnhancementInfo(
+                            parametersInfo = listOf(TypeEnhancementInfo(0 to NOT_NULLABLE)),
+                            returnTypeInfo = TypeEnhancementInfo(0 to NOT_NULLABLE)
+                    ),
+            signature("java/util/function/BiFunction", "apply(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;") to
+                    PredefinedFunctionEnhancementInfo(
+                            parametersInfo = listOf(
+                                    TypeEnhancementInfo(0 to NOT_NULLABLE),
+                                    TypeEnhancementInfo(0 to NOT_NULLABLE)
+                            ),
+                            returnTypeInfo = TypeEnhancementInfo(0 to NOT_NULLABLE)
+                    ),
+            signature(javaUtil("Optional"), "empty()Ljava/util/Optional;") to
+                    PredefinedFunctionEnhancementInfo(
+                            returnTypeInfo = TypeEnhancementInfo(0 to NOT_NULLABLE, 1 to NOT_NULLABLE_T)
+                    ),
+            signature(javaUtil("Optional"), "of(Ljava/lang/Object;)Ljava/util/Optional;") to
+                    PredefinedFunctionEnhancementInfo(
+                            parametersInfo = listOf(TypeEnhancementInfo(0 to NOT_NULLABLE_T)),
+                            returnTypeInfo = TypeEnhancementInfo(0 to NOT_NULLABLE, 1 to NOT_NULLABLE_T)
+                    ),
+            signature(javaUtil("Optional"), "ofNullable(Ljava/lang/Object;)Ljava/util/Optional;") to
+                    PredefinedFunctionEnhancementInfo(
+                            parametersInfo = listOf(TypeEnhancementInfo(0 to NULLABLE)),
+                            returnTypeInfo = TypeEnhancementInfo(0 to NOT_NULLABLE, 1 to NOT_NULLABLE_T)
+                    ),
+            signature(javaUtil("Optional"), "get()Ljava/lang/Object;") to
+                    PredefinedFunctionEnhancementInfo(
+                            returnTypeInfo = TypeEnhancementInfo(0 to NOT_NULLABLE)
+                    ),
+            signature(javaUtil("Optional"), "ifPresent(Ljava/util/function/Consumer;)V") to
+                    PredefinedFunctionEnhancementInfo(
+                            parametersInfo = listOf(TypeEnhancementInfo(0 to NOT_NULLABLE, 1 to NOT_NULLABLE_T))
+                    )
     )
+
 }
