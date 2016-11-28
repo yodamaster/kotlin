@@ -152,7 +152,7 @@ class IDELightClassGenerationSupport(private val project: Project) : LightClassG
                     return SourceNavigationHelper.getOriginalClass(classOrObject) as? KtLightClass
             }
         }
-        if (classOrObject.getContainingKtFile().analysisContext != null) {
+        if ((classOrObject.containingFile as? KtFile)?.analysisContext != null) {
             // explicit request to create light class from dummy.kt
             return KtLightClassForSourceDeclaration.create(classOrObject)
         }
@@ -299,10 +299,7 @@ class IDELightClassGenerationSupport(private val project: Project) : LightClassG
         if (decompiledClassOrObject is KtEnumEntry) {
             return null
         }
-        val containingJetFile = decompiledClassOrObject.getContainingKtFile()
-        if (containingJetFile !is KtClsFile) {
-            return null
-        }
+        val containingJetFile = decompiledClassOrObject.containingFile as? KtClsFile ?: return null
         val rootLightClassForDecompiledFile = createLightClassForDecompiledKotlinFile(containingJetFile) ?: return null
 
         return findCorrespondingLightClass(decompiledClassOrObject, rootLightClassForDecompiledFile)
