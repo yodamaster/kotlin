@@ -17,13 +17,13 @@
 package org.jetbrains.kotlin.js.translate.declaration;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.kotlin.descriptors.PackageFragmentDescriptor;
+import org.jetbrains.kotlin.descriptors.*;
 import org.jetbrains.kotlin.js.translate.context.TranslationContext;
 import org.jetbrains.kotlin.js.translate.general.AbstractTranslator;
 import org.jetbrains.kotlin.js.translate.utils.AnnotationsUtils;
 import org.jetbrains.kotlin.js.translate.utils.BindingUtils;
-import org.jetbrains.kotlin.psi.KtDeclaration;
-import org.jetbrains.kotlin.psi.KtFile;
+import org.jetbrains.kotlin.psi.*;
+import org.jetbrains.kotlin.resolve.DescriptorUtils;
 
 final class PackageTranslator extends AbstractTranslator {
     static PackageTranslator create(
@@ -50,6 +50,40 @@ final class PackageTranslator extends AbstractTranslator {
             if (!AnnotationsUtils.isPredefinedObject(BindingUtils.getDescriptorForElement(bindingContext(), declaration))) {
                 declaration.accept(visitor, context());
             }
+            else if (declaration instanceof KtClassOrObject) {
+                translateNativeFunctions((KtClassOrObject) declaration);
+            }
         }
+    }
+
+    private void translateNativeFunctions(KtClassOrObject declaration) {
+        ClassDescriptor classDescriptor = BindingUtils.getClassDescriptor(context().bindingContext(), declaration);
+        TranslationContext classContext = context().newDeclaration(classDescriptor);
+
+        NativeDeclarationVisitor visitor = new NativeDeclarationVisitor(classContext);
+        for (KtDeclaration child : declaration.getDeclarations()) {
+            if (child instanceof KtClassOrObject) {
+                translateNativeFunctions((KtClassOrObject) child);
+            }
+            else if (child instanceof KtFunction) {
+                FunctionDescriptor descriptor = BindingUtils.getFunctionDescriptor(bindingContext(), (KtFunction) child);
+                if (descriptor.isInline()) {
+                    child.accept(visitor, classContext);
+                }
+            }
+            else if (child instanceof KtProperty) {
+                PropertyDescriptor descriptor = BindingUtils.getPropertyDescriptor(bindingContext(), (KtProperty) child);
+                if (isInline(descriptor)) {
+                    child.accept(visitor, classContext);
+                }
+            }
+        }
+    }
+
+    private static boolean isInline(PropertyDescriptor property) {
+        for (PropertyAccessorDescriptor accessor : property.getAccessors()) {
+            if (!accessor.isInline()) return false;
+        }
+        return true;
     }
 }

@@ -3866,6 +3866,12 @@ public class BoxJsTestGenerated extends AbstractBoxJsTest {
             doTest(fileName);
         }
 
+        @TestMetadata("nativeInline.kt")
+        public void testNativeInline() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("js/js.translator/testData/box/inline/nativeInline.kt");
+            doTest(fileName);
+        }
+
         @TestMetadata("noInlineLambda.kt")
         public void testNoInlineLambda() throws Exception {
             String fileName = KotlinTestUtils.navigationMetadata("js/js.translator/testData/box/inline/noInlineLambda.kt");
@@ -4520,6 +4526,12 @@ public class BoxJsTestGenerated extends AbstractBoxJsTest {
         @TestMetadata("method.kt")
         public void testMethod() throws Exception {
             String fileName = KotlinTestUtils.navigationMetadata("js/js.translator/testData/box/inlineMultiModule/method.kt");
+            doTest(fileName);
+        }
+
+        @TestMetadata("nativeInline.kt")
+        public void testNativeInline() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("js/js.translator/testData/box/inlineMultiModule/nativeInline.kt");
             doTest(fileName);
         }
 
