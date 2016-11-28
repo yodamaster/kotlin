@@ -23,6 +23,7 @@ import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.resolve.AnalyzerExtensions
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.BindingTrace
+import org.jetbrains.kotlin.resolve.DescriptorUtils
 import org.jetbrains.kotlin.resolve.annotations.isInlineOnlyOrReified
 import org.jetbrains.kotlin.resolve.descriptorUtil.hasDefaultValue
 
@@ -141,7 +142,8 @@ object InlineAnalyzerExtension : AnalyzerExtensions.AnalyzerExtension {
 
         if (InlineUtil.containsReifiedTypeParameters(functionDescriptor) ||
             functionDescriptor.isInlineOnlyOrReified() ||
-            functionDescriptor.isPlatform) return
+            functionDescriptor.isPlatform ||
+            DescriptorUtils.isEffectivelyExternal(functionDescriptor)) return
 
         val reportOn = function.modifierList?.getModifier(KtTokens.INLINE_KEYWORD) ?: function
         trace.report(Errors.NOTHING_TO_INLINE.on(reportOn, functionDescriptor))
