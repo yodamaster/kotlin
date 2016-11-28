@@ -16,7 +16,10 @@
 
 package org.jetbrains.kotlin.load.java.typeEnhancement
 
+import org.jetbrains.kotlin.load.kotlin.SignatureBuildingComponents
 import org.jetbrains.kotlin.load.kotlin.signatures
+import org.jetbrains.kotlin.resolve.jvm.JvmPrimitiveType
+import org.jetbrains.kotlin.resolve.jvm.JvmPrimitiveType.BOOLEAN
 
 class TypeEnhancementInfo(val map: Map<Int, JavaTypeQualifiers>) {
     constructor(vararg pairs: Pair<Int, JavaTypeQualifiers>) : this(mapOf(*pairs))
@@ -27,82 +30,132 @@ class PredefinedFunctionEnhancementInfo(
         val parametersInfo: List<TypeEnhancementInfo?> = emptyList()
 )
 
+/** Type is always nullable: `T?` */
 private val NULLABLE = JavaTypeQualifiers(NullabilityQualifier.NULLABLE, null, isNotNullTypeParameter = false)
-private val NOT_NULLABLE = JavaTypeQualifiers(NullabilityQualifier.NOT_NULL, null, isNotNullTypeParameter = false)
-private val NOT_NULLABLE_T = JavaTypeQualifiers(NullabilityQualifier.NOT_NULL, null, isNotNullTypeParameter = true)
+/** Nullability depends on substitution, but the type is not platform: `T` */
+private val NOT_PLATFORM = JavaTypeQualifiers(NullabilityQualifier.NOT_NULL, null, isNotNullTypeParameter = false)
+/** Type is always non-nullable: `T & Any` */
+private val NOT_NULLABLE = JavaTypeQualifiers(NullabilityQualifier.NOT_NULL, null, isNotNullTypeParameter = true)
 
 val PREDEFINED_FUNCTION_ENHANCEMENT_INFO_BY_SIGNATURE = signatures {
-    val JLObject = "java/lang/Object"
-    mapOf(
-            signature(javaUtil("Iterator"), "forEachRemaining(Ljava/util/function/Consumer;)V") to
-                    PredefinedFunctionEnhancementInfo(
-                            parametersInfo = listOf(
-                                    TypeEnhancementInfo(
-                                            0 to NOT_NULLABLE,
-                                            1 to NOT_NULLABLE
-                                    )
-                            )
-                    ),
-            signature(javaUtil("Collection"), "removeIf(Ljava/util/function/Predicate;)Z") to
-                    PredefinedFunctionEnhancementInfo(
-                            parametersInfo = listOf(TypeEnhancementInfo(0 to NOT_NULLABLE, 1 to NOT_NULLABLE))
-                    ),
-            signature(javaUtil("Map"), jvmDescriptor("merge", JLObject, JLObject, "java/util/function/BiFunction", ret = JLObject)) to
-                    PredefinedFunctionEnhancementInfo(
-                            parametersInfo = listOf(
-                                    TypeEnhancementInfo(0 to NOT_NULLABLE),
-                                    TypeEnhancementInfo(0 to NOT_NULLABLE_T),
-                                    TypeEnhancementInfo(0 to NOT_NULLABLE, 1 to NOT_NULLABLE_T, 2 to NOT_NULLABLE_T, 3 to NULLABLE)
-                            ),
-                            returnTypeInfo = TypeEnhancementInfo(0 to NULLABLE)
-                    ),
-            signature("java/util/function/Consumer", jvmDescriptor("accept", JLObject)) to
-                    PredefinedFunctionEnhancementInfo(
-                            parametersInfo = listOf(TypeEnhancementInfo(0 to NOT_NULLABLE))
-                    ),
-            signature("java/util/function/Predicate", jvmDescriptor("test", JLObject, ret = "Z")) to
-                    PredefinedFunctionEnhancementInfo(
-                            parametersInfo = listOf(TypeEnhancementInfo(0 to NOT_NULLABLE))
-                    ),
-            signature("java/util/function/Function", jvmDescriptor("apply", JLObject, ret = JLObject)) to
-                    PredefinedFunctionEnhancementInfo(
-                            parametersInfo = listOf(TypeEnhancementInfo(0 to NOT_NULLABLE)),
-                            returnTypeInfo = TypeEnhancementInfo(0 to NOT_NULLABLE)
-                    ),
-            signature("java/util/function/BiFunction",jvmDescriptor("apply", JLObject, JLObject, ret = JLObject)) to
-                    PredefinedFunctionEnhancementInfo(
-                            parametersInfo = listOf(
-                                    TypeEnhancementInfo(0 to NOT_NULLABLE),
-                                    TypeEnhancementInfo(0 to NOT_NULLABLE)
-                            ),
-                            returnTypeInfo = TypeEnhancementInfo(0 to NOT_NULLABLE)
-                    )
-    ) +
-    inClass(javaUtil("Optional")) {
-        val JUOptional = this.classInternalName
-        mapOf(
-                signature(jvmDescriptor("empty", ret = JUOptional)) to
-                    PredefinedFunctionEnhancementInfo(
-                            returnTypeInfo = TypeEnhancementInfo(0 to NOT_NULLABLE, 1 to NOT_NULLABLE_T)
-                    ),
-                signature(jvmDescriptor("of", JLObject, ret = JUOptional)) to
-                    PredefinedFunctionEnhancementInfo(
-                            parametersInfo = listOf(TypeEnhancementInfo(0 to NOT_NULLABLE_T)),
-                            returnTypeInfo = TypeEnhancementInfo(0 to NOT_NULLABLE, 1 to NOT_NULLABLE_T)
-                    ),
-            signature(jvmDescriptor("ofNullable", JLObject, ret = JUOptional)) to
-                    PredefinedFunctionEnhancementInfo(
-                            parametersInfo = listOf(TypeEnhancementInfo(0 to NULLABLE)),
-                            returnTypeInfo = TypeEnhancementInfo(0 to NOT_NULLABLE, 1 to NOT_NULLABLE_T)
-                    ),
-            signature(jvmDescriptor("get", ret = JLObject)) to
-                    PredefinedFunctionEnhancementInfo(
-                            returnTypeInfo = TypeEnhancementInfo(0 to NOT_NULLABLE)
-                    ),
-            signature(jvmDescriptor("ifPresent", "java/util/function/Consumer")) to
-                    PredefinedFunctionEnhancementInfo(
-                            parametersInfo = listOf(TypeEnhancementInfo(0 to NOT_NULLABLE, 1 to NOT_NULLABLE_T))
-                    )
-        )
+    val JLObject = javaLang("Object")
+    val JFPredicate = javaFunction("Predicate")
+    val JFConsumer = javaFunction("Consumer")
+    val JFBiFunction = javaFunction("BiFunction")
+    val JFFunction = javaFunction("Function")
+    val JUOptional = javaUtil("Optional")
+
+    enhancement {
+        forClass(javaUtil("Iterator")) {
+            function("forEachRemaining") {
+                parameter(JFConsumer, NOT_PLATFORM, NOT_PLATFORM)
+            }
+        }
+        forClass(javaUtil("Collection")) {
+            function("removeIf") {
+                parameter(JFPredicate, NOT_PLATFORM, NOT_PLATFORM)
+                returns(BOOLEAN)
+            }
+        }
+        forClass(javaUtil("Map")) {
+            function("merge") {
+                parameter(JLObject, NOT_PLATFORM)
+                parameter(JLObject, NOT_NULLABLE)
+                parameter(JFBiFunction, NOT_PLATFORM, NOT_NULLABLE, NOT_NULLABLE, NULLABLE)
+                returns(JLObject, NULLABLE)
+            }
+        }
+        forClass(JFConsumer) {
+            function("accept") {
+                parameter(JLObject, NOT_PLATFORM)
+            }
+        }
+        forClass(JFPredicate) {
+            function("test") {
+                parameter(JLObject, NOT_PLATFORM)
+                returns(BOOLEAN)
+            }
+        }
+        forClass(JFFunction) {
+            function("apply") {
+                parameter(JLObject, NOT_PLATFORM)
+                returns(JLObject, NOT_PLATFORM)
+            }
+        }
+        forClass(JFBiFunction) {
+            function("apply") {
+                parameter(JLObject, NOT_PLATFORM)
+                parameter(JLObject, NOT_PLATFORM)
+                returns(JLObject, NOT_PLATFORM)
+            }
+        }
+        forClass(JUOptional) {
+            function("empty") {
+                returns(JUOptional, NOT_PLATFORM, NOT_NULLABLE)
+            }
+            function("of") {
+                parameter(JLObject, NOT_NULLABLE)
+                returns(JUOptional, NOT_PLATFORM, NOT_NULLABLE)
+            }
+            function("ofNullable") {
+                parameter(JLObject, NULLABLE)
+                returns(JUOptional, NOT_PLATFORM, NOT_NULLABLE)
+            }
+            function("get") {
+                returns(JLObject, NOT_NULLABLE)
+            }
+            function("ifPresent") {
+                parameter(JFConsumer, NOT_PLATFORM, NOT_NULLABLE)
+            }
+        }
     }
 }
+
+
+private inline fun enhancement(block: SignatureEnhancementBuilder.() -> Unit): Map<String, PredefinedFunctionEnhancementInfo>
+        = SignatureEnhancementBuilder().apply(block).build()
+
+private class SignatureEnhancementBuilder {
+    private val signatures = mutableMapOf<String, PredefinedFunctionEnhancementInfo>()
+
+    inline fun forClass(internalName: String, block: ClassEnhancementBuilder.() -> Unit) =
+            ClassEnhancementBuilder(internalName).block()
+
+    inner class ClassEnhancementBuilder(val className: String) {
+        fun function(name: String, block: FunctionEnhancementBuilder.() -> Unit) {
+            signatures += FunctionEnhancementBuilder(name).apply(block).build()
+        }
+
+        inner class FunctionEnhancementBuilder(val functionName: String) {
+            private val parameters = mutableListOf<Pair<String, TypeEnhancementInfo?>>()
+            private var returnType: Pair<String, TypeEnhancementInfo?> = "V" to null
+
+            fun parameter(type: String, vararg pairs: Pair<Int, JavaTypeQualifiers>) {
+                parameters += type to
+                        if (pairs.isEmpty()) null else TypeEnhancementInfo(*pairs)
+            }
+            fun parameter(type: String, vararg qualifiers: JavaTypeQualifiers) {
+                parameters += type to
+                        if (qualifiers.isEmpty()) null else TypeEnhancementInfo(qualifiers.withIndex().associateBy({it.index}, {it.value}))
+            }
+            fun returns(type: String, vararg pairs: Pair<Int, JavaTypeQualifiers>) {
+                returnType = type to TypeEnhancementInfo(*pairs)
+            }
+            fun returns(type: String, vararg qualifiers: JavaTypeQualifiers) {
+                returnType = type to TypeEnhancementInfo(qualifiers.withIndex().associateBy({it.index}, {it.value}))
+            }
+            fun returns(type: JvmPrimitiveType) {
+                returnType = type.desc to null
+            }
+            fun build() = with (SignatureBuildingComponents) {
+                signature(className, jvmDescriptor(functionName, parameters.map { it.first }, returnType.first)) to
+                        PredefinedFunctionEnhancementInfo(returnType.second, parameters.map { it.second })
+            }
+        }
+
+    }
+
+    fun build(): Map<String, PredefinedFunctionEnhancementInfo> = signatures
+}
+
+

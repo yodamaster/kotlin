@@ -25,6 +25,7 @@ inline fun <T> signatures(block: SignatureBuildingComponents.() -> T) = with(Sig
 object SignatureBuildingComponents {
     fun javaLang(name: String) = "java/lang/$name"
     fun javaUtil(name: String) = "java/util/$name"
+    fun javaFunction(name: String) = "java/util/function/$name"
 
     fun constructors(vararg signatures: String) = signatures.map { "<init>($it)V" }.toTypedArray()
 
@@ -38,13 +39,9 @@ object SignatureBuildingComponents {
     fun signature(internalName: String, jvmDescriptor: String) = internalName + "." + jvmDescriptor
 
     fun jvmDescriptor(name: String, vararg parameters: String, ret: String = "V") =
-            "$name(${parameters.joinToString("") { escapeClassName(it) }})${escapeClassName(ret)}"
+            jvmDescriptor(name, parameters.asList(), ret)
+    fun jvmDescriptor(name: String, parameters: List<String>, ret: String = "V") =
+            "$name(${parameters.joinToString("") { escapeClassName(it) }})${escapeClassName(internalName = ret)}"
 
     private fun escapeClassName(internalName: String) = if (internalName.length > 1) "L$internalName;" else internalName
-
-    fun <T> inClass(internalName: String, block: ClassSignatureBuildingComponents.() -> T) = with(ClassSignatureBuildingComponents(internalName), block)
-
-    class ClassSignatureBuildingComponents(val classInternalName: String) {
-        fun signature(jvmDescriptor: String) = classInternalName + "." + jvmDescriptor
-    }
 }
