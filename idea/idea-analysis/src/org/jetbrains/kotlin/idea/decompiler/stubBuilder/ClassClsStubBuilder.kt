@@ -22,10 +22,7 @@ import com.intellij.psi.stubs.StubElement
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.builtins.isNumberedFunctionClassFqName
 import org.jetbrains.kotlin.descriptors.SourceElement
-import org.jetbrains.kotlin.idea.decompiler.stubBuilder.flags.DATA
-import org.jetbrains.kotlin.idea.decompiler.stubBuilder.flags.INNER
-import org.jetbrains.kotlin.idea.decompiler.stubBuilder.flags.MODALITY
-import org.jetbrains.kotlin.idea.decompiler.stubBuilder.flags.VISIBILITY
+import org.jetbrains.kotlin.idea.decompiler.stubBuilder.flags.*
 import org.jetbrains.kotlin.lexer.KtModifierKeywordToken
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.name.ClassId
@@ -109,6 +106,7 @@ private class ClassClsStubBuilder(
     private fun createModifierListForClass(parent: StubElement<out PsiElement>): KotlinModifierListStubImpl {
         val relevantFlags = arrayListOf(VISIBILITY)
         if (isClass()) {
+            relevantFlags.add(EXTERNAL_CLASS)
             relevantFlags.add(INNER)
             relevantFlags.add(DATA)
             relevantFlags.add(MODALITY)
