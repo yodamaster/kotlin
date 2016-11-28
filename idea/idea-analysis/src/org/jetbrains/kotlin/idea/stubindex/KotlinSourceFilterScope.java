@@ -119,6 +119,6 @@ public class KotlinSourceFilterScope extends DelegatingGlobalSearchScope {
     @Override
     public String toString() {
         return "KotlinSourceFilterScope(delegate=" + myBaseScope + " src=" + includeProjectSourceFiles + " libSrc=" + includeLibrarySourceFiles +
-               "cls=" + includeClassFiles;
+               " cls=" + includeClassFiles;
     }
 }
