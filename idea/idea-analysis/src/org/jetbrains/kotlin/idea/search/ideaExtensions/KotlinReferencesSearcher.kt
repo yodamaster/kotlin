@@ -19,17 +19,15 @@ package org.jetbrains.kotlin.idea.search.ideaExtensions
 import com.intellij.openapi.application.QueryExecutorBase
 import com.intellij.psi.*
 import com.intellij.psi.impl.cache.CacheManager
+import com.intellij.psi.impl.search.ConstructorReferencesSearcher
 import com.intellij.psi.search.*
 import com.intellij.psi.search.searches.ReferencesSearch
 import com.intellij.util.Processor
-import org.jetbrains.kotlin.asJava.LightClassUtil
+import org.jetbrains.kotlin.asJava.*
 import org.jetbrains.kotlin.asJava.elements.KtLightElement
 import org.jetbrains.kotlin.asJava.elements.KtLightField
 import org.jetbrains.kotlin.asJava.elements.KtLightMethod
 import org.jetbrains.kotlin.asJava.elements.KtLightParameter
-import org.jetbrains.kotlin.asJava.namedUnwrappedElement
-import org.jetbrains.kotlin.asJava.toLightClass
-import org.jetbrains.kotlin.asJava.toLightElements
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.idea.references.KtSimpleNameReference
 import org.jetbrains.kotlin.idea.references.mainReference
@@ -142,6 +140,12 @@ class KotlinReferencesSearcher : QueryExecutorBase<PsiReference, ReferencesSearc
                 element.processDelegationCallConstructorUsages(intersectionScope) {
                     it.calleeExpression?.mainReference?.let { consumer.process(it) } ?: true
                 }
+                val constructorReferencesSearcher = ConstructorReferencesSearcher()
+                for (method in element.toLightMethods()) {
+                    val parameters = ReferencesSearch.SearchParameters(method, queryParameters.effectiveSearchScope,
+                                                                       true, queryParameters.optimizer)
+                    longTasks.add { constructorReferencesSearcher.processQuery(parameters, consumer) }
+                }
             }
 
             if (kotlinOptions.searchForComponentConventions) {
@@ -194,7 +198,7 @@ class KotlinReferencesSearcher : QueryExecutorBase<PsiReference, ReferencesSearc
                     processKtClassOrObject(element)
                 }
 
-                is KtNamedFunction, is KtSecondaryConstructor -> {
+                is KtNamedFunction -> {
                     val name = (element as KtFunction).name
                     if (name != null) {
                         val methods = LightClassUtil.getLightClassMethods(element)
@@ -203,6 +207,10 @@ class KotlinReferencesSearcher : QueryExecutorBase<PsiReference, ReferencesSearc
                         }
                     }
 
+                    processStaticsFromCompanionObject(element)
+                }
+
+                is KtSecondaryConstructor -> {
                     processStaticsFromCompanionObject(element)
                 }
 
