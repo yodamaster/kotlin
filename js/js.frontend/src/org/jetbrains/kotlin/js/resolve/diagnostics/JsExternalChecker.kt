@@ -18,7 +18,6 @@ package org.jetbrains.kotlin.js.resolve.diagnostics
 
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.diagnostics.DiagnosticSink
-import org.jetbrains.kotlin.diagnostics.Errors
 import org.jetbrains.kotlin.js.translate.utils.AnnotationsUtils
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.KtDeclaration
@@ -39,13 +38,16 @@ class JsExternalChecker : SimpleDeclarationChecker {
         }
 
         if (DescriptorUtils.isAnnotationClass(descriptor)) {
-            diagnosticHolder.report(Errors.WRONG_MODIFIER_TARGET.on(declaration, KtTokens.EXTERNAL_KEYWORD, "annotation class"))
+            diagnosticHolder.report(ErrorsJs.WRONG_EXTERNAL_DECLARATION.on(declaration, "annotation class"))
         }
         else if (descriptor is PropertyAccessorDescriptor && !AnnotationsUtils.isNativeObject(descriptor.correspondingProperty)) {
-            diagnosticHolder.report(Errors.WRONG_MODIFIER_TARGET.on(declaration, KtTokens.EXTERNAL_KEYWORD, "property accessor"))
+            diagnosticHolder.report(ErrorsJs.WRONG_EXTERNAL_DECLARATION.on(declaration, "property accessor"))
+        }
+        else if (descriptor is ClassDescriptor && descriptor.isInner) {
+            diagnosticHolder.report(ErrorsJs.WRONG_EXTERNAL_DECLARATION.on(declaration, "inner class"))
         }
         else if (isPrivateNonInlineMemberOfExternalClass(descriptor)) {
-            diagnosticHolder.report(ErrorsJs.EXTERNAL_CLASS_PRIVATE_MEMBER.on(declaration))
+            diagnosticHolder.report(ErrorsJs.WRONG_EXTERNAL_DECLARATION.on(declaration, "private member of class"))
         }
 
         if (descriptor !is PropertyAccessorDescriptor && descriptor.isExtension) {
@@ -54,7 +56,7 @@ class JsExternalChecker : SimpleDeclarationChecker {
                 is PropertyDescriptor -> "extension property"
                 else -> "extension member"
             }
-            diagnosticHolder.report(Errors.WRONG_MODIFIER_TARGET.on(declaration, KtTokens.EXTERNAL_KEYWORD, target))
+            diagnosticHolder.report(ErrorsJs.WRONG_EXTERNAL_DECLARATION.on(declaration, target))
         }
     }
 
