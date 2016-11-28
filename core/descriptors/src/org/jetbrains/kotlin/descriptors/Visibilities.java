@@ -168,8 +168,9 @@ public class Visibilities {
             ClassDescriptor classDescriptor = DescriptorUtils.getParentOfType(whatDeclaration, ClassDescriptor.class);
             if (classDescriptor == null) return false;
 
-            if (DescriptorUtils.isSubclass(fromClass, classDescriptor)
-                    && doesReceiverFitForProtectedVisibility(receiver, whatDeclaration, fromClass)) {
+            if (DescriptorUtils.isTopLevelDeclaration(fromClass) &&
+                DescriptorUtils.isSubclass(fromClass, classDescriptor) &&
+                doesReceiverFitForProtectedVisibility(receiver, whatDeclaration, fromClass)) {
                 return true;
             }
 
