@@ -41,6 +41,7 @@ fun KaptContext.doAnnotationProcessing(
 ) {
     with (options) {
         put(Option.PROC, "only") // Only process annotations
+        put(Option.BOOTCLASSPATH, "") // No boot classpath
         put(Option.CLASSPATH, compileClasspath.joinToString(File.pathSeparator) { it.canonicalPath })
         put(Option.PROCESSORPATH, annotationProcessingClasspath.joinToString(File.pathSeparator) { it.canonicalPath })
         put(Option.S, sourcesOutputDir.canonicalPath)
