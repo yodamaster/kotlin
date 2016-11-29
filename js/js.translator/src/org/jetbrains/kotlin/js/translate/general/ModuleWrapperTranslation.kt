@@ -131,13 +131,13 @@ object ModuleWrapperTranslation {
     private fun addModuleValidation(
             currentModuleId: String,
             program: JsProgram,
-            moduleName: String
+            module: StaticContext.ImportedModule
     ): JsStatement {
-        val moduleRef = makePlainModuleRef(moduleName, program)
+        val moduleRef = makePlainModuleRef(module, program)
         val moduleExistsCond = JsAstUtils.typeOfIs(moduleRef, program.getStringLiteral("undefined"))
         val moduleNotFoundMessage = program.getStringLiteral(
-                "Error loading module '" + currentModuleId + "'. Its dependency '" + moduleName + "' was not found. " +
-                "Please, check whether '" + moduleName + "' is loaded prior to '" + currentModuleId + "'.")
+                "Error loading module '" + currentModuleId + "'. Its dependency '" + module.externalName + "' was not found. " +
+                "Please, check whether '" + module.externalName + "' is loaded prior to '" + currentModuleId + "'.")
         val moduleNotFoundThrow = JsThrow(JsNew(JsNameRef("Error"), listOf<JsExpression>(moduleNotFoundMessage)))
         return JsIf(moduleExistsCond, JsBlock(moduleNotFoundThrow))
     }
