@@ -179,19 +179,26 @@ private fun <T : Any> mapBuiltInType(
     return null
 }
 
-internal fun computeInternalName(klass: ClassDescriptor): String {
-    val container = klass.containingDeclaration
+internal fun computeInternalName(descriptor: DeclarationDescriptor): String {
+    val container = descriptor.containingDeclaration
 
-    val name = SpecialNames.safeIdentifier(klass.name).identifier
+    val name = SpecialNames.safeIdentifier(descriptor.name).identifier
     if (container is PackageFragmentDescriptor) {
         val fqName = container.fqName
         return if (fqName.isRoot) name else fqName.asString().replace('.', '/') + '/' + name
     }
 
-    assert(container is ClassDescriptor) { "Unexpected container: $container for $klass" }
-
-    val containerInternalName = computeInternalName(container as ClassDescriptor)
-    return if (klass.kind == ClassKind.ENUM_ENTRY) containerInternalName else containerInternalName + "$" + name
+    when (container) {
+        is ClassDescriptor -> {
+            val containerInternalName = computeInternalName(container)
+            return if (descriptor is ClassDescriptor && descriptor.kind == ClassKind.ENUM_ENTRY) containerInternalName
+                else containerInternalName + "$" + name
+        }
+        is CallableDescriptor -> {
+            return computeInternalName(container) + "$" + name
+        }
+        else -> throw AssertionError("Unexpected container: $container for $descriptor")
+    }
 }
 
 private fun getRepresentativeUpperBound(descriptor: TypeParameterDescriptor): KotlinType {
