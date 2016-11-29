@@ -6659,6 +6659,12 @@ public class BoxJsTestGenerated extends AbstractBoxJsTest {
             doTest(fileName);
         }
 
+        @TestMetadata("exceptionIsInterface.kt")
+        public void testExceptionIsInterface() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("js/js.translator/testData/box/rtti/exceptionIsInterface.kt");
+            doTest(fileName);
+        }
+
         @TestMetadata("isComparable.kt")
         public void testIsComparable() throws Exception {
             String fileName = KotlinTestUtils.navigationMetadata("js/js.translator/testData/box/rtti/isComparable.kt");
@@ -6740,6 +6746,12 @@ public class BoxJsTestGenerated extends AbstractBoxJsTest {
         @TestMetadata("stdlibEmptyListClass.kt")
         public void testStdlibEmptyListClass() throws Exception {
             String fileName = KotlinTestUtils.navigationMetadata("js/js.translator/testData/box/rtti/stdlibEmptyListClass.kt");
+            doTest(fileName);
+        }
+
+        @TestMetadata("subclassOfNativeIsInterface.kt")
+        public void testSubclassOfNativeIsInterface() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("js/js.translator/testData/box/rtti/subclassOfNativeIsInterface.kt");
             doTest(fileName);
         }
     }
