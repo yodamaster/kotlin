@@ -37,8 +37,8 @@ import org.jetbrains.org.objectweb.asm.commons.InstructionAdapter
  * parameter values substituted.
  */
 class DefaultParameterValueSubstitutor(val state: GenerationState) {
-    companion object {
-        val ANNOTATION_TYPE_DESCRIPTOR_FOR_GENERATED_METHODS: String =
+    private companion object {
+        private val ANNOTATION_TYPE_DESCRIPTOR_FOR_GENERATED_METHODS: String =
                 Type.getObjectType("synthetic/kotlin/jvm/GeneratedByJvmOverloads").descriptor
     }
 
