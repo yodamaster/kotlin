@@ -29,6 +29,8 @@ import org.jetbrains.kotlin.kapt3.javac.KaptTreeMaker
 import org.jetbrains.kotlin.kapt3.javac.KaptJavaFileObject
 import org.jetbrains.kotlin.kapt3.util.*
 import org.jetbrains.kotlin.psi.KtFile
+import org.jetbrains.kotlin.resolve.DescriptorUtils
+import org.jetbrains.kotlin.resolve.descriptorUtil.getSuperClassNotAny
 import org.jetbrains.kotlin.resolve.descriptorUtil.getSuperClassOrAny
 import org.jetbrains.org.objectweb.asm.Opcodes
 import org.jetbrains.org.objectweb.asm.Type
@@ -193,17 +195,17 @@ class ClassFileToSourceStubConverter(
 
     private fun convertField(field: FieldNode, packageFqName: String): JCVariableDecl? {
         if (isSynthetic(field.access)) return null
+        val descriptor = kaptContext.origins[field]?.descriptor
 
         val modifiers = convertModifiers(field.access, ElementKind.FIELD, packageFqName, field.visibleAnnotations, field.invisibleAnnotations)
         val name = treeMaker.name(field.name)
         val type = Type.getType(field.desc)
 
         // Enum type must be an identifier (Javac requirement)
-        val typeExpression = if (isEnum(field.access)) {
+        val typeExpression = if (isEnum(field.access))
             treeMaker.SimpleName(type.className.substringAfterLast('.'))
-        } else {
-            signatureParser.parseFieldSignature(field.signature, treeMaker.Type(type))
-        }
+        else
+            getMaybeAnonymousType(descriptor) { signatureParser.parseFieldSignature(field.signature, treeMaker.Type(type)) }
 
         val value = field.value
 
@@ -234,8 +236,8 @@ class ClassFileToSourceStubConverter(
                     method.access.toLong(),
                 ElementKind.METHOD, packageFqName, visibleAnnotations, method.invisibleAnnotations)
 
-        val returnType = Type.getReturnType(method.desc)
-        val jcReturnType = if (isConstructor) null else treeMaker.Type(returnType)
+        val asmReturnType = Type.getReturnType(method.desc)
+        val jcReturnType = if (isConstructor) null else treeMaker.Type(asmReturnType)
 
         val parametersInfo = method.getParametersInfo(containingClass)
         @Suppress("NAME_SHADOWING")
@@ -258,7 +260,8 @@ class ClassFileToSourceStubConverter(
 
         val exceptionTypes = mapJList(method.exceptions) { treeMaker.FqName(it) }
 
-        val genericType = signatureParser.parseMethodSignature(method.signature, parameters, exceptionTypes, jcReturnType)
+        val genericSignature = signatureParser.parseMethodSignature(method.signature, parameters, exceptionTypes, jcReturnType)
+        val returnType = getMaybeAnonymousType(descriptor) { genericSignature.returnType }
 
         val defaultValue = method.annotationDefault?.let { convertLiteralExpression(it) }
 
@@ -285,17 +288,40 @@ class ClassFileToSourceStubConverter(
             }
 
             treeMaker.Block(0, superClassConstructorCall)
-        } else if (returnType == Type.VOID_TYPE) {
+        } else if (asmReturnType == Type.VOID_TYPE) {
             treeMaker.Block(0, JavacList.nil())
         } else {
-            val returnStatement = treeMaker.Return(convertLiteralExpression(getDefaultValue(returnType)))
+            val returnStatement = treeMaker.Return(convertLiteralExpression(getDefaultValue(asmReturnType)))
             treeMaker.Block(0, JavacList.of(returnStatement))
         }
 
         return treeMaker.MethodDef(
-                modifiers, name, genericType.returnType, genericType.typeParameters,
-                genericType.parameterTypes, genericType.exceptionTypes,
+                modifiers, name, returnType, genericSignature.typeParameters,
+                genericSignature.parameterTypes, genericSignature.exceptionTypes,
                 body, defaultValue)
+    }
+
+    private inline fun <T : JCExpression?> getMaybeAnonymousType(descriptor: DeclarationDescriptor?, f: () -> T): T {
+        if (descriptor is CallableDescriptor) {
+            val returnTypeDescriptor = descriptor.returnType?.constructor?.declarationDescriptor
+            if (returnTypeDescriptor is ClassDescriptor && DescriptorUtils.isAnonymousObject(returnTypeDescriptor)) {
+                @Suppress("UNCHECKED_CAST")
+                return getMostSuitableSuperTypeForAnonymousType(returnTypeDescriptor) as T
+            }
+        }
+
+        return f()
+    }
+
+    private fun getMostSuitableSuperTypeForAnonymousType(typeDescriptor: ClassDescriptor): JCExpression {
+        val superClass = typeDescriptor.getSuperClassNotAny()
+        if (superClass != null) {
+            return treeMaker.Type(typeMapper.mapType(superClass))
+        } else {
+            typeDescriptor.typeConstructor.supertypes.firstOrNull()?.let { return treeMaker.Type(typeMapper.mapType(it)) }
+        }
+
+        return treeMaker.FqName("java.lang.Object")
     }
 
     @Suppress("NOTHING_TO_INLINE")
