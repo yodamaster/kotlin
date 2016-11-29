@@ -28,7 +28,6 @@ import org.jetbrains.kotlin.diagnostics.Errors
 import org.jetbrains.kotlin.diagnostics.Errors.*
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.*
-import org.jetbrains.kotlin.psi.psiUtil.containingClassOrObject
 import org.jetbrains.kotlin.psi.psiUtil.visibilityModifier
 import org.jetbrains.kotlin.resolve.BindingContext.*
 import org.jetbrains.kotlin.resolve.DescriptorUtils.classCanHaveAbstractMembers
@@ -74,10 +73,12 @@ internal class DeclarationsCheckerBuilder(
         private val originalModifiersChecker: ModifiersChecker,
         private val annotationChecker: AnnotationChecker,
         private val identifierChecker: IdentifierChecker,
+        private val treatAsExternalRule: TreatAsExternalRule,
         private val languageVersionSettings: LanguageVersionSettings
 ) {
     fun withTrace(trace: BindingTrace) =
-            DeclarationsChecker(descriptorResolver, originalModifiersChecker, annotationChecker, identifierChecker, trace, languageVersionSettings)
+            DeclarationsChecker(descriptorResolver, originalModifiersChecker, annotationChecker, identifierChecker, treatAsExternalRule,
+                                trace, languageVersionSettings)
 }
 
 class DeclarationsChecker(
@@ -85,6 +86,7 @@ class DeclarationsChecker(
         modifiersChecker: ModifiersChecker,
         private val annotationChecker: AnnotationChecker,
         private val identifierChecker: IdentifierChecker,
+        private val treatAsExternalRule: TreatAsExternalRule,
         private val trace: BindingTrace,
         private val languageVersionSettings: LanguageVersionSettings
 ) {
@@ -295,10 +297,10 @@ class DeclarationsChecker(
         if (visibilityModifier != null && visibilityModifier.node?.elementType != KtTokens.PRIVATE_KEYWORD) {
             val classDescriptor = constructorDescriptor.containingDeclaration
             if (classDescriptor.kind == ClassKind.ENUM_CLASS) {
-                trace.report(NON_PRIVATE_CONSTRUCTOR_IN_ENUM.on(visibilityModifier));
+                trace.report(NON_PRIVATE_CONSTRUCTOR_IN_ENUM.on(visibilityModifier))
             }
             else if (classDescriptor.modality == Modality.SEALED) {
-                trace.report(NON_PRIVATE_CONSTRUCTOR_IN_SEALED.on(visibilityModifier));
+                trace.report(NON_PRIVATE_CONSTRUCTOR_IN_SEALED.on(visibilityModifier))
             }
         }
     }
@@ -725,7 +727,7 @@ class DeclarationsChecker(
         }
         else {
             val isUninitialized = trace.bindingContext.get(BindingContext.IS_UNINITIALIZED, propertyDescriptor) ?: false
-            val isExternal = DescriptorUtils.isEffectivelyExternal(propertyDescriptor)
+            val isExternal = treatAsExternalRule.apply(property, propertyDescriptor, trace.bindingContext)
             if (backingFieldRequired && !inTrait && !propertyDescriptor.isLateInit && !isPlatform && isUninitialized && !isExternal) {
                 if (containingDeclaration !is ClassDescriptor || hasAccessorImplementation) {
                     trace.report(MUST_BE_INITIALIZED.on(property))
@@ -762,7 +764,7 @@ class DeclarationsChecker(
 
         val containingDescriptor = functionDescriptor.containingDeclaration
         val hasAbstractModifier = function.hasModifier(KtTokens.ABSTRACT_KEYWORD)
-        val hasExternalModifier = DescriptorUtils.isEffectivelyExternal(functionDescriptor)
+        val hasExternalModifier = treatAsExternalRule.apply(function, functionDescriptor, trace.bindingContext)
 
         if (containingDescriptor is ClassDescriptor) {
             val inInterface = containingDescriptor.kind == ClassKind.INTERFACE

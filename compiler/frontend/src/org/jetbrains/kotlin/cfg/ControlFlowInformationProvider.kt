@@ -63,15 +63,16 @@ import java.util.*
 class ControlFlowInformationProvider private constructor(
         private val subroutine: KtElement,
         private val trace: BindingTrace,
-        private val pseudocode: Pseudocode
+        private val pseudocode: Pseudocode,
+        private val treatAsExternalRule: TreatAsExternalRule
 ) {
 
     private val pseudocodeVariablesData by lazy {
         PseudocodeVariablesData(pseudocode, trace.bindingContext)
     }
 
-    constructor(declaration: KtElement, trace: BindingTrace)
-    : this(declaration, trace, ControlFlowProcessor(trace).generatePseudocode(declaration)) {}
+    constructor(declaration: KtElement, trace: BindingTrace, treatAsExternalRule: TreatAsExternalRule)
+    : this(declaration, trace, ControlFlowProcessor(trace).generatePseudocode(declaration), treatAsExternalRule) {}
 
     fun checkForLocalClassOrObjectMode() {
         // Local classes and objects are analyzed twice: when TopDownAnalyzer processes it and as a part of its container.
@@ -176,7 +177,8 @@ class ControlFlowInformationProvider private constructor(
                 val functionDescriptor = trace.bindingContext.get(BindingContext.DECLARATION_TO_DESCRIPTOR, element) as? CallableDescriptor
                 val expectedType = functionDescriptor?.returnType
 
-                val providerForLocalDeclaration = ControlFlowInformationProvider(element, trace, localDeclarationInstruction.body)
+                val providerForLocalDeclaration = ControlFlowInformationProvider(
+                        element, trace, localDeclarationInstruction.body, treatAsExternalRule)
 
                 providerForLocalDeclaration.checkFunction(expectedType)
             }
@@ -638,7 +640,7 @@ class ControlFlowInformationProvider private constructor(
                 val containingClass = owner.getContainingClassOrObject()
                 val containingClassDescriptor = trace.get(DECLARATION_TO_DESCRIPTOR, containingClass) as? ClassDescriptor
                 if (!DescriptorUtils.isAnnotationClass(containingClassDescriptor) && containingClassDescriptor?.isPlatform == false &&
-                    !DescriptorUtils.isEffectivelyExternal(containingClassDescriptor)
+                    !treatAsExternalRule.apply(containingClass, containingClassDescriptor, trace.bindingContext)
                 ) {
                     report(UNUSED_PARAMETER.on(element, variableDescriptor), ctxt)
                 }
@@ -654,7 +656,7 @@ class ControlFlowInformationProvider private constructor(
                     || functionDescriptor.isOverridableOrOverrides
                     || owner.hasModifier(KtTokens.OVERRIDE_KEYWORD)
                     || functionDescriptor.isPlatform || functionDescriptor.isImpl
-                    || (DescriptorUtils.isEffectivelyExternal(functionDescriptor) && !owner.hasBody())
+                    || treatAsExternalRule.apply(owner, functionDescriptor, trace.bindingContext)
                     || OperatorNameConventions.GET_VALUE == functionName
                     || OperatorNameConventions.SET_VALUE == functionName
                     || OperatorNameConventions.PROPERTY_DELEGATED == functionName) {

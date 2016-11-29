@@ -20,14 +20,13 @@ import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.diagnostics.Errors
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.*
-import org.jetbrains.kotlin.resolve.AnalyzerExtensions
-import org.jetbrains.kotlin.resolve.BindingContext
-import org.jetbrains.kotlin.resolve.BindingTrace
-import org.jetbrains.kotlin.resolve.DescriptorUtils
+import org.jetbrains.kotlin.resolve.*
 import org.jetbrains.kotlin.resolve.annotations.isInlineOnlyOrReified
 import org.jetbrains.kotlin.resolve.descriptorUtil.hasDefaultValue
 
-object InlineAnalyzerExtension : AnalyzerExtensions.AnalyzerExtension {
+class InlineAnalyzerExtension(
+        private val inlineApplicabilityRules: Iterable<InlineApplicabilityRule>
+) : AnalyzerExtensions.AnalyzerExtension {
 
     override fun process(descriptor: CallableMemberDescriptor, functionOrProperty: KtCallableDeclaration, trace: BindingTrace) {
         checkModalityAndOverrides(descriptor, functionOrProperty, trace)
@@ -143,11 +142,14 @@ object InlineAnalyzerExtension : AnalyzerExtensions.AnalyzerExtension {
         if (InlineUtil.containsReifiedTypeParameters(functionDescriptor) ||
             functionDescriptor.isInlineOnlyOrReified() ||
             functionDescriptor.isPlatform ||
-            DescriptorUtils.isEffectivelyExternal(functionDescriptor)) return
+            checkAdditionalRules(functionDescriptor, function, trace)) return
 
         val reportOn = function.modifierList?.getModifier(KtTokens.INLINE_KEYWORD) ?: function
         trace.report(Errors.NOTHING_TO_INLINE.on(reportOn, functionDescriptor))
     }
+
+    private fun checkAdditionalRules(functionDescriptor: FunctionDescriptor, function: KtFunction, trace: BindingTrace) =
+        inlineApplicabilityRules.any { it.isInlineApplicable(function, functionDescriptor, trace.bindingContext) }
 
     fun checkInlinableParameter(
             parameter: ParameterDescriptor,

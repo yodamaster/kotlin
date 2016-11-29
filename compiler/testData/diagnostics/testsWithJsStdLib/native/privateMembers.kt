@@ -1,6 +1,3 @@
-// !DIAGNOSTICS: -NOTHING_TO_INLINE
-// TODO: should we disable NOTHING_TO_INLINE in JS backend?
-
 external class C {
     <!WRONG_EXTERNAL_DECLARATION!>private fun a(): Int<!>
 

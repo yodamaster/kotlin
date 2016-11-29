@@ -33,10 +33,16 @@ import static org.jetbrains.kotlin.types.TypeUtils.NO_EXPECTED_TYPE;
 public class ControlFlowAnalyzer {
     @NotNull private final BindingTrace trace;
     @NotNull private final KotlinBuiltIns builtIns;
+    @NotNull private final TreatAsExternalRule treatAsExternalRule;
 
-    public ControlFlowAnalyzer(@NotNull BindingTrace trace, @NotNull KotlinBuiltIns builtIns) {
+    public ControlFlowAnalyzer(
+            @NotNull BindingTrace trace,
+            @NotNull KotlinBuiltIns builtIns,
+            @NotNull TreatAsExternalRule treatAsExternalRule
+    ) {
         this.trace = trace;
         this.builtIns = builtIns;
+        this.treatAsExternalRule = treatAsExternalRule;
     }
 
     public void process(@NotNull BodiesResolveContext c) {
@@ -68,7 +74,8 @@ public class ControlFlowAnalyzer {
     }
 
     private void checkSecondaryConstructor(@NotNull KtSecondaryConstructor constructor) {
-        ControlFlowInformationProvider controlFlowInformationProvider = new ControlFlowInformationProvider(constructor, trace);
+        ControlFlowInformationProvider controlFlowInformationProvider = new ControlFlowInformationProvider(
+                constructor, trace, treatAsExternalRule);
         controlFlowInformationProvider.checkDeclaration();
         controlFlowInformationProvider.checkFunction(builtIns.getUnitType());
     }
@@ -76,8 +83,8 @@ public class ControlFlowAnalyzer {
     private void checkDeclarationContainer(@NotNull BodiesResolveContext c, KtDeclarationContainer declarationContainer) {
         // A pseudocode of class/object initialization corresponds to a class/object
         // or initialization of properties corresponds to a package declared in a file
-        ControlFlowInformationProvider
-                controlFlowInformationProvider = new ControlFlowInformationProvider((KtElement) declarationContainer, trace);
+        ControlFlowInformationProvider controlFlowInformationProvider = new ControlFlowInformationProvider(
+                (KtElement) declarationContainer, trace, treatAsExternalRule);
         if (c.getTopDownAnalysisMode().isLocalDeclarations()) {
             controlFlowInformationProvider.checkForLocalClassOrObjectMode();
             return;
@@ -98,7 +105,8 @@ public class ControlFlowAnalyzer {
 
     private void checkFunction(@NotNull BodiesResolveContext c, @NotNull KtDeclarationWithBody function, @Nullable KotlinType expectedReturnType) {
         if (!function.hasBody()) return;
-        ControlFlowInformationProvider controlFlowInformationProvider = new ControlFlowInformationProvider(function, trace);
+        ControlFlowInformationProvider controlFlowInformationProvider = new ControlFlowInformationProvider(
+                function, trace, treatAsExternalRule);
         if (c.getTopDownAnalysisMode().isLocalDeclarations()) {
             controlFlowInformationProvider.checkForLocalClassOrObjectMode();
             return;

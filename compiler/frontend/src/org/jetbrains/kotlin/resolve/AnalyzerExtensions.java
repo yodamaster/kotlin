@@ -22,6 +22,7 @@ import org.jetbrains.kotlin.psi.KtCallableDeclaration;
 import org.jetbrains.kotlin.psi.KtNamedFunction;
 import org.jetbrains.kotlin.psi.KtProperty;
 import org.jetbrains.kotlin.resolve.inline.InlineAnalyzerExtension;
+import org.jetbrains.kotlin.resolve.inline.InlineApplicabilityRule;
 import org.jetbrains.kotlin.resolve.inline.InlineUtil;
 
 import java.util.Collections;
@@ -29,6 +30,8 @@ import java.util.List;
 import java.util.Map;
 
 public class AnalyzerExtensions {
+    @NotNull
+    private final InlineAnalyzerExtension inlineAnalyzerExtension;
 
     public interface AnalyzerExtension {
         void process(@NotNull CallableMemberDescriptor descriptor, @NotNull KtCallableDeclaration functionOrProperty, @NotNull BindingTrace trace);
@@ -36,8 +39,9 @@ public class AnalyzerExtensions {
 
     @NotNull private final BindingTrace trace;
 
-    public AnalyzerExtensions(@NotNull BindingTrace trace) {
+    public AnalyzerExtensions(@NotNull BindingTrace trace, @NotNull Iterable<InlineApplicabilityRule> inlineApplicabilityRules) {
         this.trace = trace;
+        inlineAnalyzerExtension = new InlineAnalyzerExtension(inlineApplicabilityRules);
     }
 
     public void process(@NotNull BodiesResolveContext bodiesResolveContext) {
@@ -61,17 +65,17 @@ public class AnalyzerExtensions {
     }
 
     @NotNull
-    private static List<InlineAnalyzerExtension> getFunctionExtensions(@NotNull FunctionDescriptor functionDescriptor) {
+    private List<InlineAnalyzerExtension> getFunctionExtensions(@NotNull FunctionDescriptor functionDescriptor) {
         if (InlineUtil.isInline(functionDescriptor)) {
-            return Collections.singletonList(InlineAnalyzerExtension.INSTANCE);
+            return Collections.singletonList(inlineAnalyzerExtension);
         }
         return Collections.emptyList();
     }
 
     @NotNull
-    private static List<InlineAnalyzerExtension> getPropertyExtensions(@NotNull PropertyDescriptor propertyDescriptor) {
+    private List<InlineAnalyzerExtension> getPropertyExtensions(@NotNull PropertyDescriptor propertyDescriptor) {
         if (InlineUtil.hasInlineAccessors(propertyDescriptor)) {
-            return Collections.singletonList(InlineAnalyzerExtension.INSTANCE);
+            return Collections.singletonList(inlineAnalyzerExtension);
         }
         return Collections.emptyList();
     }

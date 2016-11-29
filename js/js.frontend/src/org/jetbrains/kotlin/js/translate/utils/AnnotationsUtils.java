@@ -27,8 +27,6 @@ import org.jetbrains.kotlin.name.FqName;
 import org.jetbrains.kotlin.resolve.DescriptorUtils;
 import org.jetbrains.kotlin.resolve.constants.ConstantValue;
 
-import javax.management.Descriptor;
-
 public final class AnnotationsUtils {
     private static final String JS_NAME = "kotlin.js.JsName";
 
@@ -123,7 +121,21 @@ public final class AnnotationsUtils {
     }
 
     private static boolean isEffectivelyExternal(@NotNull DeclarationDescriptor descriptor) {
-        return descriptor instanceof MemberDescriptor && DescriptorUtils.isEffectivelyExternal((MemberDescriptor) descriptor);
+        return descriptor instanceof MemberDescriptor && isEffectivelyExternal((MemberDescriptor) descriptor);
+    }
+
+    private static boolean isEffectivelyExternal(@NotNull MemberDescriptor descriptor) {
+        if (descriptor.isExternal()) return true;
+
+        if (descriptor instanceof FunctionDescriptor && ((FunctionDescriptor) descriptor).isInline()) return false;
+
+        if (descriptor instanceof PropertyAccessorDescriptor) {
+            PropertyDescriptor variableDescriptor = ((PropertyAccessorDescriptor) descriptor).getCorrespondingProperty();
+            if (isEffectivelyExternal(variableDescriptor)) return true;
+        }
+
+        ClassDescriptor containingClass = DescriptorUtils.getContainingClass(descriptor);
+        return containingClass != null && isEffectivelyExternal(containingClass);
     }
 
     public static boolean isLibraryObject(@NotNull DeclarationDescriptor descriptor) {

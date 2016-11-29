@@ -20,6 +20,7 @@ import org.jetbrains.kotlin.container.StorageComponentContainer
 import org.jetbrains.kotlin.container.useImpl
 import org.jetbrains.kotlin.container.useInstance
 import org.jetbrains.kotlin.platform.JavaToKotlinClassMap
+import org.jetbrains.kotlin.resolve.TreatAsExternalWhenModifierPresentsRule
 import org.jetbrains.kotlin.resolve.PlatformConfigurator
 import org.jetbrains.kotlin.resolve.checkers.PlatformImplDeclarationChecker
 import org.jetbrains.kotlin.resolve.jvm.JvmOverloadFilter
@@ -84,5 +85,6 @@ object JvmPlatformConfigurator : PlatformConfigurator(
         container.useImpl<JavaSyntheticScopes>()
         container.useInstance(JavaSyntheticConstructorsProvider)
         container.useInstance(JvmTypeSpecificityComparator)
+        container.useInstance(TreatAsExternalWhenModifierPresentsRule)
     }
 }

@@ -52,7 +52,8 @@ class ResolveElementCache(
         private val resolveSession: ResolveSession,
         private val project: Project,
         private val targetPlatform: TargetPlatform,
-        private val codeFragmentAnalyzer: CodeFragmentAnalyzer
+        private val codeFragmentAnalyzer: CodeFragmentAnalyzer,
+        private val treatAsExternalRule: TreatAsExternalRule
 ) : BodyResolveCache {
     private class CachedFullResolve(val bindingContext: BindingContext, resolveElement: KtElement) {
         private val modificationStamp: Long? = modificationStamp(resolveElement)
@@ -346,7 +347,7 @@ class ResolveElementCache(
         }
 
         val controlFlowTrace = DelegatingBindingTrace(trace.bindingContext, "Element control flow resolve", resolveElement)
-        ControlFlowInformationProvider(resolveElement, controlFlowTrace).checkDeclaration()
+        ControlFlowInformationProvider(resolveElement, controlFlowTrace, treatAsExternalRule).checkDeclaration()
         controlFlowTrace.addOwnDataTo(trace, null, false)
 
         return Pair(trace.bindingContext, statementFilterUsed)
@@ -482,7 +483,7 @@ class ResolveElementCache(
         forceResolveAnnotationsInside(property)
 
         for (accessor in property.accessors) {
-            ControlFlowInformationProvider(accessor, trace).checkDeclaration()
+            ControlFlowInformationProvider(accessor, trace, treatAsExternalRule).checkDeclaration()
         }
 
         return trace
