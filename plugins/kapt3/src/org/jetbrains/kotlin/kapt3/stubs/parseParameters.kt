@@ -18,6 +18,7 @@ package org.jetbrains.kotlin.kapt3.stubs
 
 import org.jetbrains.kotlin.kapt3.util.isAbstract
 import org.jetbrains.kotlin.kapt3.util.isEnum
+import org.jetbrains.kotlin.kapt3.util.isJvmOverloadsGenerated
 import org.jetbrains.kotlin.kapt3.util.isStatic
 import org.jetbrains.org.objectweb.asm.Type
 import org.jetbrains.org.objectweb.asm.tree.AnnotationNode
@@ -36,6 +37,8 @@ internal fun MethodNode.getParametersInfo(containingClass: ClassNode): List<Para
     val localVariables = this.localVariables ?: emptyList()
     val parameters = this.parameters ?: emptyList()
     val isStatic = isStatic(access)
+    val isJvmOverloads = this.isJvmOverloadsGenerated()
+    val isConstructor = this.name == "<init>"
 
     // First and second parameters in enum constructors are synthetic, we should ignore them
     val isEnumConstructor = (name == "<init>") && containingClass.isEnum()
@@ -53,7 +56,15 @@ internal fun MethodNode.getParametersInfo(containingClass: ClassNode): List<Para
         else
             null
 
-        name = name ?: localVariables.getOrNull(index + (if (isStatic) 0 else 1))?.name
+        val localVariableIndexOffset = when {
+            isStatic -> 0
+            isConstructor && !isJvmOverloads -> 1
+            isJvmOverloads -> 0
+            else -> 1
+        }
+
+        // @JvmOverloads constructors and ordinary methods don't have "this" local variable
+        name = name ?: localVariables.getOrNull(index + localVariableIndexOffset)?.name
                    ?: "p${index - startParameterIndex}"
 
         // Property setters has bad parameter names

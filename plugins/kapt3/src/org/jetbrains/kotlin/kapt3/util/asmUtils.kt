@@ -16,7 +16,9 @@
 
 package org.jetbrains.kotlin.kapt3.util
 
+import org.jetbrains.kotlin.codegen.DefaultParameterValueSubstitutor
 import org.jetbrains.org.objectweb.asm.Opcodes
+import org.jetbrains.org.objectweb.asm.tree.AnnotationNode
 import org.jetbrains.org.objectweb.asm.tree.ClassNode
 import org.jetbrains.org.objectweb.asm.tree.MethodNode
 
@@ -31,3 +33,12 @@ internal fun ClassNode.isAnnotation() = (access and Opcodes.ACC_ANNOTATION) != 0
 internal fun MethodNode.isVarargs() = (access and Opcodes.ACC_VARARGS) != 0
 
 internal fun <T> List<T>?.isNullOrEmpty() = this == null || this.isEmpty()
+
+internal fun MethodNode.isJvmOverloadsGenerated(): Boolean {
+    return (invisibleAnnotations?.any { it.isJvmOverloadsGenerated() } ?: false)
+           || (visibleAnnotations?.any { it.isJvmOverloadsGenerated() } ?: false)
+}
+
+private fun AnnotationNode.isJvmOverloadsGenerated(): Boolean {
+    return this.desc == DefaultParameterValueSubstitutor.ANNOTATION_TYPE_DESCRIPTOR_FOR_GENERATED_METHODS
+}
