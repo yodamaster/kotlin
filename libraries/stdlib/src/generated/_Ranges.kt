@@ -870,26 +870,33 @@ public fun Double.coerceIn(minimumValue: Double, maximumValue: Double): Double {
  */
 public fun <T: Comparable<T>> T.coerceIn(range: ClosedRange<T>): T {
     if (range.isEmpty()) throw IllegalArgumentException("Cannot coerce value to an empty range: $range.")
+    ignoreAbstractMethodError {
+        return when {
+            !range.greaterThanOrEquals(this, range.start) -> range.start
+            !range.lessThanOrEquals(this, range.endInclusive) -> range.endInclusive
+            else -> this
+        }
+    }
     return if (this < range.start) range.start else if (this > range.endInclusive) range.endInclusive else this
 }
 
 /**
  * Ensures that this value lies in the specified [range].
- * 
+ *
  * @return this value if it's in the [range], or range.start if this value is less than range.start, or range.end if this value is greater than range.end.
  */
 public fun Int.coerceIn(range: ClosedRange<Int>): Int {
-    if (range.isEmpty()) throw IllegalArgumentException("Cannot coerce value to an empty range: $range.")
-    return if (this < range.start) range.start else if (this > range.endInclusive) range.endInclusive else this
+    // TODO: if (range is IntRange) // specialization
+    return (this as Comparable<Any>).coerceIn(range as ClosedRange<Comparable<Any>>) as Int
 }
 
 /**
  * Ensures that this value lies in the specified [range].
- * 
+ *
  * @return this value if it's in the [range], or range.start if this value is less than range.start, or range.end if this value is greater than range.end.
  */
 public fun Long.coerceIn(range: ClosedRange<Long>): Long {
-    if (range.isEmpty()) throw IllegalArgumentException("Cannot coerce value to an empty range: $range.")
-    return if (this < range.start) range.start else if (this > range.endInclusive) range.endInclusive else this
+    // TODO: if (range is IntRange) // specialization
+    return (this as Comparable<Any>).coerceIn(range as ClosedRange<Comparable<Any>>) as Long
 }
 

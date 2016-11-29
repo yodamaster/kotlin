@@ -59,12 +59,26 @@ fun comparables(): List<GenericFunction> {
             @return this value if it's in the [range], or range.start if this value is less than range.start, or range.end if this value is greater than range.end.
             """
         }
-        body {
+        body(Generic) {
             """
             if (range.isEmpty()) throw IllegalArgumentException("Cannot coerce value to an empty range: ${'$'}range.")
+            ignoreAbstractMethodError {
+                return when {
+                    !range.greaterThanOrEquals(this, range.start) -> range.start
+                    !range.lessThanOrEquals(this, range.endInclusive) -> range.endInclusive
+                    else -> this
+                }
+            }
             return if (this < range.start) range.start else if (this > range.endInclusive) range.endInclusive else this
             """
         }
+        body(Primitives) {
+            """
+            // TODO: if (range is IntRange) // specialization
+            return (this as Comparable<Any>).coerceIn(range as ClosedRange<Comparable<Any>>) as SELF
+            """
+        }
+
     }
 
     templates add f("coerceIn(minimumValue: SELF, maximumValue: SELF)") {

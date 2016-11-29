@@ -97,16 +97,21 @@ public operator fun <T: Comparable<T>> T.rangeTo(that: T): ClosedRange<T> = Comp
  * Creates a range from this [Double] value to the specified [other] value.
  */
 @SinceKotlin("1.1")
-public operator fun Double.rangeTo(that: Double): ClosedComparableRange<Double> = ClosedDoubleRange(this, that)
+public operator fun Double.rangeTo(that: Double): ClosedRange<Double> = ClosedDoubleRange(this, that)
 
 /**
  * Creates a range from this [Float] value to the specified [other] value.
  */
 @JvmVersion
 @SinceKotlin("1.1")
-public operator fun Float.rangeTo(that: Float): ClosedComparableRange<Float> = ClosedFloatRange(this, that)
+public operator fun Float.rangeTo(that: Float): ClosedRange<Float> = ClosedFloatRange(this, that)
 
 
 internal fun checkStepIsPositive(isPositive: Boolean, step: Number) {
     if (!isPositive) throw IllegalArgumentException("Step must be positive, was: $step.")
 }
+
+@JvmVersion
+internal inline fun ignoreAbstractMethodError(f: () -> Unit) =
+    try { f() } catch (e: AbstractMethodError) {}
+
