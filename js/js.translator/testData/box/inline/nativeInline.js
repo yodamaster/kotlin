@@ -4,6 +4,9 @@ function A(y) {
 A.prototype.f = function(x) {
     return "A.f(" + (x + this.y) + ")";
 };
+A.prototype.v = function() {
+    return arguments.length + this.y;
+};
 
 var O = {
     f: function(x) {

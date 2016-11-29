@@ -5,6 +5,12 @@ external class A(y: Int) {
 
     inline val h: String
         get() = g(3)
+
+    fun v(vararg args: Any): Int
+
+    inline fun w(vararg args: Any) = v(*args) * 2
+
+    inline fun u() = v(2, 3) * 2
 }
 
 external object O {
@@ -32,6 +38,12 @@ fun box(): String {
 
     result = O.P.g(4)
     if (result != "[O.P.f(4)]") return "fail: nested object: $result"
+
+    var intResult = A(1).w(1, 2, 3, 4, 5)
+    if (intResult != 12) return "fail: vararg spread: $intResult"
+
+    intResult = A(1).u()
+    if (intResult != 6) return "fail: vararg: $intResult"
 
     return "OK"
 }

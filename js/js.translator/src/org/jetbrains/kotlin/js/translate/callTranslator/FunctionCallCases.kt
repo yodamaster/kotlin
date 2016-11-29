@@ -49,12 +49,17 @@ fun CallArgumentTranslator.ArgumentsInfo.argsWithReceiver(receiver: JsExpression
 object DefaultFunctionCallCase : FunctionCallCase() {
     // TODO: refactor after fix ArgumentsInfo - duplicate code
     private fun nativeSpreadFunWithDispatchOrExtensionReceiver(
+            dispatchReceiver: JsExpression?,
             argumentsInfo: CallArgumentTranslator.ArgumentsInfo,
             functionName: JsName
     ): JsExpression {
-        val cachedReceiver = argumentsInfo.cachedReceiver!!
-        val functionCallRef = Namer.getFunctionApplyRef(JsNameRef(functionName, cachedReceiver.assignmentExpression()))
-        return JsInvocation(functionCallRef, argumentsInfo.translateArguments)
+        val receiver = (argumentsInfo.cachedReceiver?.assignmentExpression() ?: dispatchReceiver)!!
+        val arguments = argumentsInfo.translateArguments.toMutableList()
+        if (dispatchReceiver != null && arguments[0] == JsLiteral.NULL) {
+            arguments[0] = dispatchReceiver
+        }
+        val functionCallRef = Namer.getFunctionApplyRef(JsNameRef(functionName, receiver))
+        return JsInvocation(functionCallRef, arguments)
     }
 
     fun buildDefaultCallWithDispatchReceiver(argumentsInfo: CallArgumentTranslator.ArgumentsInfo,
@@ -63,7 +68,7 @@ object DefaultFunctionCallCase : FunctionCallCase() {
                                        isNative: Boolean,
                                        hasSpreadOperator: Boolean): JsExpression {
         if (isNative && hasSpreadOperator) {
-            return nativeSpreadFunWithDispatchOrExtensionReceiver(argumentsInfo, functionName)
+            return nativeSpreadFunWithDispatchOrExtensionReceiver(dispatchReceiver, argumentsInfo, functionName)
         }
         return JsInvocation(pureFqn(functionName, dispatchReceiver), argumentsInfo.translateArguments)
     }
@@ -92,7 +97,7 @@ object DefaultFunctionCallCase : FunctionCallCase() {
 
     override fun FunctionCallInfo.extensionReceiver(): JsExpression {
         if (isNative() && hasSpreadOperator()) {
-            return nativeSpreadFunWithDispatchOrExtensionReceiver(argumentsInfo, functionName)
+            return nativeSpreadFunWithDispatchOrExtensionReceiver(null, argumentsInfo, functionName)
         }
         if (isNative()) {
             return JsInvocation(JsNameRef(functionName, extensionReceiver), argumentsInfo.translateArguments)
