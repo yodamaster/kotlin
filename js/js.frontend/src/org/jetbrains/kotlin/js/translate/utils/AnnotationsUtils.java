@@ -27,8 +27,6 @@ import org.jetbrains.kotlin.name.FqName;
 import org.jetbrains.kotlin.resolve.DescriptorUtils;
 import org.jetbrains.kotlin.resolve.constants.ConstantValue;
 
-import javax.management.Descriptor;
-
 public final class AnnotationsUtils {
     private static final String JS_NAME = "kotlin.js.JsName";
 
