@@ -34,10 +34,19 @@ public interface ClosedRange<T: Comparable<T>> {
     /**
      * Checks whether the specified [value] belongs to the range.
      */
-    public operator fun contains(value: T): Boolean = value >= start && value <= endInclusive
+    public operator fun contains(value: T): Boolean = greaterThanOrEquals(value, start) && lessThanOrEquals(value, endInclusive)
 
     /**
      * Checks whether the range is empty.
      */
-    public fun isEmpty(): Boolean = start > endInclusive
+    public fun isEmpty(): Boolean = !lessThanOrEquals(start, endInclusive)
+
+    /**
+     * Compares two values of range domain type and returns true if first is less than or equal to second
+     */
+    public fun lessThanOrEquals(a: T, b: T): Boolean = a <= b
+    /**
+     * Compares two values of range domain type and returns true if first is greater than or equal to second
+     */
+    public fun greaterThanOrEquals(a: T, b: T): Boolean = a >= b
 }

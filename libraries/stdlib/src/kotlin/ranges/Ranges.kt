@@ -2,14 +2,6 @@
 @file:kotlin.jvm.JvmName("RangesKt")
 package kotlin.ranges
 
-public interface ClosedComparableRange<T: Comparable<T>> : ClosedRange<T> {
-    override fun contains(value: T): Boolean = greaterThanOrEquals(start, value) && lessThanOrEquals(value, endInclusive)
-    override fun isEmpty(): Boolean = !lessThanOrEquals(start, endInclusive)
-
-    fun lessThanOrEquals(a: T, b: T): Boolean
-    fun greaterThanOrEquals(a: T, b: T): Boolean
-}
-
 /**
  * Represents a range of [Comparable] values.
  */
@@ -38,7 +30,7 @@ private open class ComparableRange<T: Comparable<T>> (
 private class ClosedDoubleRange (
         start: Double,
         endInclusive: Double
-) : ClosedComparableRange<Double> {
+) : ClosedRange<Double> {
     private val _start = start
     private val _endInclusive = endInclusive
     override val start: Double get() = _start
@@ -71,7 +63,7 @@ private class ClosedDoubleRange (
 private class ClosedFloatRange (
         start: Float,
         endInclusive: Float
-): ClosedComparableRange<Float> {
+): ClosedRange<Float> {
     private val _start = start
     private val _endInclusive = endInclusive
     override val start: Float get() = _start
