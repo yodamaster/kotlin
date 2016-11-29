@@ -6108,6 +6108,12 @@ public class IntentionTestGenerated extends AbstractIntentionTest {
             doTest(fileName);
         }
 
+        @TestMetadata("implicitReceiver.kt")
+        public void testImplicitReceiver() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("idea/testData/intentions/convertTryFinallyToUseCall/implicitReceiver.kt");
+            doTest(fileName);
+        }
+
         @TestMetadata("notClose.kt")
         public void testNotClose() throws Exception {
             String fileName = KotlinTestUtils.navigationMetadata("idea/testData/intentions/convertTryFinallyToUseCall/notClose.kt");
@@ -6123,6 +6129,12 @@ public class IntentionTestGenerated extends AbstractIntentionTest {
         @TestMetadata("simple.kt")
         public void testSimple() throws Exception {
             String fileName = KotlinTestUtils.navigationMetadata("idea/testData/intentions/convertTryFinallyToUseCall/simple.kt");
+            doTest(fileName);
+        }
+
+        @TestMetadata("this.kt")
+        public void testThis() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("idea/testData/intentions/convertTryFinallyToUseCall/this.kt");
             doTest(fileName);
         }
 
